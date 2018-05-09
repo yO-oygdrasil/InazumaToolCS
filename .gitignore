@@ -1,3 +1,5 @@
-/.vs/InazumaToolCS/v15
-/InazumaToolCS/obj/Debug
-/InazumaToolCS/Properties
+/.vs/InazumaTool/v15
+/InazumaTool/obj
+/InazumaTool/Properties
+/InazumaTool/bin/Debug
+/InazumaTool/bin/x64/Release
