@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 using Autodesk.Maya.OpenMaya;
@@ -192,7 +193,12 @@ namespace InazumaTool.BasicTools
         public static MDagPath CreateCircle(string ctlName)
         {
             string resultStr = MGlobal.executePythonCommandStringResult("cmds.circle(n='" + ctlName + "')");
+            //string resultStr = MGlobal.executeCommandStringResult("circle -n " + ctlName);
             string[] resultArr = SplitPythonResultStr(resultStr);
+            for (int i = 0; i < resultArr.Length; i++)
+            {
+                MGlobal.displayInfo(resultArr[i]);
+            }
             return GetDagPathByName(resultArr[0]);
         }
 
@@ -309,12 +315,7 @@ k=[0,1,2,3,4,5,6,7,8,9,10,11,12])");
 
         public static string SubUShell(string originStr)
         {
-            originStr.Replace("[u'", "");
-            originStr.Replace("u'", "");
-            originStr.Replace("']", "");
-            originStr.Replace("'", "");
-            originStr.Replace(" ", "");
-            return originStr;
+            return originStr.Replace("[u'", "").Replace("'", "").Replace(" ", "").Replace("]", "");
         }
 
         public static string[] SplitPythonResultStr(string pythonStr)
@@ -323,6 +324,7 @@ k=[0,1,2,3,4,5,6,7,8,9,10,11,12])");
             for (int i = 0; i < result.Length; i++)
             {
                 result[i] = SubUShell(result[i]);
+                MGlobal.displayInfo(result[i]);
             }
             return result;
         }
