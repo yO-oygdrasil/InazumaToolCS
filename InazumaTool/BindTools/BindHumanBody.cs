@@ -236,7 +236,7 @@ namespace InazumaTool.BindTools
 
             }
 
-            return BasicFunc.GetDagPathByName(resultArr[0]);
+            return null;// BasicFunc.GetDagPathByName(resultArr[0]);
         }
 
 

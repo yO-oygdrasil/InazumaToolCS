@@ -188,6 +188,7 @@ namespace InazumaTool.BasicTools
             return true;
         }
 
+        //error here
         public static MDagPath CreateCircle(string ctlName)
         {
             string resultStr = MGlobal.executePythonCommandStringResult("cmds.circle(n='" + ctlName + "')");
