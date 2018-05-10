@@ -102,27 +102,20 @@ namespace InazumaTool.BindTools
 #endregion
 
 #region RPIK
-
-
-        public static bool AddRPIKPole(MDagPath locDagPath)
+                
+        public static MDagPath AddRPIKPole(MDagPath middleDagPath = null)
         {
-            MObject selected = BasicFunc.GetSelectedObject(0);
-            return AddRPIKPole(locDagPath, selected);
-        }
-
-        public static bool AddRPIKPole(MDagPath locDagPath, MObject middleObject)
-        {
-            MDagPath middleDagPath = new MDagPath();
-            if (middleObject.hasFn(MFn.Type.kDagNode))
-            {                
-                MDagPath.getAPathTo(middleObject, middleDagPath);
+            if (middleDagPath == null)
+            {
+                middleDagPath = BasicFunc.GetSelectedDagPath(0);
+                if (middleDagPath == null)
+                {
+                    MGlobal.displayInfo("please select middle joint");
+                    return null;
+                }
             }
-            return AddRPIKPole(locDagPath, middleDagPath);
-        }
-
-        public static bool AddRPIKPole(MDagPath locDagPath, MDagPath middleDagPath)
-        {
-            MDagPath rootDagPath = null, endDagPath = null;
+            
+            MDagPath rootDagPath = new MDagPath(), endDagPath = new MDagPath();
             MFnIkJoint middleJoint = new MFnIkJoint(middleDagPath);
             if (middleJoint.parentCount > 0)
             {
@@ -135,25 +128,28 @@ namespace InazumaTool.BindTools
                     MVector rootPos = rootJoint.getTranslation(MSpace.Space.kWorld);
                     MVector middlePos = middleJoint.getTranslation(MSpace.Space.kWorld);
                     MVector endPos = endJoint.getTranslation(MSpace.Space.kWorld);
+                    
 
-                    double len0 = (middlePos - rootPos).length;
-                    double len1 = (endPos - middlePos).length;
-                    MVector nmPos = (rootPos * len0 + endPos * len1) * (1 / (len0 + len1));
+                    //double len0 = (middlePos - rootPos).length;
+                    //double len1 = (endPos - middlePos).length;
+
+                    MVector fitLinePos = (rootPos + endPos) * 0.5;
+                    MVector direct_pole = middlePos - fitLinePos;
+                    MVector direct_fitLine = rootPos - endPos;
+                    MVector direct_projectPolePos = BasicFunc.VerticalProject(direct_pole, direct_fitLine).normal;
+
+                    //MVector nmPos = (rootPos * len0 + endPos * len1) * (1 / (len0 + len1));
                     float factor = 2;
-                    MVector polePos = factor * middlePos - nmPos;
-
+                    MVector polePos = factor * direct_projectPolePos + middlePos;
+                    
                     string locName = "loc_" + rootJoint.name + "_" + endJoint.name;
-                    return BasicFunc.CreateLocator(locDagPath, polePos, locName);
+                    return BasicFunc.CreateLocator(polePos, locName);
                 }
             }
-            return false;
+            return null;
         }
 
-
-
-
-
-
+        
         public static MDagPath BindRPIK()
         {
             MSelectionList selected = new MSelectionList();
@@ -189,29 +185,17 @@ namespace InazumaTool.BindTools
 
         public static MDagPath BindRPIK(MDagPath rootDagPath, MDagPath endDagPath, MDagPath ctlDagPath)
         {
-            /*MFnIkHandle* ikHandle = new MFnIkHandle;
-            MStatus status;
-            ikHandle.create(rootObject, endObject, &status);
-
-            if (status == MStatus::kSuccess)
-            {
-                MGlobal.displayInfo("successsssssss" + ikHandle.name());
-            }
-            ikHandle.findPlug("");
-            MFnIkSolver solver(ikHandle.solver());*/
-            //solver
-
             //string resultStr = MGlobal.executeCommandStringResult("ikHandle -sj " + rootObject.fullPathName() + " -ee " + endObject.fullPathName() + " -sol ikRPsolver -n ik_" + rootObject.partialPathName() + "_" + endObject.partialPathName(),true);
             string resultStr = MGlobal.executePythonCommandStringResult("cmds.ikHandle(sj='" + rootDagPath.fullPathName + "',ee='" + endDagPath.fullPathName + "',sol='ikRPsolver',n='ik_" + rootDagPath.partialPathName + "_" + endDagPath.partialPathName + "')");
 
             //[u'ik_joint1_joint4', u'effector1']
             string[] resultArr = BasicFunc.SplitPythonResultStr(resultStr);
-            MGlobal.displayInfo("begin test");
-            for (int i = 0; i < resultArr.Length; i++)
-            {
-                MGlobal.displayInfo(i + ":" + resultArr[i]);
-            }
-            MGlobal.displayInfo("end test");
+            //MGlobal.displayInfo("begin test");
+            //for (int i = 0; i < resultArr.Length; i++)
+            //{
+            //    MGlobal.displayInfo(i + ":" + resultArr[i]);
+            //}
+            //MGlobal.displayInfo("end test");
 
             //MGlobal.displayInfo(resultStr);
             /*for (int i = 0; i < msa.length(); i++)
@@ -225,8 +209,8 @@ namespace InazumaTool.BindTools
                 MGlobal.displayInfo(ikDagPath.fullPathName());
             }*/
             MDagPath middleObject = MDagPath.getAPathTo(rootDagPath.child(0));
-            MDagPath locDagPath =new MDagPath();
-            if (AddRPIKPole(locDagPath, middleObject))
+            MDagPath locDagPath = AddRPIKPole(middleObject);
+            if (locDagPath != null)
             {
                 BasicFunc.FreezeTransform(new MFnTransform(locDagPath));
                 //begin to add constriant

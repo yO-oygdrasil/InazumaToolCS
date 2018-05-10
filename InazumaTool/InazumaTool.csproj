@@ -48,7 +48,8 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="openmayacs">
+    <Reference Include="openmayacs, Version=18.0.0.5870, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\mayaDlls\openmayacs.dll</HintPath>
     </Reference>
     <Reference Include="System" />
@@ -63,6 +64,7 @@
   <ItemGroup>
     <Compile Include="BasicTools\BasicFunc.cs" />
     <Compile Include="BasicTools\ConstantValue.cs" />
+    <Compile Include="BasicTools\DynamicConverter.cs" />
     <Compile Include="BasicTools\JointProcess.cs" />
     <Compile Include="BindTools\BindHumanBody.cs" />
     <Compile Include="InazumaToolEntrance.cs" />

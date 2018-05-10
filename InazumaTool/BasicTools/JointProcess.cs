@@ -129,8 +129,10 @@ namespace InazumaTool.BasicTools
         {
             //begin convert curve to dynamic
             MDagPath curveDagPath = CreateJointsCurve(jointDagPaths);
+            string cmdStr = "cmds.makeCurveDynamic(0,0,0,1,0)";
+            string resultStr = MGlobal.executePythonCommandStringResult(cmdStr);
 
-            string resultStr = MGlobal.executeCommandStringResult("makeCurvesDynamic 2 {\"0\",\"0\",\"0\",\"1\",\"0\"}");
+            //string resultStr = MGlobal.executeCommandStringResult("makeCurvesDynamic 2 {\"0\",\"0\",\"0\",\"1\",\"0\"}");
             MGlobal.displayInfo("message" + resultStr);
         }
 
