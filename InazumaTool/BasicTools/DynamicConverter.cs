@@ -39,6 +39,9 @@ namespace InazumaTool.BasicTools
                 if (follicleDagPath.hasFn(MFn.Type.kFollicle))
                 {
                     MGlobal.displayInfo("follicle exist!");
+                    BasicFunc.Select(follicleDagPath);
+
+
 
 
                 }
@@ -49,5 +52,27 @@ namespace InazumaTool.BasicTools
             return curveDagPath;
         }
 
+        public enum HairSelectionType
+        {
+            Follicles,
+            HairSystem,
+            StartCurves,
+            OutputCurves
+        }
+
+        
+
+        public static void ConvertHairSelection()
+        {
+            //MGlobal.executeCommand("convertHairSelection \"current\"");
+
+            MPlug plug = new MPlug();
+
+            //plug.destinations
+
+
+        }
     }
+
+
 }
