@@ -156,5 +156,43 @@ namespace InazumaTool.BasicTools
             MVector worldPos = targetPosJoint.getTranslation(MSpace.Space.kWorld);
             return CreateJoint(worldPos, jtName);
         }
+
+        public enum IKSolverType
+        {
+            SingleChain,
+            RotatePlane,
+            Spline
+        }
+        public static string[] AddIKHandle(MDagPath startJointDagPath, MDagPath endJointDagPath, IKSolverType solverType = IKSolverType.RotatePlane, string curveName = "")
+        {
+            string typeStr = "";
+            string resultStr = "";
+            switch (solverType)
+            {
+                case IKSolverType.SingleChain:
+                    {
+                        typeStr = "ikSCsolver";
+                        resultStr = MGlobal.executePythonCommandStringResult("cmds.ikHandle(sj='" + startJointDagPath.fullPathName + "',ee='" + endJointDagPath.fullPathName + "',sol='" + typeStr + "',n='ik_" + startJointDagPath.partialPathName + "_" + endJointDagPath.partialPathName + "')");
+                        break;
+                    }
+                case IKSolverType.RotatePlane:
+                    {
+                        typeStr = "ikRPsolver";
+                        resultStr = MGlobal.executePythonCommandStringResult("cmds.ikHandle(sj='" + startJointDagPath.fullPathName + "',ee='" + endJointDagPath.fullPathName + "',sol='" + typeStr + "',n='ik_" + startJointDagPath.partialPathName + "_" + endJointDagPath.partialPathName + "')");
+                        break;
+                    }
+                case IKSolverType.Spline:
+                    {
+                        typeStr = "ikSplineSolver";
+                        resultStr = MGlobal.executePythonCommandStringResult("cmds.ikHandle(sj='" + startJointDagPath.fullPathName + "',ee='" + endJointDagPath.fullPathName + "',sol='" + typeStr + "',c='" + curveName + "',n='ik_" + startJointDagPath.partialPathName + "_" + endJointDagPath.partialPathName + "')");
+                        break;
+                    }
+            }
+            
+            //[u'ik_joint1_joint4', u'effector1']
+            string[] resultArr = BasicFunc.SplitPythonResultStr(resultStr);
+
+            return resultArr;
+        }
     }
 }

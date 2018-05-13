@@ -62,13 +62,13 @@ namespace InazumaTool.BasicTools
 
         
 
-        public static void ConvertHairSelection()
+        public static void ConvertHairSelection(MDagPath dagPath)
         {
             //MGlobal.executeCommand("convertHairSelection \"current\"");
 
             MPlug plug = new MPlug();
 
-            //plug.destinations
+            
 
 
         }

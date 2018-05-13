@@ -162,12 +162,6 @@ namespace InazumaTool.BasicTools
             return mDagPath;
         }
 
-        public static MDagPath GetDestinations(MPlug plug)
-        {
-
-            return null;
-        }
-
 
         #endregion
 
