@@ -80,7 +80,7 @@ namespace InazumaTool.BasicTools
             List<CommandData> cmdList = new List<CommandData>();
             cmdList.Add(new CommandData("Bind", cmdStr, "curveToHair", "convert curve to hair", () =>
             {
-                DynamicConverter.CurveToHair();
+                CurveToHair();
             }));
             return cmdList;
         }

@@ -97,6 +97,7 @@ namespace InazumaTool
             cds.AddRange(BindHumanBody.GetCommandDatas());
             cds.AddRange(DynamicConverter.GetCommandDatas());
             cds.AddRange(JointProcess.GetCommandDatas());
+            cds.AddRange(MaterialManage.GetCommandDatas());
             foreach (CommandData cd in cds)
             {
                 AddOneCommand(cd);

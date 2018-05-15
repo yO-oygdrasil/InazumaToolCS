@@ -24,19 +24,26 @@ namespace InazumaTool.BasicTools
             plug.destinations(destPlugs);
             BasicFunc.PrintPlugs(destPlugs);
 
-
+            MSelectionList newSelection = new MSelectionList();
+            for (int i = 0; i < destPlugs.length; i++)
+            {
+                newSelection.add(destPlugs[i]);
+            }
+            BasicFunc.Select(newSelection);
             return 0;
         }
 
-        //public static int SelectMaterialWithSameTex(MImage img)
-        //{
-            
-
-
-        //    return null;
-        //}
-
-
+        
+        const string cmdStr = "MaterialManage";
+        public static List<CommandData> GetCommandDatas()
+        {
+            List<CommandData> cmdList = new List<CommandData>();
+            cmdList.Add(new CommandData("Select", cmdStr, "matsWithSameTex", "Select Materials With Same Tex", () =>
+            {
+                SelectMaterialWithSameTex(BasicFunc.GetSelectedObject(0));
+            }));
+            return cmdList;
+        }
 
     }
 }
