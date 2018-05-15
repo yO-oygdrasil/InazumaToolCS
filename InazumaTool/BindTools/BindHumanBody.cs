@@ -10,10 +10,10 @@ using Autodesk.Maya.OpenMayaAnim;
 
 namespace InazumaTool.BindTools
 {
-    public class BindHumanBody
+    public static class BindHumanBody
     {
 
-#region Finger
+        #region Finger
 
         public static bool BindFinger(MDagPath rootJointDagPath, string fingerTag, bool useIK = false)
         {
@@ -50,11 +50,11 @@ namespace InazumaTool.BindTools
             {
                 MDagPath ctlDagPath = BasicFunc.AddParentCircle(rootJointDagPath, true);
                 MFnDependencyNode remapNode_root = BasicFunc.CreateRemapValueNode(-2, 3, 60, -90);
-                MFnDependencyNode remapNode_rootSide = BasicFunc.CreateRemapValueNode(-1, 1, 30, -30); 
+                MFnDependencyNode remapNode_rootSide = BasicFunc.CreateRemapValueNode(-1, 1, 30, -30);
                 MFnDependencyNode remapNode_middle = BasicFunc.CreateRemapValueNode(-1, 3, 30, -90);
-                MFnDependencyNode remapNode_final= BasicFunc.CreateRemapValueNode(-1, 3, 30, -90);
+                MFnDependencyNode remapNode_final = BasicFunc.CreateRemapValueNode(-1, 3, 30, -90);
                 //MFnDependencyNode** ptr_remapNode_root = &remapNode_root,
-        
+
 
                 //string remapValueNodeName_root = BasicFunc.CreateRemapValueNode(-2, 3, 60, -90, ptr_remapNode_root);
                 //string remapValueNodeName_rootSide = BasicFunc.CreateRemapValueNode(-1, 1, 30, -30, ptr_remapNode_rootSide);
@@ -65,7 +65,7 @@ namespace InazumaTool.BindTools
                 MFnDependencyNode dn_root = new MFnDependencyNode(rootJointDagPath.node);
                 MFnDependencyNode dn_middle = new MFnDependencyNode(middleJointDagPath.node);
                 MFnDependencyNode dn_final = new MFnDependencyNode(finalJointDagPath.node);
-                
+
                 /*MPlug plug_ctlTy = dn_ctl.findPlug("translateY");
                 MGlobal.displayInfo("plug name:" + plug_ctlTy.partialName() + " fullname:" + plug_ctlTy.name());*/
                 //MStatus status;
@@ -99,10 +99,10 @@ namespace InazumaTool.BindTools
             return true;
         }
 
-#endregion
+        #endregion
 
-#region RPIK
-                
+        #region RPIK
+
         public static MDagPath AddRPIKPole(MDagPath middleDagPath = null)
         {
             if (middleDagPath == null)
@@ -224,9 +224,9 @@ namespace InazumaTool.BindTools
         }
 
 
-#endregion
+        #endregion
 
-#region Foot
+        #region Foot
 
         public static MDagPath[] AddReverseFootBone()
         {
@@ -339,9 +339,9 @@ namespace InazumaTool.BindTools
             return true;
         }
 
-#endregion
+        #endregion
 
-#region Hair
+        #region Hair
 
         public static void ConvertJointLinesToHair(MSelectionList jointList)
         {
@@ -349,10 +349,10 @@ namespace InazumaTool.BindTools
         }
 
 
-#endregion
+        #endregion
 
 
-#region MiddleBody
+        #region MiddleBody
 
         public static void BindBodySplineIK(MSelectionList jointList)
         {
@@ -395,8 +395,33 @@ namespace InazumaTool.BindTools
 
         }
 
-#endregion
+        #endregion
 
-
+        const string cmdStr = "BindHumanBody";
+        public static List<CommandData> GetCommandDatas()
+        {
+            List<CommandData> cmdList = new List<CommandData>();
+            cmdList.Add(new CommandData("Bind", cmdStr, "finger", "bind finger ctl", () =>
+            {
+                BindFinger(BasicFunc.GetSelectedDagPath(0), "test", false);
+            }));
+            cmdList.Add(new CommandData("Bind", cmdStr, "rpik", "add rpik", () =>
+            {
+                BindRPIK();
+            }));
+            cmdList.Add(new CommandData("Add", cmdStr, "rpikPole", "add rpik pole", () =>
+            {
+                AddRPIKPole();
+            }));
+            cmdList.Add(new CommandData("Add", cmdStr, "reverseFootBones", "add reverse foot bones", () =>
+            {
+                AddReverseFootBone();
+            }));
+            cmdList.Add(new CommandData("Bind", cmdStr, "reverseFootRPIK", "bind reverse foot rpik", () =>
+            {
+                BindReverseFootRPIK();
+            }));
+            return cmdList;
+        }
     }
 }

@@ -72,6 +72,19 @@ namespace InazumaTool.BasicTools
 
 
         }
+
+
+        const string cmdStr = "DynamicConverter";
+        public static List<CommandData> GetCommandDatas()
+        {
+            List<CommandData> cmdList = new List<CommandData>();
+            cmdList.Add(new CommandData("Bind", cmdStr, "curveToHair", "convert curve to hair", () =>
+            {
+                DynamicConverter.CurveToHair();
+            }));
+            return cmdList;
+        }
+
     }
 
 

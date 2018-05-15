@@ -25,45 +25,119 @@ namespace InazumaTool
             return version;
         }
 
+        public static Dictionary<string, string> subMenuDic = new Dictionary<string, string>();
+        //commandStr,dic<paramStr,action>
+        public static Dictionary<string, Dictionary<string, Action>> commandDic = new Dictionary<string, Dictionary<string, Action>>();
+        void AddOneCommand(CommandData cd)
+        {
+            //MGlobal.displayInfo("try add:" + cd.DebugMessage());
+            string realSubMenuName = "";
+            if (cd.subMenuName == null)
+            {
+                realSubMenuName = totalMenuName;
+            }
+            else
+            {
+                if (subMenuDic.ContainsKey(cd.subMenuName))
+                {
+                    realSubMenuName = subMenuDic[cd.subMenuName];
+                }
+                else
+                {
+                    realSubMenuName = AddSubMenu(totalMenuName, cd.subMenuName, true);
+                    subMenuDic.Add(cd.subMenuName, realSubMenuName);
+                }
+            }            
+            Dictionary<string, Action> paramActionDic;
+            if (commandDic.ContainsKey(cd.cmdTypeStr))
+            {
+                paramActionDic = commandDic[cd.cmdTypeStr];                
+            }
+            else
+            {
+                paramActionDic = new Dictionary<string, Action>();
+                commandDic.Add(cd.cmdTypeStr, paramActionDic);
+            }
+            if (paramActionDic.ContainsKey(cd.paramStr))
+            {
+                MGlobal.displayWarning("Repeated Command Param:" + cd.paramStr);                
+                while (paramActionDic.ContainsKey(cd.paramStr))
+                {
+                    cd.paramStr += "_r";
+                }
+                MGlobal.displayWarning("Rename to:" + cd.paramStr);
+            }
+            paramActionDic.Add(cd.paramStr, cd.action);
 
+            AddMenuItem(cd.labelStr, realSubMenuName, "InazumaCommand", cd.cmdTypeStr + " " + cd.paramStr);
+
+        }
+
+        public static bool Execute(string cmdTypeStr,string paramStr)
+        {
+            if (commandDic.ContainsKey(cmdTypeStr))
+            {
+                Dictionary<string, Action> paramDic = commandDic[cmdTypeStr];
+                if (paramDic.ContainsKey(paramStr))
+                {
+                    paramDic[paramStr]();
+                    return true;
+                }
+            }
+            return false;
+        }
+
+
+        public static List<CommandData> cds = new List<CommandData>();
+        string totalMenuName;
         bool IExtensionPlugin.InitializePlugin()
         {
-            string totalMenuName = GetMayaWindowName();
-            int paramInt = (int)MPCMap.MPCType.Test;
-            AddMenuItem("Test", totalMenuName, "InazumaCommand", paramInt);
+            totalMenuName = GetMayaWindowName();
+            cds.AddRange(BasicFunc.GetCommandDatas());
+            cds.AddRange(BindHumanBody.GetCommandDatas());
+            cds.AddRange(DynamicConverter.GetCommandDatas());
+            cds.AddRange(JointProcess.GetCommandDatas());
+            foreach (CommandData cd in cds)
+            {
+                AddOneCommand(cd);
+            }
 
-            string subMenuName_bodyBind = AddSubMenu(totalMenuName, "Body Bind", true);
-            string subMenuName_create = AddSubMenu(totalMenuName, "Create", true);
 
-            paramInt = (int)MPCMap.MPCType.AddRPIK;
-            AddMenuItem("add rpik", subMenuName_bodyBind, "InazumaCommand", paramInt);
+            //int paramInt = (int)MPCMap.MPCType.Test;
+            //AddMenuItem("Test", totalMenuName, "InazumaCommand", paramInt);
 
-            paramInt = (int)MPCMap.MPCType.AddRPIKPole;
-            AddMenuItem("add rpik pole", subMenuName_create, "InazumaCommand", paramInt);
+            //string subMenuName_bodyBind = AddSubMenu(totalMenuName, "Body Bind", true);
+            //string subMenuName_create = AddSubMenu(totalMenuName, "Create", true);
 
-            paramInt = (int)MPCMap.MPCType.CreateCTL_CrysTal;
-            AddMenuItem("create cystal ctl", subMenuName_create, "InazumaCommand", paramInt);
+            //paramInt = (int)MPCMap.MPCType.AddRPIK;
+            //AddMenuItem("add rpik", subMenuName_bodyBind, "InazumaCommand", paramInt);
 
-            paramInt = (int)MPCMap.MPCType.AddChildCtl;
-            AddMenuItem("add child ctl", subMenuName_create, "InazumaCommand", paramInt);
+            //paramInt = (int)MPCMap.MPCType.AddRPIKPole;
+            //AddMenuItem("add rpik pole", subMenuName_create, "InazumaCommand", paramInt);
 
-            paramInt = (int)MPCMap.MPCType.AddParentCtl;
-            AddMenuItem("add parent ctl", subMenuName_create, "InazumaCommand", paramInt);
+            //paramInt = (int)MPCMap.MPCType.CreateCTL_CrysTal;
+            //AddMenuItem("create cystal ctl", subMenuName_create, "InazumaCommand", paramInt);
 
-            paramInt = (int)MPCMap.MPCType.AddReverseFootBones;
-            AddMenuItem("add reverse foot bones", subMenuName_create, "InazumaCommand", paramInt);
+            //paramInt = (int)MPCMap.MPCType.AddChildCtl;
+            //AddMenuItem("add child ctl", subMenuName_create, "InazumaCommand", paramInt);
 
-            paramInt = (int)MPCMap.MPCType.BindReverseFootRPIK;
-            AddMenuItem("Bind Reverse Foot RPIK", subMenuName_bodyBind, "InazumaCommand", paramInt);
+            //paramInt = (int)MPCMap.MPCType.AddParentCtl;
+            //AddMenuItem("add parent ctl", subMenuName_create, "InazumaCommand", paramInt);
 
-            paramInt = (int)MPCMap.MPCType.BindFinger_CTL_L;
-            AddMenuItem("Bind Finger using CTL L", subMenuName_bodyBind, "InazumaCommand", paramInt);
+            //paramInt = (int)MPCMap.MPCType.AddReverseFootBones;
+            //AddMenuItem("add reverse foot bones", subMenuName_create, "InazumaCommand", paramInt);
 
-            paramInt = (int)MPCMap.MPCType.CreateJointsCurve;
-            AddMenuItem("Create Joints Curve", subMenuName_create, "InazumaCommand", paramInt);
+            //paramInt = (int)MPCMap.MPCType.BindReverseFootRPIK;
+            //AddMenuItem("Bind Reverse Foot RPIK", subMenuName_bodyBind, "InazumaCommand", paramInt);
 
-            paramInt = (int)MPCMap.MPCType.MakeHairJointsChain;
-            AddMenuItem("Make Hair Joints To Chain", subMenuName_bodyBind, "InazumaCommand", paramInt);
+            //paramInt = (int)MPCMap.MPCType.BindFinger_CTL_L;
+            //AddMenuItem("Bind Finger using CTL L", subMenuName_bodyBind, "InazumaCommand", paramInt);
+
+            //paramInt = (int)MPCMap.MPCType.CreateJointsCurve;
+            //AddMenuItem("Create Joints Curve", subMenuName_create, "InazumaCommand", paramInt);
+
+            //paramInt = (int)MPCMap.MPCType.MakeHairJointsChain;
+            //AddMenuItem("Make Hair Joints To Chain", subMenuName_bodyBind, "InazumaCommand", paramInt);
 
             return true;
         }
@@ -101,7 +175,9 @@ namespace InazumaTool
         string AddSubMenu(string parentMenuName, string labelStr, bool tearOff)
         {
             MGlobal.executePythonCommand("import maya.cmds as cmds");
-            string subMenuName = MGlobal.executePythonCommandStringResult((tearOff ? "cmds.menuItem(tearOff = True, parent='" : "cmds.menuItem(parent='") + parentMenuName + "',subMenu = True, label='" + labelStr + "')");
+            string cmdStr = (tearOff ? "cmds.menuItem(tearOff = True, parent='" : "cmds.menuItem(parent='") + parentMenuName + "',subMenu = True, label='" + labelStr + "')";
+            MGlobal.displayInfo("cmdStr:" + cmdStr);
+            string subMenuName = MGlobal.executePythonCommandStringResult(cmdStr);
             return subMenuName;
         }
 
@@ -109,37 +185,38 @@ namespace InazumaTool
         {
             string cmdStr = "menuItem -l \"" + label + "\" -p \"" + parentMenuName + "\" -c \"" + command + " " + paramInt + "\"";
             //MGlobal.displayInfo(cmdStr);
-            //MGlobal.executeCommandOnIdle(cmdStr);
-            MGlobal.executeCommand(cmdStr);
+            MGlobal.executeCommandOnIdle(cmdStr);
+            //MGlobal.executeCommand(cmdStr);
         }
 
         void AddMenuItem(string label, string parentMenuName, string command, string paramStr)
         {
             string cmdStr = "menuItem -l \"" + label + "\" -p \"" + parentMenuName + "\" -c \"" + command + " " + paramStr + "\"";
             //MGlobal.displayInfo(cmdStr);
-            //MGlobal.executeCommandOnIdle(cmdStr);
-            MGlobal.executeCommand(cmdStr);
+            MGlobal.executeCommandOnIdle(cmdStr);
+            //MGlobal.executeCommand(cmdStr);
         }
 
     }
     
     public class MPCMap : MPxCommand 
     {
-        public enum MPCType
-        {
-            Test = 0,
-            BindFinger_CTL_L = 1,
-            BindFinger_CTL_R = 2,
-            AddRPIK = 3,
-            AddRPIKPole = 4,
-            AddChildCtl = 5,
-            AddParentCtl = 6,
-            CreateCTL_CrysTal = 7,
-            AddReverseFootBones = 8,
-            BindReverseFootRPIK = 9,
-            CreateJointsCurve = 10,
-            MakeHairJointsChain = 11
-        }
+        //public enum MPCType
+        //{
+        //    Test = 0,
+        //    BindFinger_CTL_L = 1,
+        //    BindFinger_CTL_R = 2,
+        //    AddRPIK = 3,
+        //    AddRPIKPole = 4,
+        //    AddChildCtl = 5,
+        //    AddParentCtl = 6,
+        //    CreateCTL_CrysTal = 7,
+        //    AddReverseFootBones = 8,
+        //    BindReverseFootRPIK = 9,
+        //    CreateJointsCurve = 10,
+        //    MakeHairJointsChain = 11,
+
+        //}
         
         public override void doIt(MArgList args)
         {
@@ -150,77 +227,92 @@ namespace InazumaTool
                 MGlobal.displayInfo("no param!");
                 return;
             }
-            int type = args.asInt(0);
-
-            MPCType mpcType = (MPCType)type;
-
-
-            switch (mpcType)
+            string cmdTypeStr = args.asString(0);
+            string paramStr = args.asString(1);
+            bool success = InazumaToolEntrance.Execute(cmdTypeStr, paramStr);
+            if (success)
             {
-                case MPCType.Test:
-                    {
-                        BasicFunc.PrintObjects(BasicFunc.GetSelectedList());
-                       
-                        break;
-                    }
-                case MPCType.BindFinger_CTL_L:
-                    {
-                        BindHumanBody.BindFinger(BasicFunc.GetSelectedDagPath(0), "test", false);
-                        break;
-                    }
-                case MPCType.BindFinger_CTL_R:
-                    {
-                        MGlobal.displayInfo("oh my god it works333");
-                        break;
-                    }
-                case MPCType.AddRPIK:
-                    {
-                        BindHumanBody.BindRPIK();
-                        break;
-                    }
-                case MPCType.AddRPIKPole:
-                    {
-                        BindHumanBody.AddRPIKPole();
-                        break;
-                    }
-                case MPCType.AddChildCtl:
-                    {
-                        BasicFunc.AddChildCircle(BasicFunc.GetSelectedDagPath(0));
-                        break;
-                    }
-                case MPCType.AddParentCtl:
-                    {
-                        BasicFunc.AddParentCircle(BasicFunc.GetSelectedDagPath(0), true);
-                        break;
-                    }
-                case MPCType.CreateCTL_CrysTal:
-                    {
-                        BasicFunc.CreateCTL_Crystal("ctl_sample");
-                        break;
-                    }
-                case MPCType.AddReverseFootBones:
-                    {
-                        BindHumanBody.AddReverseFootBone();
-                        break;
-                    }
-                case MPCType.BindReverseFootRPIK:
-                    {
-                        BindHumanBody.BindReverseFootRPIK();
-                        break;
-                    }
-                case MPCType.CreateJointsCurve:
-                    {
-                        JointProcess.CreateJointsCurve(BasicFunc.GetSelectedList());
-                        break;
-                    }
-                case MPCType.MakeHairJointsChain:
-                    {
-                        DynamicConverter.CurveToHair();
-
-                        //JointProcess.MakeJointsHairChain(BasicFunc.GetSelectedList());
-                        break;
-                    }
+                MGlobal.displayInfo("yep");
             }
+            else
+            {
+                MGlobal.displayInfo("nope");
+            }
+
+
+
+
+            //int type = args.asInt(0);
+
+            //MPCType mpcType = (MPCType)type;
+            
+
+            //switch (mpcType)
+            //{
+            //    case MPCType.Test:
+            //        {
+            //            BasicFunc.PrintObjects(BasicFunc.GetSelectedList());
+                       
+            //            break;
+            //        }
+            //    case MPCType.BindFinger_CTL_L:
+            //        {
+            //            BindHumanBody.BindFinger(BasicFunc.GetSelectedDagPath(0), "test", false);
+            //            break;
+            //        }
+            //    case MPCType.BindFinger_CTL_R:
+            //        {
+            //            MGlobal.displayInfo("oh my god it works333");
+            //            break;
+            //        }
+            //    case MPCType.AddRPIK:
+            //        {
+            //            BindHumanBody.BindRPIK();
+            //            break;
+            //        }
+            //    case MPCType.AddRPIKPole:
+            //        {
+            //            BindHumanBody.AddRPIKPole();
+            //            break;
+            //        }
+            //    case MPCType.AddChildCtl:
+            //        {
+            //            BasicFunc.AddChildCircle(BasicFunc.GetSelectedDagPath(0));
+            //            break;
+            //        }
+            //    case MPCType.AddParentCtl:
+            //        {
+            //            BasicFunc.AddParentCircle(BasicFunc.GetSelectedDagPath(0), true);
+            //            break;
+            //        }
+            //    case MPCType.CreateCTL_CrysTal:
+            //        {
+            //            BasicFunc.CreateCTL_Crystal("ctl_sample");
+            //            break;
+            //        }
+            //    case MPCType.AddReverseFootBones:
+            //        {
+            //            BindHumanBody.AddReverseFootBone();
+            //            break;
+            //        }
+            //    case MPCType.BindReverseFootRPIK:
+            //        {
+            //            BindHumanBody.BindReverseFootRPIK();
+            //            break;
+            //        }
+            //    case MPCType.CreateJointsCurve:
+            //        {
+            //            JointProcess.CreateJointsCurve(BasicFunc.GetSelectedList());
+            //            break;
+            //        }
+            //    case MPCType.MakeHairJointsChain:
+            //        {
+            //            DynamicConverter.CurveToHair();
+
+            //            //JointProcess.MakeJointsHairChain(BasicFunc.GetSelectedList());
+            //            break;
+            //        }
+            //}
         }
     }
 

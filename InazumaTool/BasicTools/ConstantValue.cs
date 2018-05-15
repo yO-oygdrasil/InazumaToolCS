@@ -10,5 +10,9 @@ namespace InazumaTool.BasicTools
     {
         public const float PI = 3.1415926f;
         public const float DPR = 57.29578049f;
+
+        public const string plugName_fileTexPath = "fileTextureName";
+
+
     }
 }

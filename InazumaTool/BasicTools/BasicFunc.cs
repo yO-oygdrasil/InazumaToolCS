@@ -411,9 +411,37 @@ k=[0,1,2,3,4,5,6,7,8,9,10,11,12])");
 
         }
 
+        public static void PrintPlugs(MPlugArray plugs)
+        {
+            for (int i = 0; i < plugs.length; i++)
+            {
+                MGlobal.displayInfo(i + ":" + plugs[i].name);
+            }
+        }
 
         #endregion
 
-
+        const string cmdStr = "BasicFunc";
+        public static List<CommandData> GetCommandDatas()
+        {
+            List<CommandData> cmdList = new List<CommandData>();
+            cmdList.Add(new CommandData(null, cmdStr, "test", "test", () => 
+            {
+                BasicFunc.PrintObjects(BasicFunc.GetSelectedList());
+            }));
+            cmdList.Add(new CommandData("Create", cmdStr, "childCircle", "add child circle", () =>
+            {
+                AddChildCircle(GetSelectedDagPath(0));                
+            }));
+            cmdList.Add(new CommandData("Create", cmdStr, "parentCircle", "add parent circle", () =>
+            {
+                AddParentCircle(GetSelectedDagPath(0), true);
+            }));
+            cmdList.Add(new CommandData("Create", cmdStr, "crystal", "create ctl crystal", () =>
+            {
+                BasicFunc.CreateCTL_Crystal("ctl_sample");
+            }));
+            return cmdList;
+        }
     }
 }

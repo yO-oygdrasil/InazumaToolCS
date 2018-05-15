@@ -194,5 +194,21 @@ namespace InazumaTool.BasicTools
 
             return resultArr;
         }
+
+
+
+        const string cmdStr = "JointProcess";
+        public static List<CommandData> GetCommandDatas()
+        {
+            List<CommandData> cmdList = new List<CommandData>();
+            cmdList.Add(new CommandData("Add", cmdStr, "add", "Add Joints Curve", () =>
+            {
+                CreateJointsCurve(BasicFunc.GetSelectedList());
+            }));
+            return cmdList;
+        }
+
+
+
     }
 }
