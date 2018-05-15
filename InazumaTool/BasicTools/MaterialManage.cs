@@ -19,7 +19,7 @@ namespace InazumaTool.BasicTools
             MImage img = new MImage();
             img.readFromTextureNode(imageObject, MImage.MPixelType.kUnknown);
             MFnDependencyNode imageNode = new MFnDependencyNode(imageObject);
-            MPlug plug = imageNode.findPlug(ConstantValue.plugName_fileTexPath);
+            MPlug plug = imageNode.findPlug(ConstantValue.plugName_fileTexOutput);
             MPlugArray destPlugs = new MPlugArray();
             plug.destinations(destPlugs);
             BasicFunc.PrintPlugs(destPlugs);
@@ -27,7 +27,7 @@ namespace InazumaTool.BasicTools
             MSelectionList newSelection = new MSelectionList();
             for (int i = 0; i < destPlugs.length; i++)
             {
-                newSelection.add(destPlugs[i]);
+                newSelection.add(destPlugs[i].node);
             }
             BasicFunc.Select(newSelection);
             return 0;

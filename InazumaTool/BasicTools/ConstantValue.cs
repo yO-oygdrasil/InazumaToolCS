@@ -12,7 +12,7 @@ namespace InazumaTool.BasicTools
         public const float DPR = 57.29578049f;
 
         public const string plugName_fileTexPath = "fileTextureName";
-
+        public const string plugName_fileTexOutput = "outColor";
 
     }
 }
