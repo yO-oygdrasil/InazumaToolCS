@@ -98,6 +98,11 @@ namespace InazumaTool.BasicTools
             //MGlobal.displayInfo("result int array str:" + result);
             return result;
         }
+
+        public static string MToString(MColor color)
+        {
+            return string.Format("({0},{1},{2},{3})", color.r, color.g, color.b, color.a);
+        }
         #endregion
 
         #region Get

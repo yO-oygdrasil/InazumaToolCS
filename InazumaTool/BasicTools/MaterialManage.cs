@@ -12,7 +12,48 @@ namespace InazumaTool.BasicTools
     public static class MaterialManage
     {
 
+        public static bool SelectObjectsWithMat(MFnDependencyNode matNode)
+        {
+            if (matNode == null)
+            {
+                return false;
+            }
+            MGlobal.executeCommandOnIdle("hyperShade -objects " + matNode.absoluteName);
+            return true;
+        }
 
+        /// <summary>
+        /// well, this action is truely dangerous
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        public static bool CombineMaterials(MSelectionList list = null)
+        {
+            if (list == null)
+            {
+                list = BasicFunc.GetSelectedList();
+            }
+            for (uint i = 0; i < list.length; i++)
+            {
+                MObject matObject = new MObject();
+                list.getDependNode(i, matObject);
+                MFnDependencyNode dnode = new MFnDependencyNode(matObject);
+                if (matObject.hasFn(MFn.Type.kMaterial))
+                {
+                    MMaterial mat = new MMaterial(matObject);
+                    MColor color = new MColor();
+                    mat.getDiffuse(color);
+                    MGlobal.displayInfo("mat:" + dnode.absoluteName + " ,color:" + BasicFunc.MToString(color));
+                }
+                
+            }
+
+
+
+
+            //MGlobal.executeCommandOnIdle("hyperShade -objects " + matNode.absoluteName);
+            return true;
+        }
 
         public static int SelectMaterialWithSameTex(MObject imageObject)
         {
@@ -30,6 +71,9 @@ namespace InazumaTool.BasicTools
                 newSelection.add(destPlugs[i].node);
             }
             BasicFunc.Select(newSelection);
+
+
+
             return 0;
         }
 
@@ -39,6 +83,10 @@ namespace InazumaTool.BasicTools
         {
             List<CommandData> cmdList = new List<CommandData>();
             cmdList.Add(new CommandData("Select", cmdStr, "matsWithSameTex", "Select Materials With Same Tex", () =>
+            {
+                SelectMaterialWithSameTex(BasicFunc.GetSelectedObject(0));
+            }));
+            cmdList.Add(new CommandData("Select", cmdStr, "objectsWithMats", "Select Objects With Selected Materials", () =>
             {
                 SelectMaterialWithSameTex(BasicFunc.GetSelectedObject(0));
             }));
