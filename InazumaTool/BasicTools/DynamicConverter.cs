@@ -78,7 +78,7 @@ namespace InazumaTool.BasicTools
         public static List<CommandData> GetCommandDatas()
         {
             List<CommandData> cmdList = new List<CommandData>();
-            cmdList.Add(new CommandData("Bind", cmdStr, "curveToHair", "convert curve to hair", () =>
+            cmdList.Add(new CommandData("动力学", cmdStr, "curveToHair", "为链骨增加动力学", () =>
             {
                 CurveToHair();
             }));

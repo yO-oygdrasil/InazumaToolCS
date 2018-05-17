@@ -434,15 +434,19 @@ k=[0,1,2,3,4,5,6,7,8,9,10,11,12])");
             {
                 BasicFunc.PrintObjects(BasicFunc.GetSelectedList());
             }));
-            cmdList.Add(new CommandData("Create", cmdStr, "childCircle", "add child circle", () =>
+            cmdList.Add(new CommandData("基本操作", cmdStr, "childCircle", "增加子层级圆环", () =>
             {
                 AddChildCircle(GetSelectedDagPath(0));                
             }));
-            cmdList.Add(new CommandData("Create", cmdStr, "parentCircle", "add parent circle", () =>
+            cmdList.Add(new CommandData("基本操作", cmdStr, "parentCircle", "增加同层级圆环", () =>
             {
                 AddParentCircle(GetSelectedDagPath(0), true);
             }));
-            cmdList.Add(new CommandData("Create", cmdStr, "crystal", "create ctl crystal", () =>
+            cmdList.Add(new CommandData("基本操作", cmdStr, "crystal", "创建八面体控制器", () =>
+            {
+                BasicFunc.CreateCTL_Crystal("ctl_sample");
+            }));
+            cmdList.Add(new CommandData("基本操作", cmdStr, "crystal", "创建偏方三八面体", () =>
             {
                 BasicFunc.CreateCTL_Crystal("ctl_sample");
             }));

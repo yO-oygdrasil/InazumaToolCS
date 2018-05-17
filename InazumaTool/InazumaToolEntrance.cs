@@ -139,14 +139,17 @@ namespace InazumaTool
 
             //paramInt = (int)MPCMap.MPCType.MakeHairJointsChain;
             //AddMenuItem("Make Hair Joints To Chain", subMenuName_bodyBind, "InazumaCommand", paramInt);
-
+            MGlobal.displayInfo("-回港了-");
             return true;
         }
 
         bool IExtensionPlugin.UninitializePlugin()
         {
             //MFnPluginData plugin = new MFnPluginData();
-            
+            subMenuDic.Clear();
+            commandDic.Clear();
+            cds.Clear();
+
 
             string menus = MGlobal.executePythonCommandStringResult("cmds.window(mel.eval('$temp1=$gMainWindow'), q=True, menuArray=True)");
             //BasicFunc.Print(menus);
@@ -159,10 +162,10 @@ namespace InazumaTool
                 string labelName = MGlobal.executePythonCommandStringResult("cmds.menu(" + menuNames[i] + ",q=True,label=True)");
                 if (labelName == "InazumaTool")
                 {
-                    MGlobal.executePythonCommand("cmds.deleteUI(" + menuNames[i] + ",m=True)");
+                    MGlobal.executePythonCommandOnIdle("cmds.deleteUI(" + menuNames[i] + ",m=True)");
                 }
             }
-
+            MGlobal.displayInfo("-远征去了-");
             return true;
         }
 
@@ -177,7 +180,7 @@ namespace InazumaTool
         {
             MGlobal.executePythonCommand("import maya.cmds as cmds");
             string cmdStr = (tearOff ? "cmds.menuItem(tearOff = True, parent='" : "cmds.menuItem(parent='") + parentMenuName + "',subMenu = True, label='" + labelStr + "')";
-            MGlobal.displayInfo("cmdStr:" + cmdStr);
+            //MGlobal.displayInfo("cmdStr:" + cmdStr);
             string subMenuName = MGlobal.executePythonCommandStringResult(cmdStr);
             return subMenuName;
         }

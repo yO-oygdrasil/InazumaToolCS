@@ -201,7 +201,7 @@ namespace InazumaTool.BasicTools
         public static List<CommandData> GetCommandDatas()
         {
             List<CommandData> cmdList = new List<CommandData>();
-            cmdList.Add(new CommandData("Add", cmdStr, "add", "Add Joints Curve", () =>
+            cmdList.Add(new CommandData("骨骼", cmdStr, "add", "沿骨骼生成曲线", () =>
             {
                 CreateJointsCurve(BasicFunc.GetSelectedList());
             }));

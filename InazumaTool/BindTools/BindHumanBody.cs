@@ -401,23 +401,39 @@ namespace InazumaTool.BindTools
         public static List<CommandData> GetCommandDatas()
         {
             List<CommandData> cmdList = new List<CommandData>();
-            cmdList.Add(new CommandData("Bind", cmdStr, "finger", "bind finger ctl", () =>
+            cmdList.Add(new CommandData("绑定", cmdStr, "bindFinger", "绑定手指控制器", () =>
             {
                 BindFinger(BasicFunc.GetSelectedDagPath(0), "test", false);
             }));
-            cmdList.Add(new CommandData("Bind", cmdStr, "rpik", "add rpik", () =>
+            cmdList.Add(new CommandData("绑定", cmdStr, "rpik", "绑定旋转平面IK控制器", () =>
             {
                 BindRPIK();
             }));
-            cmdList.Add(new CommandData("Add", cmdStr, "rpikPole", "add rpik pole", () =>
+            cmdList.Add(new CommandData("绑定", cmdStr, "rpikPole", "生成极向量控制器", () =>
             {
                 AddRPIKPole();
             }));
-            cmdList.Add(new CommandData("Add", cmdStr, "reverseFootBones", "add reverse foot bones", () =>
+            cmdList.Add(new CommandData("绑定", cmdStr, "reverseFootBones", "生成反向脚部控制骨", () =>
             {
                 AddReverseFootBone();
             }));
-            cmdList.Add(new CommandData("Bind", cmdStr, "reverseFootRPIK", "bind reverse foot rpik", () =>
+            cmdList.Add(new CommandData("绑定", cmdStr, "reverseFootRPIK", "绑定反向脚控制器", () =>
+            {
+                BindReverseFootRPIK();
+            }));
+            cmdList.Add(new CommandData("绑定", cmdStr, "bindBreast", "绑定上半身与腰部", () =>
+            {
+                BindReverseFootRPIK();
+            }));
+            cmdList.Add(new CommandData("绑定", cmdStr, "bindTongue", "绑定花京院型舌头", () =>
+            {
+                BindReverseFootRPIK();
+            }));
+            cmdList.Add(new CommandData("绑定", cmdStr, "bindSight", "绑定平视控制器", () =>
+            {
+                BindReverseFootRPIK();
+            }));
+            cmdList.Add(new CommandData("绑定", cmdStr, "bindShoulder", "绑定人类肩膀-手臂", () =>
             {
                 BindReverseFootRPIK();
             }));

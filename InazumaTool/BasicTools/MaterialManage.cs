@@ -12,15 +12,28 @@ namespace InazumaTool.BasicTools
     public static class MaterialManage
     {
 
-        public static bool SelectObjectsWithMat(MFnDependencyNode matNode)
+        static bool SelectObjectsWithMat(MFnDependencyNode matNode)
         {
             if (matNode == null)
             {
                 return false;
-            }
-            MGlobal.executeCommandOnIdle("hyperShade -objects " + matNode.absoluteName);
+            }            
+            return SelectObjectsWithMat(matNode.absoluteName);
+        }
+
+        static bool SelectObjectsWithMat(string matName)
+        {
+            MGlobal.executeCommandOnIdle("hyperShade -objects " + matName);
             return true;
         }
+
+
+
+        static void AssignMat(string matName)
+        {
+            MGlobal.executeCommandOnIdle("hyperShade -assign " + matName);
+        }
+
 
         /// <summary>
         /// well, this action is truely dangerous
@@ -33,19 +46,39 @@ namespace InazumaTool.BasicTools
             {
                 list = BasicFunc.GetSelectedList();
             }
+            if (list.length <= 1)
+            {
+                MGlobal.displayInfo("please choose at least 2 materials");
+                return false;
+            }
+            string firstMatName = "";
+
             for (uint i = 0; i < list.length; i++)
             {
+                //MGlobal.displayInfo(i + " mat test");
                 MObject matObject = new MObject();
                 list.getDependNode(i, matObject);
                 MFnDependencyNode dnode = new MFnDependencyNode(matObject);
-                if (matObject.hasFn(MFn.Type.kMaterial))
+                if (i == 0)
                 {
-                    MMaterial mat = new MMaterial(matObject);
-                    MColor color = new MColor();
-                    mat.getDiffuse(color);
-                    MGlobal.displayInfo("mat:" + dnode.absoluteName + " ,color:" + BasicFunc.MToString(color));
+                    firstMatName = dnode.absoluteName;
+                    continue;
                 }
-                
+                //MGlobal.displayInfo(i + " node:" + dnode.absoluteName);
+                if (matObject.hasFn(MFn.Type.kLambert) || matObject.hasFn(MFn.Type.kBlinn) || matObject.hasFn(MFn.Type.kPhong))
+                {
+                    MGlobal.displayInfo("has mat fn");
+                    //MMaterial mat = new MMaterial(matObject);
+                    //MColor color = new MColor();
+                    //mat.getDiffuse(color);
+                    //MGlobal.displayInfo("mat:" + dnode.absoluteName + " ,color:" + BasicFunc.MToString(color));
+                    SelectObjectsWithMat(dnode);
+                    AssignMat(firstMatName);
+                }
+                else
+                {
+                    MGlobal.displayInfo("no mat fn");
+                }
             }
 
 
@@ -82,13 +115,13 @@ namespace InazumaTool.BasicTools
         public static List<CommandData> GetCommandDatas()
         {
             List<CommandData> cmdList = new List<CommandData>();
-            cmdList.Add(new CommandData("Select", cmdStr, "matsWithSameTex", "Select Materials With Same Tex", () =>
+            cmdList.Add(new CommandData("材质", cmdStr, "matsWithSameTex", "选择同图片材质", () =>
             {
                 SelectMaterialWithSameTex(BasicFunc.GetSelectedObject(0));
             }));
-            cmdList.Add(new CommandData("Select", cmdStr, "objectsWithMats", "Select Objects With Selected Materials", () =>
+            cmdList.Add(new CommandData("材质", cmdStr, "combineMats", "合并选中材质", () =>
             {
-                SelectMaterialWithSameTex(BasicFunc.GetSelectedObject(0));
+                CombineMaterials();
             }));
             return cmdList;
         }
