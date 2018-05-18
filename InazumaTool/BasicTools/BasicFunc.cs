@@ -326,6 +326,41 @@ k=[0,1,2,3,4,5,6,7,8,9,10,11,12])");
 
         }
 
+        #region Delete
+        public static bool DeleteObject(MObject mo)
+        {
+            if (mo == null)
+            {
+                return false;
+            }
+            MDGModifier dGModifier = new MDGModifier();
+            dGModifier.deleteNode(mo);
+            dGModifier.doIt();
+            return true;
+        }
+
+        public static bool DeleteObjects(List<MObject> list)
+        {
+            if (list == null)
+            {
+                return false;
+            }
+            MDGModifier dGModifier = new MDGModifier();
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (list[i] == null)
+                {
+                    continue;
+                }
+                dGModifier.deleteNode(list[i]);
+            }
+            dGModifier.doIt();
+            return true;
+        }
+
+
+        
+        #endregion
 
         #region Select
 

@@ -67,6 +67,7 @@
     <Compile Include="BasicTools\DynamicConverter.cs" />
     <Compile Include="BasicTools\JointProcess.cs" />
     <Compile Include="BasicTools\MaterialManage.cs" />
+    <Compile Include="BindTools\BindAttr.cs" />
     <Compile Include="BindTools\BindHumanBody.cs" />
     <Compile Include="CommandData.cs" />
     <Compile Include="InazumaToolEntrance.cs" />

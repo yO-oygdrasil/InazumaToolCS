@@ -333,9 +333,8 @@ namespace InazumaTool.BindTools
             MGlobal.executeCommandStringResult("orientConstraint -mo " + rbs[4].fullPathName + " " + middleDagPath.fullPathName);
             MGlobal.executeCommandStringResult("orientConstraint -mo " + rbs[5].fullPathName + " " + ankleDagPath.fullPathName);
 
-            MGlobal.displayInfo("try delete rbs");
 
-            MGlobal.displayInfo("delete complete");
+
             return true;
         }
 

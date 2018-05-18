@@ -40,7 +40,7 @@ namespace InazumaTool.BasicTools
         /// </summary>
         /// <param name="list"></param>
         /// <returns></returns>
-        public static bool CombineMaterials(MSelectionList list = null)
+        public static bool CombineMaterials(MSelectionList list = null,bool deleteRepeated = true)
         {
             if (list == null)
             {
@@ -52,6 +52,10 @@ namespace InazumaTool.BasicTools
                 return false;
             }
             string firstMatName = "";
+            List<MObject> deleteList = new List<MObject>();
+            List<MSelectionList> waitForAssign = new List<MSelectionList>();
+
+            MDGModifier dGModifier = new MDGModifier();
 
             for (uint i = 0; i < list.length; i++)
             {
@@ -64,6 +68,10 @@ namespace InazumaTool.BasicTools
                     firstMatName = dnode.absoluteName;
                     continue;
                 }
+                else
+                {
+                    deleteList.Add(matObject);
+                }
                 //MGlobal.displayInfo(i + " node:" + dnode.absoluteName);
                 if (matObject.hasFn(MFn.Type.kLambert) || matObject.hasFn(MFn.Type.kBlinn) || matObject.hasFn(MFn.Type.kPhong))
                 {
@@ -73,6 +81,14 @@ namespace InazumaTool.BasicTools
                     //mat.getDiffuse(color);
                     //MGlobal.displayInfo("mat:" + dnode.absoluteName + " ,color:" + BasicFunc.MToString(color));
                     SelectObjectsWithMat(dnode);
+
+                    if (deleteRepeated)
+                    {
+                        dGModifier.deleteNode(matObject);
+                        //BasicFunc.DeleteObjects(deleteList);
+                    }
+
+                    //waitForAssign.Add(BasicFunc.GetSelectedList());
                     AssignMat(firstMatName);
                 }
                 else
@@ -81,8 +97,7 @@ namespace InazumaTool.BasicTools
                 }
             }
 
-
-
+            dGModifier.doIt();
 
             //MGlobal.executeCommandOnIdle("hyperShade -objects " + matNode.absoluteName);
             return true;
@@ -110,18 +125,92 @@ namespace InazumaTool.BasicTools
             return 0;
         }
 
+
+
+        public static bool CombineSameTextures(MSelectionList list = null,bool deleteRepeated = true)
+        {
+            if (list == null)
+            {
+                list = BasicFunc.GetSelectedList();
+            }
+            if (list.length <= 1)
+            {
+                MGlobal.displayInfo("please choose at least 2 materials");
+                return false;
+            }
+            //string texFilePath = "";
+            //List<string> texFilePaths = new List<string>();
+            Dictionary<string, int> combineDic = new Dictionary<string, int>();
+            List<MPlug> texOutputPlugs = new List<MPlug>();
+
+            MDGModifier dGModifier = new MDGModifier();
+            List<MObject> deleteList = new List<MObject>();
+            for (int i = 0; i < list.length; i++)
+            {
+                MObject texObject = new MObject();
+                list.getDependNode((uint)i, texObject);
+                //MImage img = new MImage();
+                //img.readFromTextureNode(texObject, MImage.MPixelType.kUnknown);
+                MFnDependencyNode texDN = new MFnDependencyNode(texObject);
+                MPlug texPlug = texDN.findPlug(ConstantValue.plugName_fileTexPath);
+                MPlug texOutputPlug = texDN.findPlug(ConstantValue.plugName_fileTexOutput);
+                //MGlobal.displayInfo("texplug name:" + texPlug.name);
+                texOutputPlugs.Add(texOutputPlug);
+                string filePath = texPlug.asString();
+                //MGlobal.displayInfo("path:" + filePath);
+                if (combineDic.ContainsKey(filePath))
+                {
+                    //combine
+                    int targetIndex = combineDic[filePath];
+                    //MGlobal.displayInfo("combine " + i + " to " + targetIndex);
+
+                    MPlugArray destPlugs = new MPlugArray();
+                    texOutputPlug.destinations(destPlugs);
+                    for (int j = 0; j < destPlugs.Count; j++)
+                    {
+                        //MGlobal.displayInfo("texPlugs[targetIndex]:" + texOutputPlugs[targetIndex].name + " , destPlugs[j]" + destPlugs[j].name);
+                        dGModifier.disconnect(texOutputPlug, destPlugs[j]);
+                        dGModifier.connect(texOutputPlugs[targetIndex], destPlugs[j]);
+                    }
+                    deleteList.Add(texObject);
+                    
+
+                }
+                else
+                {
+                    combineDic.Add(filePath, i);
+                }
+            }
+            dGModifier.doIt();
+            if (deleteRepeated)
+            {
+                for (int i = 0; i < deleteList.Count; i++)
+                {
+                    dGModifier.deleteNode(deleteList[i]);
+                }
+
+            }
+            dGModifier.doIt();
+            return true;
+
+        }
+        
         
         const string cmdStr = "MaterialManage";
         public static List<CommandData> GetCommandDatas()
         {
             List<CommandData> cmdList = new List<CommandData>();
+            cmdList.Add(new CommandData("材质", cmdStr, "combineTextures", "合并相同路径图片", () =>
+            {
+                CombineSameTextures();
+            }));
             cmdList.Add(new CommandData("材质", cmdStr, "matsWithSameTex", "选择同图片材质", () =>
             {
                 SelectMaterialWithSameTex(BasicFunc.GetSelectedObject(0));
             }));
             cmdList.Add(new CommandData("材质", cmdStr, "combineMats", "合并选中材质", () =>
             {
-                CombineMaterials();
+                CombineMaterials(null, false);
             }));
             return cmdList;
         }
