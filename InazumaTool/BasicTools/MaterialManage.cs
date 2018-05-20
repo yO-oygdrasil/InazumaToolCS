@@ -216,6 +216,25 @@ namespace InazumaTool.BasicTools
 
         }
 
+        public static void RenameMaterials(MSelectionList list = null)
+        {
+            if (list == null)
+            {
+                list = BasicFunc.GetSelectedList();
+            }
+            for (int i = 0; i < list.length; i++)
+            {
+                MObject mo = new MObject();
+                list.getDependNode((uint)i, mo);
+                MFnDependencyNode matNode = new MFnDependencyNode(mo);
+                MPlug plug = matNode.findPlug(ConstantValue.plugName_matColorInput);
+                MPlug sourcePlug = plug.source;
+                matNode.setName("mat_" + sourcePlug.name);
+            }
+
+
+        }
+
         public static void RemoveUnusedTextures(MSelectionList list = null)
         {
             if (list == null)
@@ -260,6 +279,10 @@ namespace InazumaTool.BasicTools
             cmdList.Add(new CommandData("材质", cmdStr, "renameTextures", "重命名图片节点", () =>
             {
                 RenameTextures();
+            }));
+            cmdList.Add(new CommandData("材质", cmdStr, "renameMaterials", "重命名材质节点（根据图片名）", () =>
+            {
+                RenameMaterials();
             }));
             cmdList.Add(new CommandData("材质", cmdStr, "removeUnused", "删除无用图片", () =>
             {
