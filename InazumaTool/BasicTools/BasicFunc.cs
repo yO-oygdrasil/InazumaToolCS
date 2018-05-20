@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -167,6 +168,23 @@ namespace InazumaTool.BasicTools
             return mDagPath;
         }
 
+        public static string GetFileName(string fullPath,bool subSuffix = true)
+        {
+            return subSuffix ? Path.GetFileNameWithoutExtension(fullPath) : Path.GetFileName(fullPath);
+
+            //string partialName = "";
+            //if (fullPath != null)
+            //{
+                
+            //    partialName = fullPath.Substring(fullPath.LastIndexOf('\\') + 1);
+
+            //}
+            //if (subSuffix)
+            //{
+            //    partialName = partialName.Substring(0, partialName.LastIndexOf('.'));
+            //}
+            //return partialName;
+        }
 
         #endregion
 
@@ -327,6 +345,12 @@ k=[0,1,2,3,4,5,6,7,8,9,10,11,12])");
         }
 
         #region Delete
+        public static void DeleteByCMD(string name)
+        {
+            MGlobal.executeCommand("delete " + name);
+
+        }
+
         public static bool DeleteObject(MObject mo)
         {
             if (mo == null)
@@ -481,7 +505,7 @@ k=[0,1,2,3,4,5,6,7,8,9,10,11,12])");
             {
                 BasicFunc.CreateCTL_Crystal("ctl_sample");
             }));
-            cmdList.Add(new CommandData("基本操作", cmdStr, "crystal", "创建偏方三八面体", () =>
+            cmdList.Add(new CommandData("基本操作", cmdStr, "cthulhu", "创建偏方三八面体", () =>
             {
                 BasicFunc.CreateCTL_Crystal("ctl_sample");
             }));

@@ -23,7 +23,7 @@ namespace InazumaTool.BasicTools
 
         static bool SelectObjectsWithMat(string matName)
         {
-            MGlobal.executeCommandOnIdle("hyperShade -objects " + matName);
+            MGlobal.executeCommand("hyperShade -objects " + matName);
             return true;
         }
 
@@ -31,7 +31,7 @@ namespace InazumaTool.BasicTools
 
         static void AssignMat(string matName)
         {
-            MGlobal.executeCommandOnIdle("hyperShade -assign " + matName);
+            MGlobal.executeCommand("hyperShade -assign " + matName);
         }
 
 
@@ -81,15 +81,15 @@ namespace InazumaTool.BasicTools
                     //mat.getDiffuse(color);
                     //MGlobal.displayInfo("mat:" + dnode.absoluteName + " ,color:" + BasicFunc.MToString(color));
                     SelectObjectsWithMat(dnode);
-
-                    if (deleteRepeated)
-                    {
-                        dGModifier.deleteNode(matObject);
-                        //BasicFunc.DeleteObjects(deleteList);
-                    }
+                    MGlobal.displayInfo("finish select");
+                    
 
                     //waitForAssign.Add(BasicFunc.GetSelectedList());
                     AssignMat(firstMatName);
+                    MGlobal.displayInfo("finish assign");
+                    BasicFunc.DeleteByCMD(dnode.absoluteName);
+                    MGlobal.displayInfo("finish delete");
+
                 }
                 else
                 {
@@ -105,8 +105,8 @@ namespace InazumaTool.BasicTools
 
         public static int SelectMaterialWithSameTex(MObject imageObject)
         {
-            MImage img = new MImage();
-            img.readFromTextureNode(imageObject, MImage.MPixelType.kUnknown);
+            //MImage img = new MImage();
+            //img.readFromTextureNode(imageObject, MImage.MPixelType.kUnknown);
             MFnDependencyNode imageNode = new MFnDependencyNode(imageObject);
             MPlug plug = imageNode.findPlug(ConstantValue.plugName_fileTexOutput);
             MPlugArray destPlugs = new MPlugArray();
@@ -119,9 +119,6 @@ namespace InazumaTool.BasicTools
                 newSelection.add(destPlugs[i].node);
             }
             BasicFunc.Select(newSelection);
-
-
-
             return 0;
         }
 
@@ -194,8 +191,56 @@ namespace InazumaTool.BasicTools
             return true;
 
         }
-        
-        
+
+        public static void RenameTextures(MSelectionList list = null)
+        {
+            if (list == null)
+            {
+                list = BasicFunc.GetSelectedList();
+            }
+            for (int i = 0; i < list.length; i++)
+            {
+                MObject mo = new MObject();
+                list.getDependNode((uint)i, mo);
+                MFnDependencyNode imageNode = new MFnDependencyNode(mo);
+                MPlug plug = imageNode.findPlug(ConstantValue.plugName_fileTexPath);
+                string filePath = plug.asString();
+                MGlobal.displayInfo("filePath:" + filePath);
+                string fileName = BasicFunc.GetFileName(filePath);
+                MGlobal.displayInfo("fileName:" + fileName);
+                imageNode.setName(fileName);
+
+
+            }
+
+
+        }
+
+        public static void RemoveUnusedTextures(MSelectionList list = null)
+        {
+            if (list == null)
+            {
+                list = BasicFunc.GetSelectedList();
+            }
+            List<MObject> deleteList = new List<MObject>();
+            for (int i = 0; i < list.length; i++)
+            {
+                MObject mo = new MObject();
+                list.getDependNode((uint)i, mo);
+                MFnDependencyNode imageNode = new MFnDependencyNode(mo);
+                MPlug texOutputPlug = imageNode.findPlug(ConstantValue.plugName_fileTexOutput);
+                MPlugArray destPlugs = new MPlugArray();
+                texOutputPlug.destinations(destPlugs);
+                if (destPlugs.Count == 0)
+                {
+                    deleteList.Add(mo);
+                    MGlobal.displayInfo("remove no use:" + imageNode.absoluteName);
+                }
+            }
+            BasicFunc.DeleteObjects(deleteList);
+
+        }
+
         const string cmdStr = "MaterialManage";
         public static List<CommandData> GetCommandDatas()
         {
@@ -210,7 +255,20 @@ namespace InazumaTool.BasicTools
             }));
             cmdList.Add(new CommandData("材质", cmdStr, "combineMats", "合并选中材质", () =>
             {
-                CombineMaterials(null, false);
+                CombineMaterials();
+            }));
+            cmdList.Add(new CommandData("材质", cmdStr, "renameTextures", "重命名图片节点", () =>
+            {
+                RenameTextures();
+            }));
+            cmdList.Add(new CommandData("材质", cmdStr, "removeUnused", "删除无用图片", () =>
+            {
+                RemoveUnusedTextures();
+            }));
+            cmdList.Add(new CommandData("材质", cmdStr, "combineMatSharingTexture", "合并相同贴图材质", () =>
+            {
+                SelectMaterialWithSameTex(BasicFunc.GetSelectedObject(0));
+                CombineMaterials();
             }));
             return cmdList;
         }
