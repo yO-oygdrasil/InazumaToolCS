@@ -229,7 +229,13 @@ namespace InazumaTool.BasicTools
                 MFnDependencyNode matNode = new MFnDependencyNode(mo);
                 MPlug plug = matNode.findPlug(ConstantValue.plugName_matColorInput);
                 MPlug sourcePlug = plug.source;
-                matNode.setName("mat_" + sourcePlug.name);
+                if (sourcePlug != null)
+                {
+
+                    MFnDependencyNode sourceNode = new MFnDependencyNode(sourcePlug.node);
+                    matNode.setName("mat_" + sourceNode.name);
+
+                }
             }
 
 
