@@ -36,40 +36,28 @@ namespace InazumaTool.BindTools
 
         public static MFnBlendShapeDeformer GetBlendShape(MObject targetObject = null)
         {
-            //if (targetObject == null)
-            //{
-            //    targetObject = BasicFunc.GetSelectedObject(0);
-            //}
-            //MItDependencyGraph mit = new MItDependencyGraph(targetObject, MFn.Type.kBlendShape, MItDependencyGraph.Direction.kDownstream);
+            if (targetObject == null)
+            {
+                targetObject = BasicFunc.GetSelectedObject(0);
+            }
+            MItDependencyGraph mit = new MItDependencyGraph(targetObject, MFn.Type.kBlendShape, MItDependencyGraph.Direction.kDownstream);
 
-            //while (!mit.isDone)
-            //{
-            //    MObject mo = mit.currentItem();
-            //    MFnDependencyNode dnode = new MFnDependencyNode(mo);
-            //    MGlobal.displayInfo("moing:" + dnode.absoluteName);
-            //    if (mo.hasFn(MFn.Type.kBlendShape))
-            //    {
-            //        MGlobal.displayInfo("find blendshape");
-            //        return new MFnBlendShapeDeformer(mo);
-
-            //    }
-            //    mit.next();
-            //}
-
-            //return null;
-
-            MDagPath dagPath = MDagPath.getAPathTo(targetObject);
-            MItDependencyGraph mit = new MItDependencyGraph(BasicFunc.GetSelectedObject(0),MItDependencyGraph.Level.kPlugLevel);
-            MObject mo = new MObject();
             while (!mit.isDone)
-            {                
-                mo = mit.currentItem();
-                MFnDependencyNode node = new MFnDependencyNode(mo);
-                MGlobal.displayInfo("find:" + node.absoluteName);
+            {
+                MObject mo = mit.currentItem();
+                MFnDependencyNode dnode = new MFnDependencyNode(mo);
+                MGlobal.displayInfo("moing:" + dnode.absoluteName);
+                if (mo.hasFn(MFn.Type.kBlendShape))
+                {
+                    MGlobal.displayInfo("find blendshape");
+                    return new MFnBlendShapeDeformer(mo);
+
+                }
                 mit.next();
             }
 
             return null;
+
         }
 
         public static bool BindBlendShapeCtl(MFnBlendShapeDeformer bs, MDagPath ctlDagPath = null)
