@@ -401,6 +401,15 @@ k=[0,1,2,3,4,5,6,7,8,9,10,11,12])");
         }
         #endregion
 
+        #region Modify
+
+        public static void ConnectAttr(string from, string to, bool force = true)
+        {
+            string cmdStr = string.Format("connectAttr {0} {1} -f {2}", from, to, force ? 1 : 0);
+            MGlobal.executeCommand(cmdStr);
+        }
+
+#endregion
 
         #region DealResultStr
         public static string SubUShell(string originStr)
