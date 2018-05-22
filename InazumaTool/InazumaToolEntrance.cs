@@ -38,16 +38,49 @@ namespace InazumaTool
             }
             else
             {
-                if (subMenuDic.ContainsKey(cd.subMenuName))
+                string[] labelLayers = cd.subMenuName.Split('/');
+                string[] menuLayers = new string[labelLayers.Length];
+                menuLayers[0] = labelLayers[0];
+                for (int i = 1; i < menuLayers.Length; i++)
                 {
-                    realSubMenuName = subMenuDic[cd.subMenuName];
+                    menuLayers[i] = labelLayers[i] + menuLayers[i - 1];
                 }
-                else
+
+                string lastRealName = totalMenuName;
+                for (int i = 0; i < menuLayers.Length; i++)
                 {
-                    realSubMenuName = AddSubMenu(totalMenuName, cd.subMenuName, true);
-                    subMenuDic.Add(cd.subMenuName, realSubMenuName);
+                    if (subMenuDic.ContainsKey(menuLayers[i]))
+                    {
+                        lastRealName = subMenuDic[menuLayers[i]];
+                        continue;
+                    }
+                    else
+                    {
+                        lastRealName = AddSubMenu(lastRealName, labelLayers[i], true);
+                        subMenuDic.Add(menuLayers[i], lastRealName);
+                    }
                 }
-            }            
+
+                realSubMenuName = lastRealName;
+                //if (subMenuDic.ContainsKey(cd.subMenuName))
+                //{
+                //    realSubMenuName = subMenuDic[cd.subMenuName];
+                //}
+                //else
+                //{
+                //    realSubMenuName = AddSubMenu(totalMenuName, cd.subMenuName, true);
+                //    subMenuDic.Add(cd.subMenuName, realSubMenuName);
+                //}
+            }
+
+            if (cd.isDivider)
+            {
+                AddMenuItemDivider(cd.labelStr, realSubMenuName);
+                return;
+            }
+
+
+
             Dictionary<string, Action> paramActionDic;
             if (commandDic.ContainsKey(cd.cmdTypeStr))
             {
@@ -103,8 +136,6 @@ namespace InazumaTool
             {
                 AddOneCommand(cd);
             }
-
-
             //int paramInt = (int)MPCMap.MPCType.Test;
             //AddMenuItem("Test", totalMenuName, "InazumaCommand", paramInt);
 
@@ -163,7 +194,7 @@ namespace InazumaTool
                 string labelName = MGlobal.executePythonCommandStringResult("cmds.menu(" + menuNames[i] + ",q=True,label=True)");
                 if (labelName == "InazumaTool")
                 {
-                    MGlobal.executePythonCommandOnIdle("cmds.deleteUI(" + menuNames[i] + ",m=True)");
+                    MGlobal.executePythonCommand("cmds.deleteUI(" + menuNames[i] + ",m=True)");
                 }
             }
             MGlobal.displayInfo("-远征去了-");
@@ -176,7 +207,7 @@ namespace InazumaTool
             string totalMenuName = MGlobal.executePythonCommandStringResult("cmds.menu(parent=mel.eval('$temp1=$gMainWindow'), label='InazumaTool',tearOff = True)");
             return totalMenuName;
         }
-
+        
         string AddSubMenu(string parentMenuName, string labelStr, bool tearOff)
         {
             MGlobal.executePythonCommand("import maya.cmds as cmds");
@@ -190,7 +221,16 @@ namespace InazumaTool
         {
             string cmdStr = "menuItem -l \"" + label + "\" -p \"" + parentMenuName + "\" -c \"" + command + " " + paramInt + "\"";
             //MGlobal.displayInfo(cmdStr);
-            MGlobal.executeCommandOnIdle(cmdStr);
+            MGlobal.executeCommand(cmdStr);
+            //MGlobal.executeCommand(cmdStr);
+        }
+
+
+        void AddMenuItemDivider(string labelStr, string parentMenuName)
+        {
+            string cmdStr = "menuItem -d 1 -dl \"" + labelStr + "\" -p \"" + parentMenuName + "\"";
+            //MGlobal.displayInfo(cmdStr);
+            MGlobal.executeCommand(cmdStr);
             //MGlobal.executeCommand(cmdStr);
         }
 
@@ -198,7 +238,7 @@ namespace InazumaTool
         {
             string cmdStr = "menuItem -l \"" + label + "\" -p \"" + parentMenuName + "\" -c \"" + command + " " + paramStr + "\"";
             //MGlobal.displayInfo(cmdStr);
-            MGlobal.executeCommandOnIdle(cmdStr);
+            MGlobal.executeCommand(cmdStr);
             //MGlobal.executeCommand(cmdStr);
         }
 

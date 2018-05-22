@@ -270,10 +270,9 @@ namespace InazumaTool.BasicTools
         public static List<CommandData> GetCommandDatas()
         {
             List<CommandData> cmdList = new List<CommandData>();
-            cmdList.Add(new CommandData("材质", cmdStr, "combineTextures", "合并相同路径图片", () =>
-            {
-                CombineSameTextures();
-            }));
+
+
+            cmdList.Add(new CommandData("材质", "图片"));
             cmdList.Add(new CommandData("材质", cmdStr, "matsWithSameTex", "选择同图片材质", () =>
             {
                 SelectMaterialWithSameTex(BasicFunc.GetSelectedObject(0));
@@ -282,23 +281,31 @@ namespace InazumaTool.BasicTools
             {
                 CombineMaterials();
             }));
-            cmdList.Add(new CommandData("材质", cmdStr, "renameTextures", "重命名图片节点", () =>
-            {
-                RenameTextures();
-            }));
             cmdList.Add(new CommandData("材质", cmdStr, "renameMaterials", "重命名材质节点（根据图片名）", () =>
             {
                 RenameMaterials();
-            }));
-            cmdList.Add(new CommandData("材质", cmdStr, "removeUnused", "删除无用图片", () =>
-            {
-                RemoveUnusedTextures();
             }));
             cmdList.Add(new CommandData("材质", cmdStr, "combineMatSharingTexture", "合并相同贴图材质", () =>
             {
                 SelectMaterialWithSameTex(BasicFunc.GetSelectedObject(0));
                 CombineMaterials();
             }));
+
+            cmdList.Add(new CommandData("材质", "材质"));
+            cmdList.Add(new CommandData("材质", cmdStr, "combineTextures", "合并相同路径图片", () =>
+            {
+                CombineSameTextures();
+            }));
+            cmdList.Add(new CommandData("材质", cmdStr, "renameTextures", "重命名图片节点", () =>
+            {
+                RenameTextures();
+            }));
+            cmdList.Add(new CommandData("材质", cmdStr, "removeUnused", "删除无用图片", () =>
+            {
+                RemoveUnusedTextures();
+            }));
+
+            
             return cmdList;
         }
 

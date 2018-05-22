@@ -273,39 +273,78 @@ namespace InazumaTool.BasicTools
             return GetDagPathByName(resultArr[0]);
         }
 
-        public static MDagPath CreateCTL_Crystal(string ctlName)
+        public static MDagPath CreateCTL_Crystal(string ctlName = "crystal")
         {
-            string resultName = MGlobal.executePythonCommandStringResult("cmds.curve(n='" + ctlName + @"', d=1,
-p=[(0,1,0),(0,0,1),(1,0,0),(0,-1,0),(0,0,-1),(1,0,0),(0,1,0),
-(0,0,-1),(-1,0,0),(0,-1,0),(0,0,1),(-1,0,0),(0,1,0)],
-k=[0,1,2,3,4,5,6,7,8,9,10,11,12])");
-            //MGlobal.displayInfo("circleName_BeforeSub:" + resultName);
-            //resultName = SubUShell(resultName);
-            //MGlobal.displayInfo("circleName_AfterSub:" + resultName);
-            return GetDagPathByName(resultName);
+            MPointArray points = new MPointArray();
+            points.Add(new MPoint(0, 1, 0));
+            points.Add(new MPoint(0, 0, 1));
+            points.Add(new MPoint(1, 0, 0));
+            points.Add(new MPoint(0, -1, 0));
+
+            points.Add(new MPoint(0, 0, -1));
+            points.Add(new MPoint(1, 0, 0));
+            points.Add(new MPoint(0, 1, 0));
+            points.Add(new MPoint(0, 0, -1));
+
+            points.Add(new MPoint(-1, 0, 0));
+            points.Add(new MPoint(0, -1, 0));
+            points.Add(new MPoint(0, 0, 1));
+            points.Add(new MPoint(-1, 0, 0));
+            points.Add(new MPoint(0, 1, 0));
+            return CreateCurve(points, ctlName, 1, MFnNurbsCurve.Form.kClosed);            
         }
 
-        public static MDagPath CreateCurve(MVector[] points, int ptCount, string curveName)
+        public static MDagPath CreateCurve(MPoint[] pts, string curveName, int degree = 1, MFnNurbsCurve.Form form = MFnNurbsCurve.Form.kOpen)
         {
-            string cmdStr = "cmds.curve(n='" + curveName + "',d=1,p=[";
-            for (int i = 0; i < ptCount; i++)
-            {
-                if (i != 0)
-                {
-                    cmdStr += ",";
-                }
-                cmdStr += ToCMDSParamStr(points[i]);
-            }
-            int[] indices = new int[ptCount];
-            for (int i = 0; i < ptCount; i++)
-            {
-                indices[i] = i;
-            }
-            cmdStr += "],k=[" + ToCMDSParamStr(indices, ptCount) + "])";
-            MGlobal.displayInfo(cmdStr);
-            string resultName = MGlobal.executePythonCommandStringResult(cmdStr);
-            return GetDagPathByName(resultName);
+            MPointArray points = new MPointArray(pts);
+            return CreateCurve(points, curveName, degree, form);
         }
+
+        public static MDagPath CreateCurve(MVector[] positions, string curveName, int degree = 1, MFnNurbsCurve.Form form = MFnNurbsCurve.Form.kOpen)
+        {
+            MPointArray points = new MPointArray();
+            for (int i = 0; i < positions.Length; i++)
+            {
+                points.Add(new MPoint(positions[i]));
+            }
+            return CreateCurve(points, curveName, degree, form);
+            //string cmdStr = "cmds.curve(n='" + curveName + "',d=1,p=[";
+            //for (int i = 0; i < ptCount; i++)
+            //{
+            //    if (i != 0)
+            //    {
+            //        cmdStr += ",";
+            //    }
+            //    cmdStr += ToCMDSParamStr(points[i]);
+            //}
+            //int[] indices = new int[ptCount];
+            //for (int i = 0; i < ptCount; i++)
+            //{
+            //    indices[i] = i;
+            //}
+            //cmdStr += "],k=[" + ToCMDSParamStr(indices, ptCount) + "])";
+            //MGlobal.displayInfo(cmdStr);
+            //string resultName = MGlobal.executePythonCommandStringResult(cmdStr);
+            //return GetDagPathByName(resultName);
+        }
+
+        public static MDagPath CreateCurve(MPointArray points, string curveName, int degree = 1, MFnNurbsCurve.Form form = MFnNurbsCurve.Form.kOpen)
+        {
+            MDoubleArray indices = new MDoubleArray();
+            for (int i = 0; i < points.Count; i++)
+            {
+                indices.Add(i);
+            }
+
+            MFnNurbsCurve nc = new MFnNurbsCurve();
+            MObject curveObject = nc.create(points, indices, (uint)degree, form, false, false);
+            MDagPath curveDagPath = MDagPath.getAPathTo(curveObject);
+            MFnDependencyNode dn = new MFnDependencyNode(curveObject);
+            dn.setName(curveName);
+            return curveDagPath;
+        }
+
+        
 
         public static MFnDependencyNode CreateRemapValueNode(float inputMin, float inputMax, float outputMin, float outputMax)
         {

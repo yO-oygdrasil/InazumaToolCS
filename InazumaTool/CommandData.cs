@@ -8,18 +8,27 @@ namespace InazumaTool
 {
     public class CommandData
     {
+        public bool isDivider = false;
         public string cmdTypeStr;
         public string paramStr;
         public string subMenuName;
         public string labelStr;
         public Action action;
-        public CommandData(string subMenu, string cmdStr, string param, string label, Action act)
+        public CommandData(string subMenu, string label, bool divider = true)
+        {
+            labelStr = label;
+            subMenuName = subMenu;
+            isDivider = divider;
+        }
+
+        public CommandData(string subMenu, string cmdStr, string param, string label, Action act,bool divider = false)
         {
             cmdTypeStr = cmdStr;
             paramStr = param;
             labelStr = label;
             action = act;
             subMenuName = subMenu;
+            isDivider = divider;
         }
         public bool TryResponse(string cmdStr, string param)
         {

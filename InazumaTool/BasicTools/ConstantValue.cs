@@ -15,6 +15,10 @@ namespace InazumaTool.BasicTools
         public const string plugName_fileTexOutput = "outColor";
         public const string plugName_matColorInput = "color";
 
+        public const string plugName_remapValueInput = "inputValue";
+        public const string plugName_remapValueOutput = "outValue";
+
+
         public const string plugName_blendShapeWeight = "weight";
     }
 }

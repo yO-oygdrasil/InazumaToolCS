@@ -118,8 +118,8 @@ namespace InazumaTool.BasicTools
                 vectors[i] = ptTrans.getTranslation(MSpace.Space.kWorld);
                 //MGlobal.displayInfo(BasicFunc::ToCMDSParamStr(vectors[i]));
             }
-            MDagPath curveDagPath = BasicFunc.CreateCurve(vectors, count, curveName);
-            MGlobal.displayInfo("create Finish");
+            MDagPath curveDagPath = BasicFunc.CreateCurve(vectors, curveName);
+            //MGlobal.displayInfo("create Finish");
             
 
             return curveDagPath;

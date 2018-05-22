@@ -335,6 +335,7 @@ namespace InazumaTool.BindTools
 
 
 
+
             return true;
         }
 
@@ -400,10 +401,15 @@ namespace InazumaTool.BindTools
         public static List<CommandData> GetCommandDatas()
         {
             List<CommandData> cmdList = new List<CommandData>();
+
+            cmdList.Add(new CommandData("绑定", "手指"));
+
             cmdList.Add(new CommandData("绑定", cmdStr, "bindFinger", "绑定手指控制器", () =>
             {
                 BindFinger(BasicFunc.GetSelectedDagPath(0), "test", false);
             }));
+
+            cmdList.Add(new CommandData("绑定", "旋转平面"));
             cmdList.Add(new CommandData("绑定", cmdStr, "rpik", "绑定旋转平面IK控制器", () =>
             {
                 BindRPIK();
@@ -412,6 +418,8 @@ namespace InazumaTool.BindTools
             {
                 AddRPIKPole();
             }));
+
+            cmdList.Add(new CommandData("绑定", "JIO"));
             cmdList.Add(new CommandData("绑定", cmdStr, "reverseFootBones", "生成反向脚部控制骨", () =>
             {
                 AddReverseFootBone();
@@ -420,10 +428,20 @@ namespace InazumaTool.BindTools
             {
                 BindReverseFootRPIK();
             }));
+
+
+            cmdList.Add(new CommandData("绑定", "上半身"));
             cmdList.Add(new CommandData("绑定", cmdStr, "bindBreast", "绑定上半身与腰部", () =>
             {
                 BindReverseFootRPIK();
             }));
+            cmdList.Add(new CommandData("绑定", cmdStr, "bindShoulder", "绑定人类肩膀-手臂", () =>
+            {
+                BindReverseFootRPIK();
+            }));
+
+
+            cmdList.Add(new CommandData("绑定", "面部"));
             cmdList.Add(new CommandData("绑定", cmdStr, "bindTongue", "绑定花京院型舌头", () =>
             {
                 BindReverseFootRPIK();
@@ -432,10 +450,7 @@ namespace InazumaTool.BindTools
             {
                 BindReverseFootRPIK();
             }));
-            cmdList.Add(new CommandData("绑定", cmdStr, "bindShoulder", "绑定人类肩膀-手臂", () =>
-            {
-                BindReverseFootRPIK();
-            }));
+
             return cmdList;
         }
     }

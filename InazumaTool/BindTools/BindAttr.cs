@@ -12,27 +12,38 @@ namespace InazumaTool.BindTools
 {
     public static class BindAttr
     {
-        public static void AddFloatAttr(MDagPath dagPath,string attrLongName, float min = 0, float max = 1, float defaultValue = 0,string shortName = "",bool keyable = true)
+        public static MPlug AddFloatAttr(MDagPath dagPath,string attrLongName, float min = 0, float max = 1, float defaultValue = 0,string shortName = "",bool keyable = true)
         {
             if (shortName.Length == 0)
             {
                 shortName = attrLongName;
             }
-            //MFnDependencyNode dnode = new MFnDependencyNode(dagPath.node);
-            //MFnNumericAttribute na = new MFnNumericAttribute();
-            //na.create(attrLongName, shortName, MFnNumericData.Type.kFloat);
-            //na.setMin(min);
-            //na.setMax(max);
-            //na.setDefault(defaultValue);
-            //dnode.addAttribute(na);
-
-            if (dagPath != null)
-            {
-                string cmdStr = string.Format("addAttr -ln {0} -min {1} -max {2} -at \"float\" -dv {3} -k {4}|{5}", attrLongName, min, max, defaultValue, keyable ? 1 : 0, dagPath.fullPathName);
-                MGlobal.executeCommand(cmdStr);
-            }
+            MFnDependencyNode dnode = new MFnDependencyNode(dagPath.node);
+            MFnNumericAttribute na = new MFnNumericAttribute();
+            na.create(attrLongName, shortName, MFnNumericData.Type.kFloat);
+            na.setMin(min);
+            na.setMax(max);
+            na.setDefault(defaultValue);
+            na.isKeyable = keyable;
+            dnode.addAttribute(na.objectProperty);
+            return dnode.findPlug(attrLongName);
+            //if (dagPath != null)
+            //{
+            //    string cmdStr = string.Format("addAttr -ln {0} -min {1} -max {2} -at \"float\" -dv {3} -k {4} {5}", attrLongName, min, max, defaultValue, keyable ? 1 : 0, dagPath.fullPathName);
+            //    MGlobal.displayInfo("cmdStr:" + cmdStr);
+            //    MGlobal.executeCommand(cmdStr);
+            //}
         }
 
+        public static bool ProjectPlug(MPlug from, MPlug to, float fromMin, float fromMax, float toMin, float toMax)
+        {
+            MFnDependencyNode remapValueNode = BasicFunc.CreateRemapValueNode(fromMin, fromMax, toMin, toMax);
+            MDGModifier dGModifier = new MDGModifier();
+            dGModifier.connect(from, remapValueNode.findPlug(ConstantValue.plugName_remapValueInput));
+            dGModifier.connect(remapValueNode.findPlug(ConstantValue.plugName_remapValueOutput), to);
+            dGModifier.doIt();
+            return true;
+        }
 
         public static MFnBlendShapeDeformer GetBlendShape(MObject targetObject = null)
         {
@@ -40,7 +51,11 @@ namespace InazumaTool.BindTools
             {
                 targetObject = BasicFunc.GetSelectedObject(0);
             }
-            MItDependencyGraph mit = new MItDependencyGraph(targetObject, MFn.Type.kBlendShape, MItDependencyGraph.Direction.kDownstream);
+            MItDependencyGraph mit = new MItDependencyGraph(MDagPath.getAPathTo(targetObject).node, MFn.Type.kBlendShape, MItDependencyGraph.Direction.kUpstream);
+
+            //MDagPath dagPath = new MDagPath();
+            
+
 
             while (!mit.isDone)
             {
@@ -68,23 +83,29 @@ namespace InazumaTool.BindTools
                 MGlobal.displayInfo("null blendShape");
                 return false;
             }
-            MGlobal.displayInfo("here i am");
+            //MGlobal.displayInfo("here i am");
 
             if (ctlDagPath == null)
             {
                 ctlDagPath = BasicFunc.CreateCTL_Crystal("ctl_bs_" + bs.name);
             }
+
+            MFnDependencyNode ctlNode = new MFnDependencyNode(ctlDagPath.node);
+
             MPlug weightPlug = bs.findPlug(ConstantValue.plugName_blendShapeWeight);
             int count = (int)weightPlug.numElements;
-            MGlobal.displayInfo("target count:" + count);
+            //MGlobal.displayInfo("target count:" + count);
+
+            MDGModifier dGModifier = new MDGModifier();
             for (int i = 0; i < count; i++)
             {
+                //MGlobal.displayInfo("process:" + i);
                 MPlug singleWeightPlug = weightPlug.elementByLogicalIndex((uint)i);
                 string weightName = singleWeightPlug.name.Split('.').Last();
-                AddFloatAttr(ctlDagPath, weightName);
-                BasicFunc.ConnectAttr(ctlDagPath.fullPathName + "." + weightName, singleWeightPlug.name);
+                MPlug ctlAttrPlug = AddFloatAttr(ctlDagPath, weightName);
+                dGModifier.connect(ctlAttrPlug, singleWeightPlug);
             }
-
+            dGModifier.doIt();
 
             return true;
 
@@ -98,7 +119,7 @@ namespace InazumaTool.BindTools
             cmdList.Add(new CommandData("绑定属性", cmdStr, "bindBlendShape", "绑定混合变形控制器", () =>
             {
                 MFnBlendShapeDeformer bs = GetBlendShape();
-                //BindBlendShapeCtl(bs);
+                BindBlendShapeCtl(bs);
             }));
             return cmdList;
         }
