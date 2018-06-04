@@ -71,7 +71,7 @@ namespace InazumaTool.BasicTools
                 MGlobal.executeCommand("select -hierarchy " + dagPath_first.fullPathName);
                 for (uint i = jointChains.length - 1; i >= 0; i--)
                 {
-                    
+                    //MDagPath
                 }
 
             }
