@@ -15,7 +15,11 @@ namespace InazumaTool.BasicTools
 {
     public static class DynamicConverter
     {
-        
+        /// <summary>
+        /// return Dynamic Output Curve
+        /// </summary>
+        /// <param name="curveDagPath">curve DagPath</param>
+        /// <returns></returns>
         public static MDagPath CurveToHair(MDagPath curveDagPath = null)
         {
             if (curveDagPath != null)
@@ -40,17 +44,39 @@ namespace InazumaTool.BasicTools
                 {
                     MGlobal.displayInfo("follicle exist!");
                     BasicFunc.Select(follicleDagPath);
-
-
-
-
+                    MGlobal.executeCommand("convertHairSelection \"current\"");
+                    return BasicFunc.GetSelectedDagPath(0);
                 }
             }
-
-
             //error
             return curveDagPath;
         }
+
+        public static void AddDynamicChainControl(MSelectionList jointChains = null)
+        {
+            //get bones
+            if (jointChains == null)
+            {
+                jointChains = BasicFunc.GetSelectedList();
+            }
+            if (jointChains.length == 0)
+            {
+                return;
+            }
+            else if (jointChains.length == 1)
+            {
+                BasicFunc.Select(jointChains);
+                MDagPath dagPath_first = new MDagPath();
+                jointChains.getDagPath((uint)0, dagPath_first);
+                MGlobal.executeCommand("select -hierarchy " + dagPath_first.fullPathName);
+                for (uint i = jointChains.length - 1; i >= 0; i--)
+                {
+                    
+                }
+
+            }
+        }
+
 
         public enum HairSelectionType
         {
