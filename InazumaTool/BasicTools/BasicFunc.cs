@@ -447,6 +447,7 @@ namespace InazumaTool.BasicTools
             string cmdStr = string.Format("connectAttr {0} {1} -f {2}", from, to, force ? 1 : 0);
             MGlobal.executeCommand(cmdStr);
         }
+        
 
 #endregion
 
