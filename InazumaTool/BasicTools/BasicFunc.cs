@@ -131,10 +131,22 @@ namespace InazumaTool.BasicTools
             return dagPath;
         }
 
-        public static MSelectionList GetSelectedList()
+        public static MSelectionList GetSelectedList(MFn.Type type = MFn.Type.kInvalid)
         {
             MSelectionList selected = new MSelectionList();
             MGlobal.getActiveSelectionList(selected);
+            if (type != MFn.Type.kInvalid)
+            {
+                for (int i = (int)(selected.length - 1); i >= 0; i--)
+                {
+                    MObject mo = new MObject();
+                    selected.getDependNode((uint)i, mo);
+                    if (!mo.hasFn(type))
+                    {
+                        selected.remove((uint)i);
+                    }
+                }
+            }            
             return selected;
         }
 
@@ -171,19 +183,7 @@ namespace InazumaTool.BasicTools
         public static string GetFileName(string fullPath,bool subSuffix = true)
         {
             return subSuffix ? Path.GetFileNameWithoutExtension(fullPath) : Path.GetFileName(fullPath);
-
-            //string partialName = "";
-            //if (fullPath != null)
-            //{
-                
-            //    partialName = fullPath.Substring(fullPath.LastIndexOf('\\') + 1);
-
-            //}
-            //if (subSuffix)
-            //{
-            //    partialName = partialName.Substring(0, partialName.LastIndexOf('.'));
-            //}
-            //return partialName;
+            
         }
 
         #endregion

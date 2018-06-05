@@ -167,28 +167,47 @@ namespace InazumaTool.BasicTools
         {
             string typeStr = "";
             string resultStr = "";
+
+            CmdStrConstructor csc = new CmdStrConstructor("ikHandle", CmdStrConstructor.CmdType.Python);
+            csc.UpdateParm("sj", startJointDagPath.fullPathName);
+            csc.UpdateParm("ee", endJointDagPath.fullPathName);
+
+            string ikMainName = startJointDagPath.partialPathName + "_" + endJointDagPath.partialPathName;
+            
             switch (solverType)
             {
                 case IKSolverType.SingleChain:
                     {
-                        typeStr = "ikSCsolver";
-                        resultStr = MGlobal.executePythonCommandStringResult("cmds.ikHandle(sj='" + startJointDagPath.fullPathName + "',ee='" + endJointDagPath.fullPathName + "',sol='" + typeStr + "',n='ik_" + startJointDagPath.partialPathName + "_" + endJointDagPath.partialPathName + "')");
+                        csc.UpdateParm("sol", "ikSCsolver");
+                        csc.UpdateParm("n", "ik_" + ikMainName);
+                        string excuteStr = csc.ToString();
+                        resultStr = MGlobal.executePythonCommandStringResult(excuteStr);
+                        //typeStr = "ikSCsolver";
+                        //resultStr = MGlobal.executePythonCommandStringResult("cmds.ikHandle(sj='" + startJointDagPath.fullPathName + "',ee='" + endJointDagPath.fullPathName + "',sol='" + typeStr + "',n='ik_" + ikMainName + "')");
                         break;
                     }
                 case IKSolverType.RotatePlane:
                     {
-                        typeStr = "ikRPsolver";
-                        resultStr = MGlobal.executePythonCommandStringResult("cmds.ikHandle(sj='" + startJointDagPath.fullPathName + "',ee='" + endJointDagPath.fullPathName + "',sol='" + typeStr + "',n='ik_" + startJointDagPath.partialPathName + "_" + endJointDagPath.partialPathName + "')");
+                        csc.UpdateParm("sol", "ikRPsolver");
+                        csc.UpdateParm("n", "ik_" + ikMainName);
+                        string excuteStr = csc.ToString();
+                        resultStr = MGlobal.executePythonCommandStringResult(excuteStr);
+                        //typeStr = "ikRPsolver";
+                        //resultStr = MGlobal.executePythonCommandStringResult("cmds.ikHandle(sj='" + startJointDagPath.fullPathName + "',ee='" + endJointDagPath.fullPathName + "',sol='" + typeStr + "',n='ik_" + ikMainName + "')");
                         break;
                     }
                 case IKSolverType.Spline:
                     {
-                        typeStr = "ikSplineSolver";
-                        resultStr = MGlobal.executePythonCommandStringResult("cmds.ikHandle(sj='" + startJointDagPath.fullPathName + "',ee='" + endJointDagPath.fullPathName + "',sol='" + typeStr + "',c='" + curveName + "',n='ik_" + startJointDagPath.partialPathName + "_" + endJointDagPath.partialPathName + "')");
+                        csc.UpdateParm("sol", "ikSplineSolver");
+                        csc.UpdateParm("n", "ik_" + ikMainName);
+                        csc.UpdateParm("ccv", curveName == null || curveName.Length == 0);
+                        csc.UpdateParm("c", curveName);
+                        string excuteStr = csc.ToString();
+                        resultStr = MGlobal.executePythonCommandStringResult(excuteStr,true);
+                        //resultStr = MGlobal.executePythonCommandStringResult("cmds.ikHandle(sj='" + startJointDagPath.fullPathName + "',ee='" + endJointDagPath.fullPathName + "',sol='" + typeStr + "',c='" + curveName + "',n='ik_" + ikMainName + "')",true);
                         break;
                     }
             }
-            
             //[u'ik_joint1_joint4', u'effector1']
             string[] resultArr = BasicFunc.SplitPythonResultStr(resultStr);
 

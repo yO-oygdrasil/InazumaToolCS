@@ -63,6 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BasicTools\BasicFunc.cs" />
+    <Compile Include="BasicTools\CmdStrConstructor.cs" />
     <Compile Include="BasicTools\ConstantValue.cs" />
     <Compile Include="BasicTools\DynamicConverter.cs" />
     <Compile Include="BasicTools\JointProcess.cs" />
