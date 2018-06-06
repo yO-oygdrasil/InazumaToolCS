@@ -102,7 +102,6 @@ namespace InazumaTool.BasicTools
             string cmdStr = "cmds.MakeCurvesDynamic(0,0,0,1,0)";
             string resultStr = MGlobal.executePythonCommandStringResult(cmdStr);
 
-
             MDagPath result = new MDagPath();
 
             //MGlobal.displayInfo(curveDagPath.fullPathName);

@@ -367,7 +367,7 @@ namespace InazumaTool.BindTools
             {
                 MDagPath jtDagPath = new MDagPath();
                 jointList.getDagPath((uint)i, jtDagPath);
-                if (jtDagPath != null) 
+                if (jtDagPath != null)
                 {
                     if (!jtDagPath.hasFn(MFn.Type.kJoint))
                     {
@@ -389,7 +389,8 @@ namespace InazumaTool.BindTools
                 }
             }
 
-            //JointProcess.CreateJoint()
+            MDagPath curveDagPath = JointProcess.CreateJointsCurve(jointList);
+            
 
 
 
