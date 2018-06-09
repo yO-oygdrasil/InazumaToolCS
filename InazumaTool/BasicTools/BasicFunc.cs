@@ -447,7 +447,12 @@ namespace InazumaTool.BasicTools
             string cmdStr = string.Format("connectAttr {0} {1} -f {2}", from, to, force ? 1 : 0);
             MGlobal.executeCommand(cmdStr);
         }
-        
+
+        public static void OrientConstraint(string from, string to, bool maintainOffset = true)
+        {
+            string cmdStr = string.Format(maintainOffset ? "orientConstraint -mo {0} {1}" : "orientConstraint {0},{1}", from, to);
+            MGlobal.executeCommandStringResult(cmdStr);
+        }
 
 #endregion
 

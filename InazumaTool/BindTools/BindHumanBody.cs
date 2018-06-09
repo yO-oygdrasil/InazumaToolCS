@@ -354,15 +354,19 @@ namespace InazumaTool.BindTools
 
         #region MiddleBody
 
-        public static void BindBodySplineIK(MSelectionList jointList)
+        public static void BindBodySplineIK(MSelectionList jointList = null)
         {
+            if (jointList == null)
+            {
+                jointList = BasicFunc.GetSelectedList();
+            }
             //check if all of selected objects are joint
             int count = (int)jointList.length;
             if (count < 2)
             {
                 return;
             }
-            MDagPath breastJointDagPath, hipJointDagPath;
+            MDagPath dag_breastJoint = new MDagPath(), dag_hipJoint = new MDagPath();
             for (int i = 0; i < count; i++)
             {
                 MDagPath jtDagPath = new MDagPath();
@@ -374,14 +378,6 @@ namespace InazumaTool.BindTools
                         return;
                     }
 
-                    if (i == 0)
-                    {
-                        breastJointDagPath = jtDagPath;
-                    }
-                    else if (i == count - 1)
-                    {
-                        hipJointDagPath = jtDagPath;
-                    }
                 }
                 else
                 {
@@ -389,10 +385,24 @@ namespace InazumaTool.BindTools
                 }
             }
 
-            MDagPath curveDagPath = JointProcess.CreateJointsCurve(jointList);
-            
+            jointList.getDagPath((uint)(count - 1), dag_breastJoint);
+            jointList.getDagPath(0, dag_hipJoint);
 
+            MFnIkJoint breastJoint = new MFnIkJoint(dag_breastJoint);
+            MFnIkJoint hipJoint = new MFnIkJoint(dag_hipJoint);
+            MDagPath dag_curve = JointProcess.CreateJointsCurve(jointList);
+            MDagPath dag_jtctl_breast = JointProcess.CreateJoint(breastJoint, "jtctl_breast");
+            MDagPath dag_jtctl_hip = JointProcess.CreateJoint(hipJoint, "jtctl_hip");
+            MSelectionList bindSelectionList = new MSelectionList();
+            bindSelectionList.add(dag_curve);
+            bindSelectionList.add(dag_jtctl_breast);
+            bindSelectionList.add(dag_jtctl_hip);
+            BasicFunc.Select(bindSelectionList);
 
+            MGlobal.executeCommand("SmoothBindSkin");
+            string ikName = JointProcess.AddIKHandle(dag_hipJoint, dag_breastJoint, JointProcess.IKSolverType.Spline, dag_curve.fullPathName)[0];
+            MDagPath dag_ik = BasicFunc.GetDagPathByName(ikName);
+            BasicFunc.ConnectAttr(dag_jtctl_breast.fullPathName + ".rotate.rotateY", dag_ik.fullPathName + ".twist");
 
         }
 
@@ -434,22 +444,22 @@ namespace InazumaTool.BindTools
             cmdList.Add(new CommandData("绑定", "上半身"));
             cmdList.Add(new CommandData("绑定", cmdStr, "bindBreast", "绑定上半身与腰部", () =>
             {
-                BindReverseFootRPIK();
+                BindBodySplineIK();
             }));
             cmdList.Add(new CommandData("绑定", cmdStr, "bindShoulder", "绑定人类肩膀-手臂", () =>
             {
-                BindReverseFootRPIK();
+                //BindReverseFootRPIK();
             }));
 
 
             cmdList.Add(new CommandData("绑定", "面部"));
             cmdList.Add(new CommandData("绑定", cmdStr, "bindTongue", "绑定花京院型舌头", () =>
             {
-                BindReverseFootRPIK();
+                //BindReverseFootRPIK();
             }));
             cmdList.Add(new CommandData("绑定", cmdStr, "bindSight", "绑定平视控制器", () =>
             {
-                BindReverseFootRPIK();
+                //BindReverseFootRPIK();
             }));
 
             return cmdList;
