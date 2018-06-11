@@ -149,24 +149,28 @@ namespace InazumaTool.BindTools
             return null;
         }
 
-        
-        public static MDagPath BindRPIK()
+
+        public static MDagPath BindRPIK(MSelectionList jointList = null)
         {
-            MSelectionList selected = new MSelectionList();
-            MGlobal.getActiveSelectionList(selected);
-            if (selected.length == 3)
+            if (jointList == null || jointList.isEmpty) 
             {
-                MDagPath rootObject = new MDagPath(), endObject = new MDagPath(), ctlObject = new MDagPath();
-                selected.getDagPath(0, rootObject);
-                selected.getDagPath(1, endObject);
-                selected.getDagPath(2, ctlObject);
-                return BindRPIK(rootObject, endObject);
+                jointList = new MSelectionList();
+                MGlobal.getActiveSelectionList(jointList);
             }
-            else if (selected.length == 2)
+            
+            if (jointList.length == 3)
+            {
+                MDagPath rootObject = new MDagPath(), endObject = new MDagPath(), ctlDagPath = new MDagPath();
+                jointList.getDagPath(0, rootObject);
+                jointList.getDagPath(1, endObject);
+                jointList.getDagPath(2, ctlDagPath);
+                return BindRPIK(rootObject, endObject, ctlDagPath);
+            }
+            else if (jointList.length == 2)
             {
                 MDagPath rootObject = new MDagPath(), endObject = new MDagPath();
-                selected.getDagPath(0, rootObject);
-                selected.getDagPath(1, endObject);
+                jointList.getDagPath(0, rootObject);
+                jointList.getDagPath(1, endObject);
                 return BindRPIK(rootObject, endObject);
             }
             else
@@ -174,42 +178,27 @@ namespace InazumaTool.BindTools
                 return null;
             }
         }
-
-        public static MDagPath BindRPIK(MDagPath rootDagPath, MDagPath endDagPath)
+        
+        public static MDagPath BindRPIK(MDagPath rootDagPath, MDagPath endDagPath, MDagPath ctlDagPath = null)
         {
-            MDagPath ctlDagPath = BasicFunc.AddChildCircle(endDagPath);
-            BasicFunc.UnparentTransform(ctlDagPath);
-            BasicFunc.FreezeTransform(new MFnTransform(ctlDagPath));
-            return BindRPIK(rootDagPath, endDagPath, ctlDagPath);
-        }
+            MFnTransform endTrans = new MFnTransform(endDagPath);
+            MDagPath middleDagPath = MDagPath.getAPathTo(endTrans.parent(0));
 
-        public static MDagPath BindRPIK(MDagPath rootDagPath, MDagPath endDagPath, MDagPath ctlDagPath)
-        {
+            if (ctlDagPath == null)
+            {
+                ctlDagPath = BasicFunc.AddChildCircle(endDagPath);
+                BasicFunc.UnparentTransform(ctlDagPath);
+                BasicFunc.FreezeTransform(new MFnTransform(ctlDagPath));
+            }
+
+
             //string resultStr = MGlobal.executeCommandStringResult("ikHandle -sj " + rootObject.fullPathName() + " -ee " + endObject.fullPathName() + " -sol ikRPsolver -n ik_" + rootObject.partialPathName() + "_" + endObject.partialPathName(),true);
             string resultStr = MGlobal.executePythonCommandStringResult("cmds.ikHandle(sj='" + rootDagPath.fullPathName + "',ee='" + endDagPath.fullPathName + "',sol='ikRPsolver',n='ik_" + rootDagPath.partialPathName + "_" + endDagPath.partialPathName + "')");
 
             //[u'ik_joint1_joint4', u'effector1']
             string[] resultArr = BasicFunc.SplitPythonResultStr(resultStr);
-            //MGlobal.displayInfo("begin test");
-            //for (int i = 0; i < resultArr.Length; i++)
-            //{
-            //    MGlobal.displayInfo(i + ":" + resultArr[i]);
-            //}
-            //MGlobal.displayInfo("end test");
 
-            //MGlobal.displayInfo(resultStr);
-            /*for (int i = 0; i < msa.length(); i++)
-            {
-                MGlobal.displayInfo(msa[i]);
-            }*/
-            /*MGlobal.displayInfo("ikName:" + msa[0]);
-            ikDagPath = &(BasicFunc.GetDagPathByName(msa[0]));
-            if (ikDagPath != NULL)
-            {
-                MGlobal.displayInfo(ikDagPath.fullPathName());
-            }*/
-            MDagPath middleObject = MDagPath.getAPathTo(rootDagPath.child(0));
-            MDagPath locDagPath = AddRPIKPole(middleObject);
+            MDagPath locDagPath = AddRPIKPole(middleDagPath);
             if (locDagPath != null)
             {
                 BasicFunc.FreezeTransform(new MFnTransform(locDagPath));
@@ -222,7 +211,6 @@ namespace InazumaTool.BindTools
 
             return null;// BasicFunc.GetDagPathByName(resultArr[0]);
         }
-
 
         #endregion
 
@@ -402,9 +390,32 @@ namespace InazumaTool.BindTools
             MGlobal.executeCommand("SmoothBindSkin");
             string ikName = JointProcess.AddIKHandle(dag_hipJoint, dag_breastJoint, JointProcess.IKSolverType.Spline, dag_curve.fullPathName)[0];
             MDagPath dag_ik = BasicFunc.GetDagPathByName(ikName);
-            BasicFunc.ConnectAttr(dag_jtctl_breast.fullPathName + ".rotate.rotateY", dag_ik.fullPathName + ".twist");
+            BasicFunc.ConnectAttr(dag_jtctl_breast.fullPathName + ".rotate.rotateY", dag_ik.fullPathName + ".twist", true, true);
 
         }
+
+        public static void BindShoulder(MSelectionList jointList = null)
+        {
+            if (jointList == null)
+            {
+                jointList = BasicFunc.GetSelectedList(MFn.Type.kJoint);
+            }
+            if (jointList.length != 4)
+            {
+                MGlobal.displayInfo("please select joints");
+                return;
+            }
+
+            MDagPath dag_shoulder = new MDagPath(), dag_armRoot = new MDagPath(), dag_elbow = new MDagPath(), dag_wrist = new MDagPath();
+            jointList.getDagPath((uint)0, dag_shoulder);
+            jointList.getDagPath((uint)1, dag_armRoot);
+            jointList.getDagPath((uint)2, dag_elbow);
+            jointList.getDagPath((uint)3, dag_wrist);
+            JointProcess.AddIKHandle(dag_shoulder, dag_armRoot, JointProcess.IKSolverType.SingleChain);
+
+        }
+
+
 
         #endregion
 

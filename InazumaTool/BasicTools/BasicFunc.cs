@@ -442,10 +442,14 @@ namespace InazumaTool.BasicTools
 
         #region Modify
 
-        public static void ConnectAttr(string from, string to, bool force = true)
+        public static void ConnectAttr(string from, string to, bool force = true,bool showInIdle = false)
         {
-            string cmdStr = string.Format("connectAttr {0} {1} -f {2}", from, to, force ? 1 : 0);
-            MGlobal.executeCommand(cmdStr);
+            string cmdStr = string.Format("connectAttr {0} {1}", from, to);
+            if (force)
+            {
+                cmdStr += " -f";
+            }
+            MGlobal.executeCommand(cmdStr, showInIdle);
         }
 
         public static void OrientConstraint(string from, string to, bool maintainOffset = true)
