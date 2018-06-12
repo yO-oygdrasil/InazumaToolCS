@@ -51,10 +51,13 @@ namespace InazumaTool.BindTools
             {
                 targetObject = BasicFunc.GetSelectedObject(0);
             }
-            MItDependencyGraph mit = new MItDependencyGraph(MDagPath.getAPathTo(targetObject).node, MFn.Type.kBlendShape, MItDependencyGraph.Direction.kUpstream);
-
+            MDagPath dag_target = MDagPath.getAPathTo(targetObject);
+            MFnDependencyNode node_target = new MFnDependencyNode(targetObject);
+            MPlug plug = node_target.findPlug("inMesh");
+            MGlobal.displayInfo("node_target:" + node_target.name+" plug:"+ plug.name);
+            MItDependencyGraph mit = new MItDependencyGraph(plug, MFn.Type.kBlendShape, MItDependencyGraph.Direction.kUpstream);
             //MDagPath dagPath = new MDagPath();
-            
+            //MItDependencyNodes mitnode = new MItDependencyNodes(MFn.Type.kBlendShape);
 
 
             while (!mit.isDone)

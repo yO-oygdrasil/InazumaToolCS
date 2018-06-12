@@ -101,7 +101,7 @@ namespace InazumaTool.BindTools
 
         #endregion
 
-        #region RPIK
+        #region IKControl
 
         public static MDagPath AddRPIKPole(MDagPath middleDagPath = null)
         {
@@ -150,7 +150,7 @@ namespace InazumaTool.BindTools
         }
 
 
-        public static MDagPath BindRPIK(MSelectionList jointList = null)
+        public static MDagPath[] BindIKControl(MSelectionList jointList = null,JointProcess.IKSolverType iKSolverType = JointProcess.IKSolverType.RotatePlane)
         {
             if (jointList == null || jointList.isEmpty) 
             {
@@ -164,14 +164,14 @@ namespace InazumaTool.BindTools
                 jointList.getDagPath(0, rootObject);
                 jointList.getDagPath(1, endObject);
                 jointList.getDagPath(2, ctlDagPath);
-                return BindRPIK(rootObject, endObject, ctlDagPath);
+                return BindIKControl(rootObject, endObject, iKSolverType, ctlDagPath);
             }
             else if (jointList.length == 2)
             {
                 MDagPath rootObject = new MDagPath(), endObject = new MDagPath();
                 jointList.getDagPath(0, rootObject);
                 jointList.getDagPath(1, endObject);
-                return BindRPIK(rootObject, endObject);
+                return BindIKControl(rootObject, endObject, iKSolverType);
             }
             else
             {
@@ -179,7 +179,7 @@ namespace InazumaTool.BindTools
             }
         }
         
-        public static MDagPath BindRPIK(MDagPath rootDagPath, MDagPath endDagPath, MDagPath ctlDagPath = null)
+        public static MDagPath[] BindIKControl(MDagPath rootDagPath, MDagPath endDagPath, JointProcess.IKSolverType iKSolverType = JointProcess.IKSolverType.RotatePlane, MDagPath ctlDagPath = null)
         {
             MFnTransform endTrans = new MFnTransform(endDagPath);
             MDagPath middleDagPath = MDagPath.getAPathTo(endTrans.parent(0));
@@ -193,26 +193,32 @@ namespace InazumaTool.BindTools
 
 
             //string resultStr = MGlobal.executeCommandStringResult("ikHandle -sj " + rootObject.fullPathName() + " -ee " + endObject.fullPathName() + " -sol ikRPsolver -n ik_" + rootObject.partialPathName() + "_" + endObject.partialPathName(),true);
-            string resultStr = MGlobal.executePythonCommandStringResult("cmds.ikHandle(sj='" + rootDagPath.fullPathName + "',ee='" + endDagPath.fullPathName + "',sol='ikRPsolver',n='ik_" + rootDagPath.partialPathName + "_" + endDagPath.partialPathName + "')");
+            //string resultStr = MGlobal.executePythonCommandStringResult("cmds.ikHandle(sj='" + rootDagPath.fullPathName + "',ee='" + endDagPath.fullPathName + "',sol='ikRPsolver',n='ik_" + rootDagPath.partialPathName + "_" + endDagPath.partialPathName + "')");
 
             //[u'ik_joint1_joint4', u'effector1']
-            string[] resultArr = BasicFunc.SplitPythonResultStr(resultStr);
+            string[] resultArr = JointProcess.AddIKHandle(rootDagPath, endDagPath, iKSolverType, ctlDagPath.fullPathName);
+            MGlobal.executeCommandStringResult("pointConstraint " + ctlDagPath.fullPathName + " " + resultArr[0]);
 
-            MDagPath locDagPath = AddRPIKPole(middleDagPath);
-            if (locDagPath != null)
+            if (iKSolverType == JointProcess.IKSolverType.RotatePlane)
             {
-                BasicFunc.FreezeTransform(new MFnTransform(locDagPath));
-                //begin to add constriant
-                string poleConstraintResult = MGlobal.executeCommandStringResult("poleVectorConstraint " + locDagPath.fullPathName + " " + resultArr[0]);
-                //MGlobal.displayInfo(poleConstraintResult);
-                MGlobal.executeCommandStringResult("pointConstraint " + ctlDagPath.fullPathName + " " + resultArr[0]);
-
+                MDagPath locDagPath = AddRPIKPole(middleDagPath);
+                if (locDagPath != null)
+                {
+                    BasicFunc.FreezeTransform(new MFnTransform(locDagPath));
+                    //begin to add constriant
+                    string poleConstraintResult = MGlobal.executeCommandStringResult("poleVectorConstraint " + locDagPath.fullPathName + " " + resultArr[0]);
+                    //MGlobal.displayInfo(poleConstraintResult);
+                    return new MDagPath[3] { BasicFunc.GetDagPathByName(resultArr[0]), ctlDagPath, locDagPath };
+                }
             }
 
-            return null;// BasicFunc.GetDagPathByName(resultArr[0]);
+            return new MDagPath[2] { BasicFunc.GetDagPathByName(resultArr[0]), ctlDagPath };
         }
 
         #endregion
+
+
+
 
         #region Foot
 
@@ -317,7 +323,7 @@ namespace InazumaTool.BindTools
             }
 
             MGlobal.displayInfo(rbs[7].fullPathName);
-            MDagPath ikDagPath = BindRPIK(legRootDagPath, ankleDagPath, rbs[7]);
+            MDagPath ikDagPath = BindIKControl(legRootDagPath, ankleDagPath, JointProcess.IKSolverType.RotatePlane, rbs[7])[0];
             MGlobal.executeCommandStringResult("orientConstraint -mo " + rbs[4].fullPathName + " " + middleDagPath.fullPathName);
             MGlobal.executeCommandStringResult("orientConstraint -mo " + rbs[5].fullPathName + " " + ankleDagPath.fullPathName);
 
@@ -411,7 +417,21 @@ namespace InazumaTool.BindTools
             jointList.getDagPath((uint)1, dag_armRoot);
             jointList.getDagPath((uint)2, dag_elbow);
             jointList.getDagPath((uint)3, dag_wrist);
-            JointProcess.AddIKHandle(dag_shoulder, dag_armRoot, JointProcess.IKSolverType.SingleChain);
+            string shoulderIkName = JointProcess.AddIKHandle(dag_shoulder, dag_armRoot, JointProcess.IKSolverType.SingleChain)[0];
+            MDagPath[] shoulderResult = BindIKControl(dag_shoulder, dag_armRoot, JointProcess.IKSolverType.SingleChain);
+            MDagPath[] armResult = BindIKControl(dag_armRoot, dag_wrist, JointProcess.IKSolverType.RotatePlane);
+
+            MDagPath dag_ctl_shoulder = shoulderResult[1], dag_ctl_arm = armResult[1], dag_ctl_pole = armResult[2];
+            BasicFunc.SetTransformParent(dag_ctl_arm.fullPathName, dag_ctl_shoulder.fullPathName);
+            BasicFunc.SetTransformParent(dag_ctl_pole.fullPathName, dag_ctl_shoulder.fullPathName);
+
+            //MFnTransform trans_ctl_shoulder = new MFnTransform(dag_ctl_shoulder);
+            //MFnTransform trans_ctl_arm = new MFnTransform(dag_ctl_arm);
+            //MFnTransform trans_ctl_pole = new MFnTransform(dag_ctl_pole);
+
+            //BasicFunc.SetTransformParent(trans_ctl_arm, trans_ctl_shoulder);
+            //BasicFunc.SetTransformParent(trans_ctl_pole, trans_ctl_shoulder);
+
 
         }
 
@@ -434,7 +454,7 @@ namespace InazumaTool.BindTools
             cmdList.Add(new CommandData("绑定", "旋转平面"));
             cmdList.Add(new CommandData("绑定", cmdStr, "rpik", "绑定旋转平面IK控制器", () =>
             {
-                BindRPIK();
+                BindIKControl();
             }));
             cmdList.Add(new CommandData("绑定", cmdStr, "rpikPole", "生成极向量控制器", () =>
             {
@@ -459,7 +479,7 @@ namespace InazumaTool.BindTools
             }));
             cmdList.Add(new CommandData("绑定", cmdStr, "bindShoulder", "绑定人类肩膀-手臂", () =>
             {
-                //BindReverseFootRPIK();
+                BindShoulder();
             }));
 
 
