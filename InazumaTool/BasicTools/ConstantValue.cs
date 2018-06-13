@@ -20,5 +20,25 @@ namespace InazumaTool.BasicTools
 
 
         public const string plugName_blendShapeWeight = "weight";
+
+        //public const string cmd_pointConstraint = "pointConstraint";
+        //public const string cmd_poleVectorConstraint = "poleVectorConstraint";
+        //public const string cmd_parentConstraint = "parentConstraint";
+        //public const string cmd_orientConstraint = "orientConstraint";
+
+        public enum ConstraintType
+        {
+            Point,
+            PoleVector,
+            Parent,
+            Orient
+        }
+        private static readonly string[] cmd_constraint = { "pointConstraint", "poleVectorConstraint", "parentConstraint", "orientConstraint" };
+        public static string Command_Constraint(ConstraintType constraintType)
+        {
+            return cmd_constraint[(int)constraintType];
+
+        }
+
     }
 }

@@ -206,7 +206,8 @@ namespace InazumaTool.BindTools
                 {
                     BasicFunc.FreezeTransform(new MFnTransform(locDagPath));
                     //begin to add constriant
-                    string poleConstraintResult = MGlobal.executeCommandStringResult("poleVectorConstraint " + locDagPath.fullPathName + " " + resultArr[0]);
+                    BasicFunc.AddConstraint(locDagPath.fullPathName, resultArr[0], ConstantValue.ConstraintType.PoleVector);
+                    //string poleConstraintResult = MGlobal.executeCommandStringResult("poleVectorConstraint " + locDagPath.fullPathName + " " + resultArr[0]);
                     //MGlobal.displayInfo(poleConstraintResult);
                     return new MDagPath[3] { BasicFunc.GetDagPathByName(resultArr[0]), ctlDagPath, locDagPath };
                 }
@@ -417,14 +418,14 @@ namespace InazumaTool.BindTools
             jointList.getDagPath((uint)1, dag_armRoot);
             jointList.getDagPath((uint)2, dag_elbow);
             jointList.getDagPath((uint)3, dag_wrist);
-            string shoulderIkName = JointProcess.AddIKHandle(dag_shoulder, dag_armRoot, JointProcess.IKSolverType.SingleChain)[0];
+            //string shoulderIkName = JointProcess.AddIKHandle(dag_shoulder, dag_armRoot, JointProcess.IKSolverType.SingleChain)[0];
             MDagPath[] shoulderResult = BindIKControl(dag_shoulder, dag_armRoot, JointProcess.IKSolverType.SingleChain);
             MDagPath[] armResult = BindIKControl(dag_armRoot, dag_wrist, JointProcess.IKSolverType.RotatePlane);
 
             MDagPath dag_ctl_shoulder = shoulderResult[1], dag_ctl_arm = armResult[1], dag_ctl_pole = armResult[2];
             BasicFunc.SetTransformParent(dag_ctl_arm.fullPathName, dag_ctl_shoulder.fullPathName);
             BasicFunc.SetTransformParent(dag_ctl_pole.fullPathName, dag_ctl_shoulder.fullPathName);
-
+            BasicFunc.AddConstraint(dag_ctl_arm.fullPathName, dag_wrist.fullPathName, ConstantValue.ConstraintType.Orient);
             //MFnTransform trans_ctl_shoulder = new MFnTransform(dag_ctl_shoulder);
             //MFnTransform trans_ctl_arm = new MFnTransform(dag_ctl_arm);
             //MFnTransform trans_ctl_pole = new MFnTransform(dag_ctl_pole);

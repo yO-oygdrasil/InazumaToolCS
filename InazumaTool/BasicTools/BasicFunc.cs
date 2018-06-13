@@ -451,14 +451,14 @@ namespace InazumaTool.BasicTools
             }
             MGlobal.executeCommand(cmdStr, showInIdle);
         }
-
-        public static void OrientConstraint(string from, string to, bool maintainOffset = true)
+        
+        public static void AddConstraint(string from, string to, ConstantValue.ConstraintType ct, bool maintainOffset = true)
         {
-            string cmdStr = string.Format(maintainOffset ? "orientConstraint -mo {0} {1}" : "orientConstraint {0},{1}", from, to);
+            string cmdStr = string.Format(maintainOffset ? "{0} -mo {1} {2}" : "{0} {1} {2}", ConstantValue.Command_Constraint(ct), from, to);
             MGlobal.executeCommandStringResult(cmdStr);
         }
-
-#endregion
+        
+        #endregion
 
         #region DealResultStr
         public static string SubUShell(string originStr)
