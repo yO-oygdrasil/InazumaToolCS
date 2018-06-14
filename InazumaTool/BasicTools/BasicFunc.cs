@@ -149,6 +149,7 @@ namespace InazumaTool.BasicTools
             }            
             return selected;
         }
+        
 
         public static MSelectionList GetObjectsByName(string name)
         {
@@ -292,6 +293,35 @@ namespace InazumaTool.BasicTools
             points.Add(new MPoint(-1, 0, 0));
             points.Add(new MPoint(0, 1, 0));
             return CreateCurve(points, ctlName, 1, MFnNurbsCurve.Form.kClosed);            
+        }
+
+        public static MDagPath CreateCTL_Square(string ctlName = "square",float height = 1, float width = 1)
+        {
+            MPointArray points = new MPointArray();
+            float up = height / 2;
+            float left = width / 2;
+            points.Add(new MPoint(left, up, 0));
+            points.Add(new MPoint(left, -up, 0));
+            points.Add(new MPoint(-left, -up, 0));
+            points.Add(new MPoint(-left, up, 0));
+            points.Add(new MPoint(left, up, 0));
+            return CreateCurve(points, ctlName, 1, MFnNurbsCurve.Form.kClosed);
+        }
+
+        public static MDagPath CreateCTL_Square(string ctlName = "square", float up = 0.5f, float down = -0.5f, float left = -0.5f, float right = 0.5f)
+        {
+            MPointArray points = new MPointArray();
+            points.Add(new MPoint(left, up, 0));
+            points.Add(new MPoint(left, down, 0));
+            points.Add(new MPoint(right, down, 0));
+            points.Add(new MPoint(right, up, 0));
+            points.Add(new MPoint(left, up, 0));
+            return CreateCurve(points, ctlName, 1, MFnNurbsCurve.Form.kClosed);
+        }
+
+        public static MDagPath CreateEmptyGroup(string grpName = "grp_empty")
+        {
+            return BasicFunc.GetDagPathByName(MGlobal.executeCommandStringResult(string.Format("group -em -n \"{0}\"", grpName)));
         }
 
         public static MDagPath CreateCurve(MPoint[] pts, string curveName, int degree = 1, MFnNurbsCurve.Form form = MFnNurbsCurve.Form.kOpen)

@@ -440,6 +440,109 @@ namespace InazumaTool.BindTools
 
         #endregion
 
+        #region Face
+        public static void BindEyes(MSelectionList jointList = null)
+        {
+            if (jointList == null)
+            {
+                jointList = BasicFunc.GetSelectedList();
+            }
+            
+            for (int i = 0; i < jointList.length; i++)
+            {
+                MDagPath dag_joint = new MDagPath();
+                jointList.getDagPath((uint)i, dag_joint);
+
+            }
+        }
+
+        public static List<MDagPath> AddBonesCTL(MSelectionList jointList = null, MFnTransform parentTrans = null)
+        {
+            if (jointList == null)
+            {
+                jointList = BasicFunc.GetSelectedList();
+            }
+            if (parentTrans == null)
+            {
+                parentTrans = new MFnTransform(BasicFunc.CreateEmptyGroup("grp_bonesCTL"));
+            }
+            List<MDagPath> jointDags = new List<MDagPath>();
+            for (int i = 0; i < jointList.length; i++)
+            {
+                MDagPath dag = new MDagPath();
+                jointList.getDagPath((uint)i, dag);
+                jointDags.Add(dag);
+            }
+            int count = jointDags.Count;
+
+            MFnTransform[] jointTrans = new MFnTransform[count];
+            for (int i = 0; i < jointDags.Count; i++)
+            {
+                jointTrans[i] = new MFnTransform(jointDags[i]);
+            }
+            MVector[] jointWorldPositions = new MVector[jointDags.Count];
+            MVector centerPos = MVector.zero;
+            for (int i = 0; i < count; i++)
+            {
+                jointWorldPositions[i] = jointTrans[i].getTranslation(MSpace.Space.kWorld);
+                centerPos += jointWorldPositions[i];
+            }
+            centerPos = centerPos * (1.0f / count);
+
+            double[] minDist_y = new double[count];
+            double[] minDist_x = new double[count];
+
+            for (int i = 0; i < count; i++)
+            {
+                double closestY = double.MaxValue, closestX = double.MaxValue;
+                //int minDistIndex = 0;
+
+                for (int j = 0; j < count; j++)
+                {
+                    if (i == j)
+                    {
+                        continue;
+                    }
+                    MVector direct = jointWorldPositions[i] - jointWorldPositions[j];
+                    direct.x = Math.Abs(direct.x);
+                    direct.y = Math.Abs(direct.y);
+                    if (direct.x >= direct.y)
+                    {
+                        if (direct.x < closestX)
+                        {
+                            closestX = direct.x;
+                            //minDistIndex = j;
+                        }
+                    }
+                    if (direct.y >= direct.x)
+                    {
+                        if (direct.y < closestY)
+                        {
+                            closestY = direct.y;
+                        }
+                    }
+                }
+                minDist_y[i] = closestY;
+                minDist_x[i] = closestX;
+            }
+            List<MDagPath> curves = new List<MDagPath>();
+            for (int i = 0; i < count; i++)
+            {
+                MDagPath curve = BasicFunc.CreateCTL_Square("ctl_" + jointDags[i].partialPathName, (float)minDist_y[i] / 2, (float)minDist_x[i] / 2);
+                MFnTransform curveTrans = new MFnTransform(curve);
+                BasicFunc.SetTransformParent(curveTrans, parentTrans);
+                curveTrans.setTranslation(jointWorldPositions[i] - centerPos, MSpace.Space.kTransform);
+                BasicFunc.FreezeTransform(curveTrans);
+                curves.Add(curve);
+            }
+            return curves;
+        }
+
+        #endregion
+
+
+
+
         const string cmdStr = "BindHumanBody";
         public static List<CommandData> GetCommandDatas()
         {
@@ -492,6 +595,10 @@ namespace InazumaTool.BindTools
             cmdList.Add(new CommandData("绑定", cmdStr, "bindSight", "绑定平视控制器", () =>
             {
                 //BindReverseFootRPIK();
+            }));
+            cmdList.Add(new CommandData("绑定", cmdStr, "createJointCTLs", "根据骨骼位置创建控制器阵列", () =>
+            {
+                AddBonesCTL();
             }));
 
             return cmdList;
