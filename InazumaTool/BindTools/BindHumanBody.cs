@@ -447,13 +447,16 @@ namespace InazumaTool.BindTools
             {
                 jointList = BasicFunc.GetSelectedList();
             }
-            
+            List<MDagPath> jointDags = new List<MDagPath>();
             for (int i = 0; i < jointList.length; i++)
             {
                 MDagPath dag_joint = new MDagPath();
                 jointList.getDagPath((uint)i, dag_joint);
-
+                jointDags.Add(dag_joint);
             }
+
+
+
         }
 
         public static List<MDagPath> AddBonesCTL(MSelectionList jointList = null, MFnTransform parentTrans = null)
@@ -466,6 +469,10 @@ namespace InazumaTool.BindTools
             {
                 parentTrans = new MFnTransform(BasicFunc.CreateEmptyGroup("grp_bonesCTL"));
             }
+            if (jointList.length == 0)
+            {
+                return null;
+            }
             List<MDagPath> jointDags = new List<MDagPath>();
             for (int i = 0; i < jointList.length; i++)
             {
@@ -476,9 +483,11 @@ namespace InazumaTool.BindTools
             int count = jointDags.Count;
 
             MFnTransform[] jointTrans = new MFnTransform[count];
+            MFnTransform[] jointParentTrans = new MFnTransform[count];
             for (int i = 0; i < jointDags.Count; i++)
             {
                 jointTrans[i] = new MFnTransform(jointDags[i]);
+                jointParentTrans[i] = new MFnTransform(MDagPath.getAPathTo(jointTrans[i].parent(0)));
             }
             MVector[] jointWorldPositions = new MVector[jointDags.Count];
             MVector centerPos = MVector.zero;
@@ -492,47 +501,66 @@ namespace InazumaTool.BindTools
             double[] minDist_y = new double[count];
             double[] minDist_x = new double[count];
 
-            for (int i = 0; i < count; i++)
+            if (count > 1)
             {
-                double closestY = double.MaxValue, closestX = double.MaxValue;
-                //int minDistIndex = 0;
-
-                for (int j = 0; j < count; j++)
+                for (int i = 0; i < count; i++)
                 {
-                    if (i == j)
+                    double closestY = double.MaxValue, closestX = double.MaxValue;
+                    //int minDistIndex = 0;
+
+                    for (int j = 0; j < count; j++)
                     {
-                        continue;
-                    }
-                    MVector direct = jointWorldPositions[i] - jointWorldPositions[j];
-                    direct.x = Math.Abs(direct.x);
-                    direct.y = Math.Abs(direct.y);
-                    if (direct.x >= direct.y)
-                    {
-                        if (direct.x < closestX)
+                        if (i == j)
                         {
-                            closestX = direct.x;
-                            //minDistIndex = j;
+                            continue;
+                        }
+                        MVector direct = jointWorldPositions[i] - jointWorldPositions[j];
+                        direct.x = Math.Abs(direct.x);
+                        direct.y = Math.Abs(direct.y);
+                        if (direct.x >= direct.y)
+                        {
+                            if (direct.x < closestX)
+                            {
+                                closestX = direct.x;
+                                //minDistIndex = j;
+                            }
+                        }
+                        if (direct.y >= direct.x)
+                        {
+                            if (direct.y < closestY)
+                            {
+                                closestY = direct.y;
+                            }
                         }
                     }
-                    if (direct.y >= direct.x)
-                    {
-                        if (direct.y < closestY)
-                        {
-                            closestY = direct.y;
-                        }
-                    }
+                    minDist_y[i] = closestY;
+                    minDist_x[i] = closestX;
                 }
-                minDist_y[i] = closestY;
-                minDist_x[i] = closestX;
             }
+            else
+            {
+                minDist_x[0] = 1;
+                minDist_y[0] = 1;
+            }
+
+           
             List<MDagPath> curves = new List<MDagPath>();
             for (int i = 0; i < count; i++)
             {
-                MDagPath curve = BasicFunc.CreateCTL_Square("ctl_" + jointDags[i].partialPathName, (float)minDist_y[i] / 2, (float)minDist_x[i] / 2);
+                float width = (float)minDist_x[i] / 2, height = (float)minDist_y[i] / 2;
+                MDagPath curve = BasicFunc.CreateCTL_Square("ctl_" + jointDags[i].partialPathName, height, width);
                 MFnTransform curveTrans = new MFnTransform(curve);
                 BasicFunc.SetTransformParent(curveTrans, parentTrans);
                 curveTrans.setTranslation(jointWorldPositions[i] - centerPos, MSpace.Space.kTransform);
                 BasicFunc.FreezeTransform(curveTrans);
+                BasicFunc.SetTranslateLimit(curveTrans, -width / 2, -height / 2, 0, width / 2, height / 2, 0);
+
+                MPlug plug_curveTX = curveTrans.findPlug(ConstantValue.plugName_tx);
+                MPlug plug_curveTY = curveTrans.findPlug(ConstantValue.plugName_ty);
+                MPlug plug_jointRY = jointParentTrans[i].findPlug(ConstantValue.plugName_ry);
+                MPlug plug_jointRZ = jointParentTrans[i].findPlug(ConstantValue.plugName_rz);
+                BindAttr.ProjectPlug(plug_curveTX, plug_jointRY, -width / 2, width / 2, -45, 45);
+                BindAttr.ProjectPlug(plug_curveTY, plug_jointRZ, -height / 2, height / 2, -45, 45);
                 curves.Add(curve);
             }
             return curves;

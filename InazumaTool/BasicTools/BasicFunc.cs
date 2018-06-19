@@ -534,6 +534,18 @@ namespace InazumaTool.BasicTools
             return vec - Project(vec, direction);
         }
 
+        public static float CalPosRadian(MVector pos)
+        {
+            MVector normalizedPos = pos.normal;
+
+            float radian = (float)Math.Acos(normalizedPos.z);
+            if (normalizedPos.x < 0)
+            {
+                radian = -radian;
+            }
+            return radian;
+        }
+
         #endregion
 
         #region Debug Output

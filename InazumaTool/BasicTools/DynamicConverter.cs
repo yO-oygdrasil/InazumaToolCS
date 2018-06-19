@@ -15,6 +15,10 @@ namespace InazumaTool.BasicTools
 {
     public static class DynamicConverter
     {
+
+
+        #region HairBone
+
         /// <summary>
         /// return Dynamic Output Curve
         /// </summary>
@@ -22,7 +26,7 @@ namespace InazumaTool.BasicTools
         /// <param name="curveList"></param>
         /// <param name="pointLock">0-none, 1-base, 2-end,3-both</param>
         /// <returns></returns>
-        public static MDagPath[] CurvesToHairs(ref MDagPath hairSystemDagPath,MSelectionList curveList = null, int pointLock = 1)
+        public static MDagPath[] CurvesToHairs(ref MDagPath hairSystemDagPath, MSelectionList curveList = null, int pointLock = 1)
         {
             if (curveList == null)
             {
@@ -73,7 +77,7 @@ namespace InazumaTool.BasicTools
                 }
             }
 
-            
+
             //error
             return results.ToArray();
         }
@@ -96,7 +100,7 @@ namespace InazumaTool.BasicTools
             {
                 MGlobal.displayInfo("hair system need to be created!");
             }
-            BasicFunc.Select(targetList);   
+            BasicFunc.Select(targetList);
 
 
             string cmdStr = "cmds.MakeCurvesDynamic(0,0,0,1,0)";
@@ -141,7 +145,7 @@ namespace InazumaTool.BasicTools
                 return;
             }
 
-            MDagPath dagPath_startJoint = new MDagPath(),dagPath_endJoint = new MDagPath();
+            MDagPath dagPath_startJoint = new MDagPath(), dagPath_endJoint = new MDagPath();
             if (jointChains.length == 1)
             {
                 BasicFunc.Select(jointChains);
@@ -174,7 +178,7 @@ namespace InazumaTool.BasicTools
                 MSelectionList tempList = new MSelectionList();
                 tempList.add(oneJoint);
                 AddDynamicChainControl(ref hairSystem, tempList);
-            }            
+            }
         }
 
 
@@ -195,7 +199,7 @@ namespace InazumaTool.BasicTools
             {
                 BasicFunc.Select(dagPath);
             }
-            switch(hairSelectionType)
+            switch (hairSelectionType)
             {
                 case HairSelectionType.Follicles:
                     {
@@ -218,11 +222,81 @@ namespace InazumaTool.BasicTools
                         break;
                     }
             }
-            
-            
+
+
 
 
         }
+
+        #endregion
+
+        #region ProxyModel
+        public enum ProxyBaseShape
+        {
+            Box,
+            Tube,
+            Sphere
+        }
+
+        public static MFnMesh CreateVertLoopCircle(List<MVector> verts, bool reOrder = true)
+        {
+            int count = verts.Count;
+            float[] radians = new float[count];
+            for (int i = 0; i < count; i++)
+            {
+                radians[i] = BasicFunc.CalPosRadian(verts[i]);
+            }
+
+
+        }
+
+
+        public static void CreateProxyModel(MSelectionList selected = null, ProxyBaseShape baseShape = ProxyBaseShape.Tube)
+        {
+            if (selected == null)
+            {
+                //
+                selected = BasicFunc.GetSelectedList();
+            }
+
+            List<MVector> positions = new List<MVector>();
+            MItSelectionList it_selectionList = new MItSelectionList(selected);
+            MVector totalWeight = MVector.zero;
+            for (; !it_selectionList.isDone; it_selectionList.next())
+            {
+                MObject component = new MObject();
+                MDagPath item = new MDagPath();
+                it_selectionList.getDagPath(item, component);
+
+
+
+
+                MItMeshVertex it_verts = new MItMeshVertex(item, component);
+                for (; !it_verts.isDone; it_verts.next())
+                {
+                    MPoint point = it_verts.position(MSpace.Space.kWorld);
+                    MVector pos = new MVector(point.x, point.y, point.z);
+                    BasicFunc.CreateLocator(pos, "vert_" + it_verts.index());
+                    positions.Add(pos);
+                    totalWeight += pos;
+                }
+
+            }
+            //merge the nearest
+            float rangeSize = 1;
+
+            
+            
+            //MVector center = totalWeight * (1.0f / positions.Count);
+            MFnMesh newMesh = new MFnMesh();
+
+
+
+        }
+
+
+
+        #endregion
 
 
         const string cmdStr = "DynamicConverter";
@@ -237,6 +311,10 @@ namespace InazumaTool.BasicTools
             cmdList.Add(new CommandData("动力学", cmdStr, "multiJointChainsToHair", "为链骨们增加动力学", () =>
             {
                 AddDynamicChainControlPerChain();
+            }));
+            cmdList.Add(new CommandData("动力学", cmdStr, "createProxyModel", "创建代理", () =>
+            {
+                CreateProxyModel();
             }));
             return cmdList;
         }
