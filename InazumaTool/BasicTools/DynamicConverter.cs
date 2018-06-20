@@ -238,16 +238,36 @@ namespace InazumaTool.BasicTools
             Sphere
         }
 
-        public static MFnMesh CreateVertLoopCircle(List<MVector> verts, bool reOrder = true)
+        public static MDagPath CreateVertLoopCircle(List<MVector> verts, bool reOrder = true,string ctlName = "loopCircle_0")
         {
-            int count = verts.Count;
-            float[] radians = new float[count];
-            for (int i = 0; i < count; i++)
+            List<MVector> vectors = new List<MVector>(verts);
+            if (vectors.Count < 2)
             {
-                radians[i] = BasicFunc.CalPosRadian(verts[i]);
+                return default(MDagPath);
             }
-
-
+            if (reOrder)
+            {
+                int count = vectors.Count;
+                //List<float> radians = new List<float>();
+                Dictionary<MVector, float> radianDic = new Dictionary<MVector, float>();
+                for (int i = 0; i < count; i++)
+                {
+                    radianDic.Add(vectors[i], BasicFunc.CalPosRadian(vectors[i]));
+                }
+                vectors.Sort((a, b) =>
+                {
+                    if (radianDic[a] > radianDic[b])
+                    {
+                        return 1;
+                    }
+                    else
+                    {
+                        return -1;
+                    }
+                });
+            }
+            vectors.Add(vectors[0]);
+            return BasicFunc.CreateCurve(vectors.ToArray(), ctlName, 1, MFnNurbsCurve.Form.kClosed);
         }
 
 
@@ -276,20 +296,20 @@ namespace InazumaTool.BasicTools
                 {
                     MPoint point = it_verts.position(MSpace.Space.kWorld);
                     MVector pos = new MVector(point.x, point.y, point.z);
-                    BasicFunc.CreateLocator(pos, "vert_" + it_verts.index());
+                    //BasicFunc.CreateLocator(pos, "vert_" + it_verts.index());
                     positions.Add(pos);
                     totalWeight += pos;
                 }
 
             }
             //merge the nearest
-            float rangeSize = 1;
+            //float rangeSize = 1;
 
-            
-            
+
+
             //MVector center = totalWeight * (1.0f / positions.Count);
-            MFnMesh newMesh = new MFnMesh();
-
+            //MFnMesh newMesh = new MFnMesh();
+            CreateVertLoopCircle(positions);
 
 
         }
@@ -303,10 +323,9 @@ namespace InazumaTool.BasicTools
         public static List<CommandData> GetCommandDatas()
         {
             List<CommandData> cmdList = new List<CommandData>();
-            cmdList.Add(new CommandData("动力学", cmdStr, "curveToHair", "曲线转头发 测试", () =>
+            cmdList.Add(new CommandData("动力学", cmdStr, "vertsToCurve", "顶点连成曲线", () =>
             {
-                MDagPath hairSystem = new MDagPath();
-                CurveToHair(ref hairSystem);
+                CreateProxyModel();
             }));
             cmdList.Add(new CommandData("动力学", cmdStr, "multiJointChainsToHair", "为链骨们增加动力学", () =>
             {
