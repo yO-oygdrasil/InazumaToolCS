@@ -35,7 +35,28 @@ namespace InazumaTool.BasicTools
             mfnTrans.setLimit(MFnTransform.LimitType.kTranslateMaxZ, maxZ);
         }
 
+        public static void SetRotationLimit(MFnTransform mfnTrans, float minX, float minY, float minZ, float maxX, float maxY, float maxZ)
+        {
+            mfnTrans.enableLimit(MFnTransform.LimitType.kRotateMinX, true);
+            mfnTrans.enableLimit(MFnTransform.LimitType.kRotateMinY, true);
+            mfnTrans.enableLimit(MFnTransform.LimitType.kRotateMinZ, true);
+            mfnTrans.enableLimit(MFnTransform.LimitType.kRotateMaxX, true);
+            mfnTrans.enableLimit(MFnTransform.LimitType.kRotateMaxY, true);
+            mfnTrans.enableLimit(MFnTransform.LimitType.kRotateMaxZ, true);
+            mfnTrans.setLimit(MFnTransform.LimitType.kRotateMinX, minX);
+            mfnTrans.setLimit(MFnTransform.LimitType.kRotateMinY, minY);
+            mfnTrans.setLimit(MFnTransform.LimitType.kRotateMinZ, minZ);
+            mfnTrans.setLimit(MFnTransform.LimitType.kRotateMaxX, maxX);
+            mfnTrans.setLimit(MFnTransform.LimitType.kRotateMaxY, maxY);
+            mfnTrans.setLimit(MFnTransform.LimitType.kRotateMaxZ, maxZ);
+        }
 
+        public static void SetTransformLimit(MFnTransform mfnTrans, float value, MFnTransform.LimitType type)
+        {
+            mfnTrans.enableLimit(type, true);
+            mfnTrans.setLimit(type, value);
+        }
+        
 
         public static void SetTransformParent(MFnTransform c, MFnTransform p)
         {

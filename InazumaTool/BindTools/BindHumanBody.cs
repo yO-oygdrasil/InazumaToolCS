@@ -223,7 +223,7 @@ namespace InazumaTool.BindTools
 
         #region Foot
 
-        public static MDagPath[] AddReverseFootBone()
+        public static MFnIkJoint[] AddReverseFootBone()
         {
             MSelectionList selected = new MSelectionList();
             MGlobal.getActiveSelectionList(selected);
@@ -239,11 +239,11 @@ namespace InazumaTool.BindTools
         }
 
 
-        public static MDagPath[] AddReverseFootBone(MDagPath rootDagPath, MDagPath middleDagPath, MDagPath endDagPath)
+        public static MFnIkJoint[] AddReverseFootBone(MDagPath rootDagPath, MDagPath middleDagPath, MDagPath endDagPath)
         {
             //啊啊
             //*reverseBones = new MDagPath[8];
-            MDagPath[] result = new MDagPath[8];
+            MFnIkJoint[] result = new MFnIkJoint[8];
 
             MFnIkJoint rootJoint = new MFnIkJoint();
             MVector rootPos = new MFnTransform(rootDagPath).getTranslation(MSpace.Space.kWorld);
@@ -252,45 +252,37 @@ namespace InazumaTool.BindTools
             //MGlobal.displayInfo("root:" + BasicFunc.ToCMDSParamStr(rootPos) + " middle:" + BasicFunc.ToCMDSParamStr(middlePos) + " end:" + BasicFunc.ToCMDSParamStr(endPos));
 
             MObject jt_ankle_Object = rootJoint.create();
-            result[0] = MDagPath.getAPathTo(jt_ankle_Object);
-            MFnIkJoint jt_ankle = new MFnIkJoint(result[0]);
-            jt_ankle.setTranslation(rootPos, MSpace.Space.kWorld);
+            result[0] = new MFnIkJoint(MDagPath.getAPathTo(jt_ankle_Object));
+            result[0].setTranslation(rootPos, MSpace.Space.kWorld);
 
             MObject jt_heel_Object = rootJoint.create(jt_ankle_Object);
-            result[1] = MDagPath.getAPathTo(jt_heel_Object);
-            MFnIkJoint jt_heel = new MFnIkJoint(result[1]);
-            jt_heel.setTranslation(new MVector(rootPos.x, endPos.y, rootPos.z), MSpace.Space.kWorld);
+            result[1] = new MFnIkJoint(MDagPath.getAPathTo(jt_heel_Object));
+            result[1].setTranslation(new MVector(rootPos.x, endPos.y, rootPos.z), MSpace.Space.kWorld);
 
             MObject jt_side_Object = rootJoint.create(jt_heel_Object);
-            result[2] = MDagPath.getAPathTo(jt_side_Object);
-            MFnIkJoint jt_side = new MFnIkJoint(result[2]);
+            result[2] = new MFnIkJoint(MDagPath.getAPathTo(jt_side_Object));
             float sideFactor = (float)(0.6 * (middlePos - endPos).length / Math.Abs(middlePos.z));
-            jt_side.setTranslation(new MVector(middlePos.x, endPos.y, middlePos.z * (1 + sideFactor)), MSpace.Space.kWorld);
+            result[2].setTranslation(new MVector(middlePos.x, endPos.y, middlePos.z * (1 + sideFactor)), MSpace.Space.kWorld);
 
             MObject jt_front_Object = rootJoint.create(jt_side_Object);
-            result[3] = MDagPath.getAPathTo(jt_front_Object);
-            MFnIkJoint jt_front = new MFnIkJoint(result[3]);
-            jt_front.setTranslation(endPos, MSpace.Space.kWorld);
+            result[3] = new MFnIkJoint(MDagPath.getAPathTo(jt_front_Object));
+            result[3].setTranslation(endPos, MSpace.Space.kWorld);
 
             MObject jt_middleF_Object = rootJoint.create(jt_front_Object);
-            result[4] = MDagPath.getAPathTo(jt_middleF_Object);
-            MFnIkJoint jt_middleF = new MFnIkJoint(result[4]);
-            jt_middleF.setTranslation(middlePos, MSpace.Space.kWorld);
+            result[4] = new MFnIkJoint(MDagPath.getAPathTo(jt_middleF_Object));
+            result[4].setTranslation(middlePos, MSpace.Space.kWorld);
 
             MObject jt_middleB_Object = rootJoint.create(jt_front_Object);
-            result[5] = MDagPath.getAPathTo(jt_middleB_Object);
-            MFnIkJoint jt_middleB = new MFnIkJoint(result[5]);
-            jt_middleB.setTranslation(middlePos, MSpace.Space.kWorld);
+            result[5] = new MFnIkJoint(MDagPath.getAPathTo(jt_middleB_Object));
+            result[5].setTranslation(middlePos, MSpace.Space.kWorld);
 
             MObject jt_toe_Object = rootJoint.create(jt_middleF_Object);
-            result[6] = MDagPath.getAPathTo(jt_toe_Object);
-            MFnIkJoint jt_toe = new MFnIkJoint(result[6]);
-            jt_toe.setTranslation(endPos, MSpace.Space.kWorld);
+            result[6] = new MFnIkJoint(MDagPath.getAPathTo(jt_toe_Object));
+            result[6].setTranslation(endPos, MSpace.Space.kWorld);
 
             MObject jt_ankleIn_Object = rootJoint.create(jt_middleB_Object);
-            result[7] = MDagPath.getAPathTo(jt_ankleIn_Object);
-            MFnIkJoint jt_ankleIn = new MFnIkJoint(result[7]);
-            jt_ankleIn.setTranslation(rootPos, MSpace.Space.kWorld);
+            result[7] = new MFnIkJoint(MDagPath.getAPathTo(jt_ankleIn_Object));
+            result[7].setTranslation(rootPos, MSpace.Space.kWorld);
 
             MGlobal.displayInfo("create joints ok");
 
@@ -317,18 +309,24 @@ namespace InazumaTool.BindTools
         {
             //ypa
             //create reverseBones
-            MDagPath[] rbs = AddReverseFootBone(ankleDagPath, middleDagPath, endDagPath);
+            MFnIkJoint[] rbs = AddReverseFootBone(ankleDagPath, middleDagPath, endDagPath);
+            //ankle, heel, side, front, middleF, middleB, toe, ankleIn
             if (rbs == null) 
             {
                 return false;
             }
 
             MGlobal.displayInfo(rbs[7].fullPathName);
-            MDagPath ikDagPath = BindIKControl(legRootDagPath, ankleDagPath, JointProcess.IKSolverType.RotatePlane, rbs[7])[0];
+            MDagPath ikDagPath = BindIKControl(legRootDagPath, ankleDagPath, JointProcess.IKSolverType.RotatePlane, rbs[7].dagPath)[0];
             MGlobal.executeCommandStringResult("orientConstraint -mo " + rbs[4].fullPathName + " " + middleDagPath.fullPathName);
             MGlobal.executeCommandStringResult("orientConstraint -mo " + rbs[5].fullPathName + " " + ankleDagPath.fullPathName);
+            //set limit test
 
-
+            BasicFunc.SetRotationLimit(rbs[1], -ConstantValue.Radian15, 0, 0, ConstantValue.Radian30, 0, 0);
+            BasicFunc.SetRotationLimit(rbs[2], -ConstantValue.Radian45, 0,0 , -ConstantValue.Radian45, 0, 0);
+            BasicFunc.SetRotationLimit(rbs[3], 0, -ConstantValue.Radian45, -ConstantValue.Radian45, 0, ConstantValue.Radian45, ConstantValue.Radian45);
+            BasicFunc.SetRotationLimit(rbs[4], -ConstantValue.Radian45, 0, 0, 0, 0, 0);
+            BasicFunc.SetRotationLimit(rbs[5], 0, 0, 0, ConstantValue.Radian45, 0, 0);
 
 
             return true;

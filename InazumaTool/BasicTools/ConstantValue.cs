@@ -8,9 +8,14 @@ namespace InazumaTool.BasicTools
 {
     public class ConstantValue
     {
-        public const float PI = 3.1415926f;
+        public const float PI = 3.14159265f;
         public const float DPR = 57.29578049f;
-        
+        public const float Radian15 = 0.2617993875f;
+        public const float Radian30 = 0.523598775f;
+        public const float Radian45 = 0.7853981625f;
+        public const float Radian60 = 1.04719755f;
+        public const float Radian75 = 1.3089969375f;
+        public const float Radian90 = 1.570796325f;
 
         public const string plugName_fileTexPath = "fileTextureName";
         public const string plugName_fileTexOutput = "outColor";
