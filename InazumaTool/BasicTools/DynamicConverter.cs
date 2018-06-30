@@ -294,6 +294,7 @@ namespace InazumaTool.BasicTools
                 MItMeshVertex it_verts = new MItMeshVertex(item, component);
                 for (; !it_verts.isDone; it_verts.next())
                 {
+                    //MGlobal.displayInfo(it_verts.index().ToString());
                     MPoint point = it_verts.position(MSpace.Space.kWorld);
                     MVector pos = new MVector(point.x, point.y, point.z);
                     //BasicFunc.CreateLocator(pos, "vert_" + it_verts.index());
