@@ -89,7 +89,42 @@ namespace InazumaTool.BasicTools
             }
             return resultCount;
         }
-        
+
+        public void CreateButtonWindow()
+        {
+            BasicWindow bw = new BasicWindow("Selector");
+            Action[] actions = new Action[2];
+            actions[0] = () =>
+            {
+
+                MGlobal.displayInfo("hahahahahhhhhhhhhhhh");
+                //SetFromSelection();
+            };
+            actions[1] = () =>
+            {
+                MGlobal.displayInfo("hohohohohoh");
+            };
+
+            bw.AddButtons(actions, new string[2] { "testBtn0", "testBtn1" });
+            bw.AddButtons(actions, new string[2] { "testBtn0_line2", "testBtn1_line2" });
+
+            bw.Show();
+
+        }
+
+
+
+
+        const string cmdStr = "Selector";
+        public static List<CommandData> GetCommandDatas()
+        {
+            List<CommandData> cmdList = new List<CommandData>();
+            cmdList.Add(new CommandData("选择", cmdStr, "testBtnWindow", "测试创建选择集成器", () =>
+            {
+                new Selector(SelectType.Face).CreateButtonWindow();
+            }));
+            return cmdList;
+        }
 
     }
 }
