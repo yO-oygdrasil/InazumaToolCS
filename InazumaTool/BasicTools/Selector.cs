@@ -23,9 +23,10 @@ namespace InazumaTool.BasicTools
             selectType = st;
         }
         
-        private List<List<int>> selectedIndicesList = new List<List<int>>();
+        private List<int[]> selectedIndicesList = new List<int[]>();
         public int[] SetFromSelection(MSelectionList selected = null)
         {
+            selectedIndicesList.Clear();
             if (selected == null)
             {
                 //
@@ -39,7 +40,6 @@ namespace InazumaTool.BasicTools
                 MObject component = new MObject();
                 MDagPath item = new MDagPath();
                 it_selectionList.getDagPath(item, component);
-
 
                 List<int> selectedIndcies = new List<int>();
                 Action<int> xx = (indice) => { selectedIndcies.Add(indice); };
@@ -80,33 +80,88 @@ namespace InazumaTool.BasicTools
                         }
                 }
                 
-                selectedIndicesList.Add(selectedIndcies);
+                selectedIndicesList.Add(selectedIndcies.ToArray());
             }
             int[] resultCount = new int[selectedIndicesList.Count];
             for (int i = 0; i < resultCount.Length; i++)
             {
-                resultCount[i] = selectedIndicesList[i].Count;
+                resultCount[i] = selectedIndicesList[i].Length;
             }
             return resultCount;
         }
 
+        public MSelectionList RestoreSelection(MSelectionList targetList = null, bool selectResult = false)
+        {
+            
+            if (targetList == null || targetList.length == 0)
+            {
+                targetList = BasicFunc.GetSelectedList();
+            }
+
+            MSelectionList resultSelection = new MSelectionList();
+
+            for (int i = 0; i < targetList.length; i++)
+            {
+                if (i >= selectedIndicesList.Count)
+                {
+                    break;
+                }
+                MDagPath dag = new MDagPath();
+                targetList.getDagPath((uint)i, dag);
+                MFnSingleIndexedComponent sic = new MFnSingleIndexedComponent();
+                MObject components = sic.create(MFn.Type.kMeshPolygonComponent);
+                sic.addElements(new MIntArray(selectedIndicesList[i]));
+                resultSelection.add(dag, components);
+
+            }
+            if (selectResult)
+            {
+                BasicFunc.Select(resultSelection);
+            }
+            return resultSelection;
+
+        }
+
+
         public void CreateButtonWindow()
         {
             BasicWindow bw = new BasicWindow("Selector");
-            Action[] actions = new Action[2];
+            Action[] actions = new Action[3];
             actions[0] = () =>
             {
-
-                MGlobal.displayInfo("hahahahahhhhhhhhhhhh");
-                //SetFromSelection();
+                for (int i = 0; i < selectedIndicesList.Count; i++)
+                {
+                    string msg = "";
+                    for (int j = 0; j < selectedIndicesList[i].Length; j++)
+                    {
+                        msg += selectedIndicesList[i][j];
+                        if (j != 0)
+                        {
+                            msg += ",";
+                        }
+                    }
+                    MGlobal.displayInfo("Selected " + i + ":" + msg);
+                }
             };
             actions[1] = () =>
             {
-                MGlobal.displayInfo("hohohohohoh");
+                SetFromSelection();
+            };
+            actions[2] = () =>
+            {
+                RestoreSelection();
             };
 
-            bw.AddButtons(actions, new string[2] { "testBtn0", "testBtn1" });
-            bw.AddButtons(actions, new string[2] { "testBtn0_line2", "testBtn1_line2" });
+            Action[] actions2 = new Action[1]
+            {
+                ()=>
+                {
+                    BasicFunc.DoDelete(RestoreSelection(), true);
+                }
+            };
+
+            bw.AddButtons(actions, new string[3] { "Print", "RefreshSelect", "Restore Selection" });
+            bw.AddButtons(actions2, new string[1] { "Delete Topo"});
 
             bw.Show();
 
@@ -121,7 +176,9 @@ namespace InazumaTool.BasicTools
             List<CommandData> cmdList = new List<CommandData>();
             cmdList.Add(new CommandData("选择", cmdStr, "testBtnWindow", "测试创建选择集成器", () =>
             {
-                new Selector(SelectType.Face).CreateButtonWindow();
+                Selector selector = new Selector();
+                selector.SetFromSelection();
+                selector.CreateButtonWindow();
             }));
             return cmdList;
         }

@@ -441,6 +441,29 @@ namespace InazumaTool.BasicTools
 
         }
 
+        public static void DoDelete(MSelectionList target = null,bool recoverOriginSelection = false)
+        {
+            if (target != null)
+            {
+                if (recoverOriginSelection)
+                {
+                    MSelectionList originSelected = GetSelectedList();
+                    Select(target);
+                    MGlobal.executeCommand("doDelete");
+                    Select(originSelected);
+                }
+                else
+                {
+                    Select(target);
+                    MGlobal.executeCommand("doDelete");
+                }
+            }
+            else
+            {
+                MGlobal.executeCommand("doDelete");
+            }
+        }
+
         public static bool DeleteObject(MObject mo)
         {
             if (mo == null)

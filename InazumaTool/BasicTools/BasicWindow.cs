@@ -5,16 +5,25 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-[assembly: MPxCommandClass(typeof(InazumaTool.BasicTools.BasicWindow), "InazumaBasicWindow")]
+[assembly: MPxCommandClass(typeof(InazumaTool.BasicTools.BasicWindowCommand), "InazumaBasicWindow")]
 
 namespace InazumaTool.BasicTools
 {
 
 
-    class BasicWindow : MPxCommand
+    public class BasicWindow
     {
-        private static Dictionary<string, BasicWindow> basicWindowDic = new Dictionary<string, BasicWindow>(); 
-
+        private static Dictionary<string, BasicWindow> basicWindowDic = new Dictionary<string, BasicWindow>();
+        public static bool ExcuteInDic(string wName, int lineIndex, int btnIndex)
+        {
+            bool result = false;
+            if (basicWindowDic.ContainsKey(wName))
+            {
+                //MGlobal.displayInfo("window data exist");
+                result = basicWindowDic[wName].Excute(lineIndex, btnIndex);
+            }
+            return result;
+        }
 
         public const int btnWidth = 40;
         public const int btnHeight = 10;
@@ -23,6 +32,11 @@ namespace InazumaTool.BasicTools
         {
             public Action action;
             public string label;
+            public ActionPair(Action a, string l)
+            {
+                action = a;
+                label = l;
+            }
         }
         private List<List<ActionPair>> pairs = new List<List<ActionPair>>();
         public string windowName = "";
@@ -57,22 +71,25 @@ namespace InazumaTool.BasicTools
                 targetPair = pairs[rowIndex];
             }
 
-            //default next line
             for (int i = 0; i < actions.Length; i++)
             {
-
+                targetPair.Add(new ActionPair(actions[i], labels[i]));
             }
         }
 
-        public void Excute(int lineIndex, int buttonIndex)
+        public bool Excute(int lineIndex, int buttonIndex)
         {
+            bool result = false;
             if (pairs.Count > lineIndex)
             {
                 if (pairs[lineIndex].Count > buttonIndex)
                 {
+                    MGlobal.displayInfo("excute");
                     pairs[lineIndex][buttonIndex].action.Invoke();
+                    result = true;
                 }
             }
+            return result;
         }
 
         private string runtimeWindowName;
@@ -89,26 +106,33 @@ namespace InazumaTool.BasicTools
 
             runtimeWindowName = MGlobal.executeCommandStringResult(string.Format("window -title \"{0}\" -widthHeight {1} {2};", windowName, columnCount * btnWidth, rowCount * btnHeight));
 
-            string btnCmdStr = "";
+            //string btnCmdStr = "";
             for (int i = 0; i < rowCount; i++)
             {
-                btnCmdStr += "columnLayout -adjustableColumn true:\n";
-                //MGlobal.executeCommandOnIdle("columnLayout -adjustableColumn true:");
+                //btnCmdStr += "columnLayout -adjustableColumn true;\n";
+                MGlobal.executeCommandOnIdle(string.Format("rowLayout -numberOfColumns {0} -adjustableColumn true;", pairs[i].Count), true);
                 for (int j = 0; j < pairs[i].Count; j++)
                 {
-                    btnCmdStr += string.Format("button -label \"{0}\" -command \"InazumaBasicWindow {1} {2} {3}\";\n", pairs[i][j].label, windowName, i, j);
-                    //MGlobal.executeCommandOnIdle(string.Format("button -label \"{0}\" -command \"InazumaBasicWindow {1} {2} {3}\";", pairs[i][j].label, windowName, i, j));
+                    //btnCmdStr += string.Format("button -label \"{0}\" -command \"InazumaBasicWindow {1} {2} {3}\";\n", pairs[i][j].label, windowName, i, j);
+                    MGlobal.executeCommandOnIdle(string.Format("button -label \"{0}\" -command \"InazumaBasicWindow {1} {2} {3}\";", pairs[i][j].label, windowName, i, j),true);
                 }
-                btnCmdStr += "setParent ..;\n";
-                //MGlobal.executeCommandOnIdle("setParent ..;");
+                //btnCmdStr += "setParent ..;\n";
+                MGlobal.executeCommandOnIdle("setParent ..;",true);
             }
 
-            MGlobal.executeCommandOnIdle(btnCmdStr);
-            MGlobal.executeCommandOnIdle("showWindow " + runtimeWindowName);
+            //MGlobal.executeCommandOnIdle(btnCmdStr, true);
+            MGlobal.executeCommandOnIdle("showWindow " + runtimeWindowName, true);
 
         }
 
 
+
+
+    }
+
+
+    public class BasicWindowCommand : MPxCommand
+    {
 
         /// <summary>
         /// 
@@ -116,18 +140,20 @@ namespace InazumaTool.BasicTools
         /// <param name="args">order: windowName, lineIndex , buttonIndex</param>
         public override void doIt(MArgList args)
         {
-            if (args.length != 0)
+            //MGlobal.displayInfo("at least do it....");
+            if (args.length != 3)
             {
-                MGlobal.displayInfo("param count error:" + args.length);
+                //MGlobal.displayInfo("param count error:" + args.length);
                 return;
             }
             string wName = args.asString(0);
             int lineIndex = args.asInt(1);
             int buttonIndex = args.asInt(2);
-            if (basicWindowDic.ContainsKey(wName))
-            {
-                basicWindowDic[wName].Excute(lineIndex, buttonIndex);
-            }
+
+            //MGlobal.displayInfo("name:" + wName + ",line:" + lineIndex + ",btn:" + buttonIndex);
+
+            BasicWindow.ExcuteInDic(wName, lineIndex, buttonIndex);
+            
 
         }
     }
