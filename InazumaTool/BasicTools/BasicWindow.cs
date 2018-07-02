@@ -104,7 +104,7 @@ namespace InazumaTool.BasicTools
                 }
             }
 
-            runtimeWindowName = MGlobal.executeCommandStringResult(string.Format("window -title \"{0}\" -widthHeight {1} {2};", windowName, columnCount * btnWidth, rowCount * btnHeight));
+            runtimeWindowName = MGlobal.executeCommandStringResult(string.Format("window -title \"{0}\" -widthHeight {1} {2};", windowName, columnCount * btnWidth, rowCount * btnHeight), true);
 
             //string btnCmdStr = "";
             for (int i = 0; i < rowCount; i++)

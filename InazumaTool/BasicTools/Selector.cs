@@ -149,7 +149,7 @@ namespace InazumaTool.BasicTools
             };
             actions[2] = () =>
             {
-                RestoreSelection();
+                RestoreSelection(null, true);
             };
 
             Action[] actions2 = new Action[1]
