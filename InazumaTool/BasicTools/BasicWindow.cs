@@ -25,8 +25,8 @@ namespace InazumaTool.BasicTools
             return result;
         }
 
-        public const int btnWidth = 40;
-        public const int btnHeight = 10;
+        public const int btnWidth = 100;
+        public const int btnHeight = 50;
 
         private class ActionPair
         {
@@ -106,22 +106,29 @@ namespace InazumaTool.BasicTools
 
             runtimeWindowName = MGlobal.executeCommandStringResult(string.Format("window -title \"{0}\" -widthHeight {1} {2};", windowName, columnCount * btnWidth, rowCount * btnHeight), true);
 
+            MGlobal.executeCommand("columnLayout");
             //string btnCmdStr = "";
             for (int i = 0; i < rowCount; i++)
             {
                 //btnCmdStr += "columnLayout -adjustableColumn true;\n";
-                MGlobal.executeCommandOnIdle(string.Format("rowLayout -numberOfColumns {0} -adjustableColumn true;", pairs[i].Count), true);
+                string rowLayoutCmdStr = string.Format("rowLayout -nc {0} ", pairs[i].Count);
+                for (int m = 0; m < pairs[i].Count; m++)
+                {
+                    rowLayoutCmdStr += string.Format(" -cw {0} {1}", m + 1, btnWidth);
+                }
+
+                MGlobal.executeCommand(rowLayoutCmdStr, true);
                 for (int j = 0; j < pairs[i].Count; j++)
                 {
                     //btnCmdStr += string.Format("button -label \"{0}\" -command \"InazumaBasicWindow {1} {2} {3}\";\n", pairs[i][j].label, windowName, i, j);
-                    MGlobal.executeCommandOnIdle(string.Format("button -label \"{0}\" -command \"InazumaBasicWindow {1} {2} {3}\";", pairs[i][j].label, windowName, i, j),true);
+                    MGlobal.executeCommand(string.Format("button -label \"{0}\" -command \"InazumaBasicWindow {1} {2} {3}\";", pairs[i][j].label, windowName, i, j),true);
                 }
                 //btnCmdStr += "setParent ..;\n";
-                MGlobal.executeCommandOnIdle("setParent ..;",true);
+                MGlobal.executeCommand("setParent ..;",true);
             }
 
             //MGlobal.executeCommandOnIdle(btnCmdStr, true);
-            MGlobal.executeCommandOnIdle("showWindow " + runtimeWindowName, true);
+            MGlobal.executeCommand("showWindow " + runtimeWindowName, true);
 
         }
 

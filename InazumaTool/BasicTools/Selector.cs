@@ -122,6 +122,28 @@ namespace InazumaTool.BasicTools
 
         }
 
+        public void DoForMultiSelection(Action<MSelectionList> dealMethod, MSelectionList targetList = null)
+        {
+            if (targetList == null || targetList.length == 0)
+            {
+                targetList = BasicFunc.GetSelectedList();
+            }
+
+            int groupCount = selectedIndicesList.Count;
+            for (int i = 0; i * groupCount < targetList.length; i++)
+            {
+                MSelectionList groupList = new MSelectionList();
+                for (int j = 0; j < groupCount; j++)
+                {
+                    int index = i * groupCount + j;
+                    MDagPath dag = new MDagPath();
+                    targetList.getDagPath((uint)index, dag);
+                    groupList.add(dag);
+                }
+                dealMethod(RestoreSelection(groupList));
+            }
+        }
+
 
         public void CreateButtonWindow()
         {
@@ -152,16 +174,22 @@ namespace InazumaTool.BasicTools
                 RestoreSelection(null, true);
             };
 
-            Action[] actions2 = new Action[1]
+            Action[] actions2 = new Action[2]
             {
                 ()=>
                 {
+                    //Delete For One Group
                     BasicFunc.DoDelete(RestoreSelection(), true);
+                },
+                ()=>
+                {
+                    //Delete For Multi Group
+                    DoForMultiSelection((list)=>{BasicFunc.DoDelete(list); });
                 }
             };
 
-            bw.AddButtons(actions, new string[3] { "Print", "RefreshSelect", "Restore Selection" });
-            bw.AddButtons(actions2, new string[1] { "Delete Topo"});
+            bw.AddButtons(actions, new string[3] { "Print", "Refresh Select", "Restore Selection" });
+            bw.AddButtons(actions2, new string[2] { "Delete Topo","Delete Topo For Multi"});
 
             bw.Show();
 
