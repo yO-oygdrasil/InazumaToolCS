@@ -202,6 +202,7 @@ namespace InazumaTool.BasicTools
                         csc.UpdateParm("n", "ik_" + ikMainName);
                         csc.UpdateParm("ccv", curveName == null || curveName.Length == 0);
                         csc.UpdateParm("c", curveName);
+                        csc.UpdateParm("pcv", false);
                         string excuteStr = csc.ToString();
                         resultStr = MGlobal.executePythonCommandStringResult(excuteStr,true);
                         //resultStr = MGlobal.executePythonCommandStringResult("cmds.ikHandle(sj='" + startJointDagPath.fullPathName + "',ee='" + endJointDagPath.fullPathName + "',sol='" + typeStr + "',c='" + curveName + "',n='ik_" + ikMainName + "')",true);

@@ -56,7 +56,11 @@ namespace InazumaTool.BasicTools
             mfnTrans.enableLimit(type, true);
             mfnTrans.setLimit(type, value);
         }
-        
+
+        public static MFnTransform GetParent(MDagPath dag, int index = 0)
+        {
+            return new MFnTransform(MDagPath.getAPathTo(new MFnTransform(dag).parent((uint)index)));
+        }
 
         public static void SetTransformParent(MFnTransform c, MFnTransform p)
         {

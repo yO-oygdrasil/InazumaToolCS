@@ -162,6 +162,8 @@ namespace InazumaTool.BasicTools
             MDagPath outCurveDagPath = CurveToHair(ref hairSystem, startCurveDagPath);
 
             JointProcess.AddIKHandle(dagPath_startJoint, dagPath_endJoint, JointProcess.IKSolverType.Spline, outCurveDagPath.fullPathName);
+
+            BasicFunc.SetTransformParent(BasicFunc.GetParent(startCurveDagPath), BasicFunc.GetParent(dagPath_startJoint));
         }
 
         public static void AddDynamicChainControlPerChain(MSelectionList rootJointsList = null)
