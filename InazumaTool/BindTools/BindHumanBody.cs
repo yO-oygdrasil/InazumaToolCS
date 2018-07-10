@@ -261,8 +261,12 @@ namespace InazumaTool.BindTools
 
             MObject jt_side_Object = rootJoint.create(jt_heel_Object);
             result[2] = new MFnIkJoint(MDagPath.getAPathTo(jt_side_Object));
-            float sideFactor = (float)(0.6 * (middlePos - endPos).length / Math.Abs(middlePos.z));
-            result[2].setTranslation(new MVector(middlePos.x, endPos.y, middlePos.z * (1 + sideFactor)), MSpace.Space.kWorld);
+            MVector footDirect = endPos - middlePos;
+            MVector middleGround = new MVector(middlePos.x, endPos.y, middlePos.z);
+            MVector offset = BasicFunc.Cross(footDirect, new MVector(0, 0.6, 0));
+            offset *= Math.Sign(BasicFunc.Dot(middleGround, offset));
+            //float sideFactor = (float)(0.6 * (middlePos - endPos).length / Math.Abs(middlePos.z));
+            result[2].setTranslation(middleGround + offset, MSpace.Space.kWorld);
 
             MObject jt_front_Object = rootJoint.create(jt_side_Object);
             result[3] = new MFnIkJoint(MDagPath.getAPathTo(jt_front_Object));
@@ -323,8 +327,8 @@ namespace InazumaTool.BindTools
             //set limit test
 
             BasicFunc.SetRotationLimit(rbs[1], -ConstantValue.Radian15, 0, 0, ConstantValue.Radian30, 0, 0);
-            BasicFunc.SetRotationLimit(rbs[2], -ConstantValue.Radian45, 0,0 , -ConstantValue.Radian45, 0, 0);
-            BasicFunc.SetRotationLimit(rbs[3], 0, -ConstantValue.Radian45, -ConstantValue.Radian45, 0, ConstantValue.Radian45, ConstantValue.Radian45);
+            BasicFunc.SetRotationLimit(rbs[2], 0, 0, -ConstantValue.Radian45, 0, 0, ConstantValue.Radian45);
+            BasicFunc.SetRotationLimit(rbs[3], -ConstantValue.Radian45, -ConstantValue.Radian45, 0, ConstantValue.Radian45, ConstantValue.Radian45, 0);
             BasicFunc.SetRotationLimit(rbs[4], -ConstantValue.Radian45, 0, 0, 0, 0, 0);
             BasicFunc.SetRotationLimit(rbs[5], 0, 0, 0, ConstantValue.Radian45, 0, 0);
 
