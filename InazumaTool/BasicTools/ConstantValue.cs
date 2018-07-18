@@ -43,6 +43,16 @@ namespace InazumaTool.BasicTools
         //public const string cmd_parentConstraint = "parentConstraint";
         //public const string cmd_orientConstraint = "orientConstraint";
 
+        public enum SampleType
+        {
+            Vert,
+            Edge,
+            Poly,
+            ObjectTrans
+        }
+
+
+
         public enum ConstraintType
         {
             Point,

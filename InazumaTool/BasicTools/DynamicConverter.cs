@@ -240,9 +240,9 @@ namespace InazumaTool.BasicTools
             Sphere
         }
 
-        public static MDagPath CreateVertLoopCircle(List<MVector> verts, bool reOrder = true,string ctlName = "loopCircle_0")
+        public static MDagPath CreateLoopCircleByPos(List<MVector> posList, bool reOrder = true, bool closedArc = true, string ctlName = "loopCircle_0")
         {
-            List<MVector> vectors = new List<MVector>(verts);
+            List<MVector> vectors = new List<MVector>(posList);
             if (vectors.Count < 2)
             {
                 return default(MDagPath);
@@ -273,50 +273,108 @@ namespace InazumaTool.BasicTools
         }
 
 
-        public static void CreateProxyModel(MSelectionList selected = null, ProxyBaseShape baseShape = ProxyBaseShape.Tube)
+        //public static void CreateProxyModel(MSelectionList selected = null, ProxyBaseShape baseShape = ProxyBaseShape.Tube)
+        //{
+        //    if (selected == null)
+        //    {
+        //        //
+        //        selected = BasicFunc.GetSelectedList();
+        //    }
+
+        //    List<MVector> positions = new List<MVector>();
+        //    MItSelectionList it_selectionList = new MItSelectionList(selected);
+        //    MVector totalWeight = MVector.zero;
+        //    for (; !it_selectionList.isDone; it_selectionList.next())
+        //    {
+        //        MObject component = new MObject();
+        //        MDagPath item = new MDagPath();
+        //        it_selectionList.getDagPath(item, component);
+        //        MItMeshVertex it_verts = new MItMeshVertex(item, component);
+        //        for (; !it_verts.isDone; it_verts.next())
+        //        {
+        //            //MGlobal.displayInfo(it_verts.index().ToString());
+        //            MPoint point = it_verts.position(MSpace.Space.kWorld);
+        //            MVector pos = new MVector(point.x, point.y, point.z);
+        //            //BasicFunc.CreateLocator(pos, "vert_" + it_verts.index());
+        //            positions.Add(pos);
+        //            totalWeight += pos;
+        //        }
+
+        //    }
+        //    //merge the nearest
+        //    //float rangeSize = 1;
+
+
+
+        //    //MVector center = totalWeight * (1.0f / positions.Count);
+        //    //MFnMesh newMesh = new MFnMesh();
+        //    CreateVertLoopCircle(positions);
+
+
+        //}
+
+        public static void CreateRelativeCurve(MSelectionList selected = null, ConstantValue.SampleType st = ConstantValue.SampleType.ObjectTrans, bool reOrder = true, bool closedArc = true,string ctlName = null)
         {
             if (selected == null)
             {
-                //
                 selected = BasicFunc.GetSelectedList();
             }
-
             List<MVector> positions = new List<MVector>();
-            MItSelectionList it_selectionList = new MItSelectionList(selected);
-            MVector totalWeight = MVector.zero;
-            for (; !it_selectionList.isDone; it_selectionList.next())
+            switch (st)
             {
-                MObject component = new MObject();
-                MDagPath item = new MDagPath();
-                it_selectionList.getDagPath(item, component);
+                case ConstantValue.SampleType.Vert:
+                    {
+                        MItSelectionList it_selectionList = new MItSelectionList(selected);
+                        MVector totalWeight = MVector.zero;
+                        for (; !it_selectionList.isDone; it_selectionList.next())
+                        {
+                            MObject component = new MObject();
+                            MDagPath item = new MDagPath();
+                            it_selectionList.getDagPath(item, component);
+                            MItMeshVertex it_verts = new MItMeshVertex(item, component);
+                            for (; !it_verts.isDone; it_verts.next())
+                            {
+                                //MGlobal.displayInfo(it_verts.index().ToString());
+                                MPoint point = it_verts.position(MSpace.Space.kWorld);
+                                MVector pos = new MVector(point.x, point.y, point.z);
+                                //BasicFunc.CreateLocator(pos, "vert_" + it_verts.index());
+                                positions.Add(pos);
+                                totalWeight += pos;
+                            }
 
+                        }
+                        break;
+                    }
+                case ConstantValue.SampleType.Edge:
+                    {
 
+                        break;
+                    }
+                case ConstantValue.SampleType.Poly:
+                    {
 
-
-                MItMeshVertex it_verts = new MItMeshVertex(item, component);
-                for (; !it_verts.isDone; it_verts.next())
-                {
-                    //MGlobal.displayInfo(it_verts.index().ToString());
-                    MPoint point = it_verts.position(MSpace.Space.kWorld);
-                    MVector pos = new MVector(point.x, point.y, point.z);
-                    //BasicFunc.CreateLocator(pos, "vert_" + it_verts.index());
-                    positions.Add(pos);
-                    totalWeight += pos;
-                }
-
+                        break;
+                    }
+                case ConstantValue.SampleType.ObjectTrans:
+                    {
+                        foreach (MDagPath dag in selected.DagPaths())
+                        {
+                            MFnTransform trans = new MFnTransform(dag);
+                            positions.Add(trans.getTranslation(MSpace.Space.kWorld));
+                        }
+                        break;
+                    }
             }
-            //merge the nearest
-            //float rangeSize = 1;
+            if (ctlName == null)
+            {
+                ctlName = "samplerCurve_00";
+            }
 
 
 
-            //MVector center = totalWeight * (1.0f / positions.Count);
-            //MFnMesh newMesh = new MFnMesh();
-            CreateVertLoopCircle(positions);
-
+            CreateLoopCircleByPos(positions, reOrder, closedArc, ctlName);
 
         }
-
 
 
         #endregion
@@ -326,17 +384,17 @@ namespace InazumaTool.BasicTools
         public static List<CommandData> GetCommandDatas()
         {
             List<CommandData> cmdList = new List<CommandData>();
-            cmdList.Add(new CommandData("动力学", cmdStr, "vertsToCurve", "顶点连成曲线", () =>
+            cmdList.Add(new CommandData("动力学", cmdStr, "vertsToCurve", "顶点连成环线", () =>
             {
-                CreateProxyModel();
+                CreateRelativeCurve(null, ConstantValue.SampleType.Vert, true, true);
+            }));
+            cmdList.Add(new CommandData("动力学", cmdStr, "posToCurve", "物体坐标连成环线", () =>
+            {
+                CreateRelativeCurve();
             }));
             cmdList.Add(new CommandData("动力学", cmdStr, "multiJointChainsToHair", "为链骨们增加动力学", () =>
             {
                 AddDynamicChainControlPerChain();
-            }));
-            cmdList.Add(new CommandData("动力学", cmdStr, "createProxyModel", "创建代理", () =>
-            {
-                CreateProxyModel();
             }));
             return cmdList;
         }
