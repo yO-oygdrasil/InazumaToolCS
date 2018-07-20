@@ -212,6 +212,87 @@ namespace InazumaTool.BasicTools
             
         }
 
+
+        public static List<MDagPath> GetHierachyChain(MDagPath startDag, MFn.Type filterType = MFn.Type.kInvalid, MDagPath endDag = null)
+        {
+            MFnTransform currentTrans = new MFnTransform(startDag);
+            //no need for trans data , so mfntransform(mobject) is used
+            List<MDagPath> result = new List<MDagPath>();
+            result.Add(startDag);
+            while (currentTrans.childCount > 0)
+            {
+                int nextIndex = 0;
+                if (filterType != MFn.Type.kInvalid)
+                {
+                    bool filterOK = false;
+                    for (int i = 0; i < currentTrans.childCount; i++)
+                    {
+                        MObject mo = currentTrans.child((uint)i);
+                        if (mo.hasFn(filterType))
+                        {
+                            nextIndex = i;
+                            filterOK = true;
+                            break;
+                        }
+                    }
+                    if (!filterOK)
+                    {
+                        break;
+                    }
+                }
+                currentTrans = new MFnTransform(currentTrans.child((uint)nextIndex));
+                MDagPath dag = currentTrans.dagPath;
+                result.Add(dag);
+                if (endDag != null && dag.fullPathName == endDag.fullPathName)
+                {
+                    break;
+                }
+            }
+            return result;
+        }
+
+        public static List<MFnTransform> GetHierachyChainTrans(MDagPath startDag, MFn.Type filterType = MFn.Type.kInvalid, MDagPath endDag = null)
+        {
+            MFnTransform currentTrans = new MFnTransform(startDag);
+            //no need for trans data , so mfntransform(mobject) is used
+            List<MFnTransform> result = new List<MFnTransform>();
+            result.Add(currentTrans);
+            while (currentTrans.childCount > 0)
+            {
+                MObject filteredMO = new MObject();
+                if (filterType != MFn.Type.kInvalid)
+                {
+                    bool filterOK = false;
+                    for (int i = 0; i < currentTrans.childCount; i++)
+                    {
+                        filteredMO = currentTrans.child((uint)i);
+                        if (filteredMO.hasFn(filterType))
+                        {
+                            filterOK = true;
+                            break;
+                        }
+                    }
+                    if (!filterOK)
+                    {
+                        break;
+                    }
+                }
+                else
+                {
+                    filteredMO = currentTrans.child(0);
+                }
+                MDagPath dag = MDagPath.getAPathTo(filteredMO);
+                currentTrans = new MFnTransform(dag);
+                result.Add(currentTrans);
+                if (endDag != null && dag.fullPathName == endDag.fullPathName)
+                {
+                    break;
+                }
+            }
+            return result;
+        }
+
+
         #endregion
 
         #region Create

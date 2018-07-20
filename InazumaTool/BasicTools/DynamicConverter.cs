@@ -268,8 +268,11 @@ namespace InazumaTool.BasicTools
                     }
                 });
             }
-            vectors.Add(vectors[0]);
-            return BasicFunc.CreateCurve(vectors.ToArray(), ctlName, 1, MFnNurbsCurve.Form.kClosed);
+            if (closedArc)
+            {
+                vectors.Add(vectors[0]);
+            }
+            return BasicFunc.CreateCurve(vectors.ToArray(), ctlName, 1, closedArc ? MFnNurbsCurve.Form.kClosed : MFnNurbsCurve.Form.kOpen);
         }
 
 
@@ -369,14 +372,48 @@ namespace InazumaTool.BasicTools
             {
                 ctlName = "samplerCurve_00";
             }
-
-
-
             CreateLoopCircleByPos(positions, reOrder, closedArc, ctlName);
 
         }
 
+        public static void CreateSpiderNetCurves(MSelectionList selected = null)
+        {
+            if (selected == null)
+            {
+                selected = BasicFunc.GetSelectedList();
+            }
+            List<List<MVector>> colList = new List<List<MVector>>();
+            int rowCount = 0;
+            foreach (MDagPath dag in selected.DagPaths())
+            {
+                List<MFnTransform> transList = BasicFunc.GetHierachyChainTrans(dag);
+                List<MVector> vectorList = new List<MVector>();
+                if (transList.Count > rowCount)
+                {
+                    rowCount = transList.Count;
+                }
+                for (int i = 0; i < transList.Count; i++)
+                {
+                    vectorList.Add(transList[i].getTranslation(MSpace.Space.kWorld));
+                }
+                colList.Add(vectorList);
+                CreateLoopCircleByPos(vectorList, false, true, string.Format("netCurve_column_{0:d4}", (colList.Count - 1)));
+            }
+            List<List<MVector>> rowList = new List<List<MVector>>();
+            for (int i = 0; i < rowCount; i++)
+            {
+                List<MVector> rowCircle = new List<MVector>();
+                for (int j = 0; j < colList.Count; j++)
+                {
+                    rowCircle.Add(colList[j][i]);
+                }
+                rowList.Add(rowCircle);
+                CreateLoopCircleByPos(rowCircle, false, true, string.Format("netCurve_row_{0:d4}", (rowCircle.Count - 1)));
+            }
 
+
+
+        }
         #endregion
 
 
@@ -388,9 +425,21 @@ namespace InazumaTool.BasicTools
             {
                 CreateRelativeCurve(null, ConstantValue.SampleType.Vert, true, true);
             }));
+            cmdList.Add(new CommandData("动力学", cmdStr, "vertsToCurve_origin", "顶点连成环线-原序", () =>
+            {
+                CreateRelativeCurve(null, ConstantValue.SampleType.Vert, false, true);
+            }));
             cmdList.Add(new CommandData("动力学", cmdStr, "posToCurve", "物体坐标连成环线", () =>
             {
                 CreateRelativeCurve();
+            }));
+            cmdList.Add(new CommandData("动力学", cmdStr, "posToCurve_origin", "物体坐标连成环线-原序", () =>
+            {
+                CreateRelativeCurve(null, ConstantValue.SampleType.ObjectTrans, false, true);
+            }));
+            cmdList.Add(new CommandData("动力学", cmdStr, "chainNet", "链骨网络", () =>
+            {
+                CreateSpiderNetCurves();
             }));
             cmdList.Add(new CommandData("动力学", cmdStr, "multiJointChainsToHair", "为链骨们增加动力学", () =>
             {
