@@ -121,7 +121,7 @@ namespace InazumaTool.BasicTools
                 }
                 result += arr[i];
             }
-            //MGlobal.displayInfo("result int array str:" + result);
+            //Debug.Log("result int array str:" + result);
             return result;
         }
 
@@ -180,7 +180,7 @@ namespace InazumaTool.BasicTools
         {
             MSelectionList matched = new MSelectionList();
             MGlobal.getSelectionListByName(name, matched);
-            //MGlobal.displayInfo("ask if [" + name + "] exist,result count:" + matched.length);
+            //Debug.Log("ask if [" + name + "] exist,result count:" + matched.length);
             return matched;
         }
 
@@ -343,7 +343,7 @@ namespace InazumaTool.BasicTools
             {
                 MFnTransform parellelGrpTrans = new MFnTransform(AddEmptyGroup(new MFnTransform(targetTrans.parent(0))));
                 parellelGrpTrans.setTranslation(targetTrans.getTranslation(MSpace.Space.kTransform), MSpace.Space.kTransform);
-                //MGlobal.displayInfo("finalLocalPos:"+BasicFunc.ToCMDSParamStr(parellelGrpTrans.getTranslation(MSpace.kTransform)));
+                //Debug.Log("finalLocalPos:"+BasicFunc.ToCMDSParamStr(parellelGrpTrans.getTranslation(MSpace.kTransform)));
                 parellelGrpTrans.setRotatePivotTranslation(targetTrans.rotatePivotTranslation(MSpace.Space.kTransform), MSpace.Space.kTransform);
                 SetTransformParent(ctlName, parellelGrpTrans.fullPathName);
             }
@@ -362,7 +362,7 @@ namespace InazumaTool.BasicTools
             locatorName = SubUShell(MGlobal.executePythonCommandStringResult(cmdStr));
             MDagPath locDagPath = BasicFunc.GetDagPathByName(locatorName);
             MFnTransform locatorTrans = new MFnTransform(locDagPath);
-            //MGlobal.displayInfo(locatorName+"dag:"+locDagPath.fullPathName);
+            //Debug.Log(locatorName+"dag:"+locDagPath.fullPathName);
             locatorTrans.setTranslation(worldPos, MSpace.Space.kWorld);
             return locDagPath;
         }
@@ -375,7 +375,7 @@ namespace InazumaTool.BasicTools
             string[] resultArr = SplitPythonResultStr(resultStr);
             for (int i = 0; i < resultArr.Length; i++)
             {
-                MGlobal.displayInfo(resultArr[i]);
+                Debug.Log(resultArr[i]);
             }
             return GetDagPathByName(resultArr[0]);
         }
@@ -459,7 +459,7 @@ namespace InazumaTool.BasicTools
             //    indices[i] = i;
             //}
             //cmdStr += "],k=[" + ToCMDSParamStr(indices, ptCount) + "])";
-            //MGlobal.displayInfo(cmdStr);
+            //Debug.Log(cmdStr);
             //string resultName = MGlobal.executePythonCommandStringResult(cmdStr);
             //return GetDagPathByName(resultName);
         }
@@ -486,7 +486,7 @@ namespace InazumaTool.BasicTools
         {
             MFnDependencyNode dependencyNode = new MFnDependencyNode();
             dependencyNode.create("remapValue");
-            //MGlobal.displayInfo("created node:" + (*dependencyNode).absoluteName());
+            //Debug.Log("created node:" + (*dependencyNode).absoluteName());
             dependencyNode.findPlug("inputMin").setFloat(inputMin);
             dependencyNode.findPlug("inputMax").setFloat(inputMax);
             dependencyNode.findPlug("outputMin").setFloat(outputMin);
@@ -666,7 +666,7 @@ namespace InazumaTool.BasicTools
             for (int i = 0; i < result.Length; i++)
             {
                 result[i] = SubUShell(result[i]);
-                MGlobal.displayInfo(result[i]);
+                Debug.Log(result[i]);
             }
             return result;
         }
@@ -718,7 +718,7 @@ namespace InazumaTool.BasicTools
                 uint index = (uint)i;
                 MDagPath mdp = new MDagPath();
                 list.getDagPath(index, mdp);
-                MGlobal.displayInfo(index + ":" + mdp.fullPathName);
+                Debug.Log(index + ":" + mdp.fullPathName);
             }
         }
 
@@ -729,7 +729,7 @@ namespace InazumaTool.BasicTools
                 uint index = (uint)i;
                 MObject mo = new MObject();
                 list.getDependNode(index, mo);
-                MGlobal.displayInfo(index + ":typeof:" + mo.apiTypeStr);
+                Debug.Log(index + ":typeof:" + mo.apiTypeStr);
 
             }
 
@@ -740,7 +740,7 @@ namespace InazumaTool.BasicTools
         {
             for (int i = 0; i < plugs.length; i++)
             {
-                MGlobal.displayInfo(i + ":" + plugs[i].name);
+                Debug.Log(i + ":" + plugs[i].name);
             }
         }
 

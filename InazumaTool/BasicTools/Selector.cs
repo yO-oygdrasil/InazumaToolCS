@@ -162,7 +162,7 @@ namespace InazumaTool.BasicTools
                             msg += ",";
                         }
                     }
-                    MGlobal.displayInfo("Selected " + i + ":" + msg);
+                    Debug.Log("Selected " + i + ":" + msg);
                 }
             };
             actions[1] = () =>

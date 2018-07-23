@@ -32,19 +32,25 @@ namespace InazumaTool.BasicTools
             {
                 curveList = BasicFunc.GetSelectedList();
             }
-            MGlobal.setActiveSelectionList(curveList);
 
             bool hairSystemReady = false;
             if (!hairSystemDagPath.node.isNull)
             {
+                //Debug.Log("hairSystem node is not null:" + hairSystemDagPath.fullPathName);
                 curveList.add(hairSystemDagPath);
                 hairSystemReady = true;
             }
+            else
+            {
+                //Debug.Log("hairsystem node is null");
+            }
+            MGlobal.setActiveSelectionList(curveList);
             string cmdStr = "cmds.MakeCurvesDynamic(0,0,0,1,0)";
             string resultStr = MGlobal.executePythonCommandStringResult(cmdStr);
 
             if (hairSystemReady)
             {
+                //Debug.Log("remove hairSystem Selection");
                 curveList.remove(curveList.length - 1);
             }
             List<MDagPath> results = new List<MDagPath>();
@@ -54,7 +60,7 @@ namespace InazumaTool.BasicTools
                 MDagPath curveDagPath = new MDagPath();
                 curveList.getDagPath((uint)i, curveDagPath);
 
-                //MGlobal.displayInfo(curveDagPath.fullPathName);
+                //Debug.Log(curveDagPath.fullPathName);
                 MFnTransform curveTrans = new MFnTransform(curveDagPath);
                 if (curveTrans.parentCount > 0)
                 {
@@ -62,7 +68,7 @@ namespace InazumaTool.BasicTools
                     MGlobal.executeCommand(string.Format("setAttr {0}.pointLock {1}", follicleDagPath.fullPathName, (int)pointLock));
                     if (follicleDagPath.hasFn(MFn.Type.kFollicle))
                     {
-                        MGlobal.displayInfo("follicle exist!");
+                        Debug.Log("follicle exist!");
                         ConvertHairSelection(HairSelectionType.OutputCurves, follicleDagPath);
                         MDagPath result = BasicFunc.GetSelectedDagPath(0);
                         new MFnDependencyNode(result.node).setName("dy_" + curveDagPath.partialPathName);
@@ -71,6 +77,7 @@ namespace InazumaTool.BasicTools
                         {
                             ConvertHairSelection(HairSelectionType.HairSystem);
                             hairSystemDagPath = BasicFunc.GetSelectedDagPath(0);
+                            //Debug.Log("assign hairSystem:" + hairSystemDagPath.fullPathName);
                             hairSystemReady = true;
                         }
                     }
@@ -93,12 +100,12 @@ namespace InazumaTool.BasicTools
             targetList.add(curveDagPath);
             if (hairSystemReady)
             {
-                MGlobal.displayInfo("hair system ready");
+                Debug.Log("hair system ready");
                 targetList.add(hairSystemDagPath);
             }
             else
             {
-                MGlobal.displayInfo("hair system need to be created!");
+                Debug.Log("hair system need to be created!");
             }
             BasicFunc.Select(targetList);
 
@@ -108,7 +115,7 @@ namespace InazumaTool.BasicTools
 
             MDagPath result = new MDagPath();
 
-            //MGlobal.displayInfo(curveDagPath.fullPathName);
+            //Debug.Log(curveDagPath.fullPathName);
             MFnTransform curveTrans = new MFnTransform(curveDagPath);
             if (curveTrans.parentCount > 0)
             {
@@ -116,7 +123,7 @@ namespace InazumaTool.BasicTools
                 MGlobal.executeCommand(string.Format("setAttr {0}.pointLock {1}", follicleDagPath.fullPathName, (int)pointLock));
                 if (follicleDagPath.hasFn(MFn.Type.kFollicle))
                 {
-                    MGlobal.displayInfo("follicle exist!");
+                    Debug.Log("follicle exist!");
                     ConvertHairSelection(HairSelectionType.OutputCurves, follicleDagPath);
                     result = BasicFunc.GetSelectedDagPath(0);
                     new MFnDependencyNode(result.node).setName("dy_" + curveDagPath.partialPathName);
@@ -133,7 +140,7 @@ namespace InazumaTool.BasicTools
         }
 
 
-        public static void AddDynamicChainControl(ref MDagPath hairSystem, MSelectionList jointChains = null, ConstantValue.HairPointLockType pointLock = ConstantValue.HairPointLockType.Base)
+        public static MDagPath AddDynamicChainControl(ref MDagPath hairSystem, MSelectionList jointChains = null, ConstantValue.HairPointLockType pointLock = ConstantValue.HairPointLockType.Base)
         {
             //get bones
             if (jointChains == null)
@@ -142,7 +149,7 @@ namespace InazumaTool.BasicTools
             }
             if (jointChains.length == 0)
             {
-                return;
+                return null;
             }
 
             MDagPath dagPath_startJoint = new MDagPath(), dagPath_endJoint = new MDagPath();
@@ -164,9 +171,11 @@ namespace InazumaTool.BasicTools
             JointProcess.AddIKHandle(dagPath_startJoint, dagPath_endJoint, JointProcess.IKSolverType.Spline, outCurveDagPath.fullPathName);
 
             BasicFunc.SetTransformParent(BasicFunc.GetParent(startCurveDagPath), BasicFunc.GetParent(dagPath_startJoint));
+
+            return outCurveDagPath;
         }
 
-        public static void AddDynamicChainControlPerChain(MSelectionList rootJointsList = null)
+        public static List<MDagPath> AddDynamicChainControlPerChain(MSelectionList rootJointsList = null)
         {
             if (rootJointsList == null)
             {
@@ -174,6 +183,7 @@ namespace InazumaTool.BasicTools
             }
             MDagPath oneJoint = new MDagPath();
             MDagPath hairSystem = new MDagPath();
+            List<MDagPath> result = new List<MDagPath>();
             for (int i = 0; i < rootJointsList.length; i++)
             {
                 rootJointsList.getDagPath((uint)i, oneJoint);
@@ -181,6 +191,7 @@ namespace InazumaTool.BasicTools
                 tempList.add(oneJoint);
                 AddDynamicChainControl(ref hairSystem, tempList);
             }
+            return result;
         }
 
 
@@ -296,7 +307,7 @@ namespace InazumaTool.BasicTools
                             MItMeshVertex it_verts = new MItMeshVertex(item, component);
                             for (; !it_verts.isDone; it_verts.next())
                             {
-                                //MGlobal.displayInfo(it_verts.index().ToString());
+                                //Debug.Log(it_verts.index().ToString());
                                 MPoint point = it_verts.position(MSpace.Space.kWorld);
                                 MVector pos = new MVector(point.x, point.y, point.z);
                                 //BasicFunc.CreateLocator(pos, "vert_" + it_verts.index());
@@ -381,22 +392,22 @@ namespace InazumaTool.BasicTools
             {
                 MDagPath hairSystem = new MDagPath();
                 MSelectionList listToDynamicCurve = new MSelectionList();
-                MGlobal.displayInfo("vertical to dynamic count:" + verticalCurves.Count);
+                Debug.Log("vertical to dynamic count:" + verticalCurves.Count);
                 for (int i = 0; i < verticalCurves.Count; i++)
                 {
                     listToDynamicCurve.add(verticalCurves[i]);
                 }
                 MDagPath[] verticalOutputCurves = CurvesToHairs(ref hairSystem, listToDynamicCurve, ConstantValue.HairPointLockType.Base);
-                MGlobal.displayInfo("vertical dynamic result count:" + verticalOutputCurves.Length);
+                Debug.Log("vertical dynamic result count:" + verticalOutputCurves.Length);
                 BasicFunc.RenameDagList(verticalOutputCurves, "netDyCurve_vertical_{0:d2}");
                 listToDynamicCurve.clear();
-                MGlobal.displayInfo("horizontal to dynamic count:" + horizontalCurves.Count);
-                for (int i = 1; i < horizontalCurves.Count; i++)
+                Debug.Log("horizontal to dynamic count:" + horizontalCurves.Count);
+                for (int i = 0; i < horizontalCurves.Count; i++)
                 {
                     listToDynamicCurve.add(horizontalCurves[i]);
                 }
                 MDagPath[] horizontalOutputCurves = CurvesToHairs(ref hairSystem, listToDynamicCurve, ConstantValue.HairPointLockType.None);
-                MGlobal.displayInfo("horizontal dynamic result count:" + horizontalOutputCurves.Length);
+                Debug.Log("horizontal dynamic result count:" + horizontalOutputCurves.Length);
                 BasicFunc.RenameDagList(horizontalOutputCurves, "netDyCurve_horizontal_{0:d2}");
                 if (bindJoints)
                 {
@@ -467,7 +478,7 @@ namespace InazumaTool.BasicTools
             {
                 CreateSpiderNetCurves(null, false, false, false);
             }));
-            cmdList.Add(new CommandData("动力学", cmdStr, "chainNetDynamic", "链骨网络-动力学附加", () =>
+            cmdList.Add(new CommandData("动力学", cmdStr, "chainNetDynamic", "链骨网络-动力学附加(仿MMD刚体)", () =>
             {
                 CreateSpiderNetCurves(null, true, true, true);
             }));

@@ -70,11 +70,11 @@ namespace InazumaTool.BasicTools
         }
 
         public const string command_DynamicConstraint = "createNConstraint";
-        public static readonly string[] dynamicConstraintTypeStr = { "pointToPoint" };
+        public static readonly string[] dynamicConstraintTypeStr = {"point", "pointToPoint" };
         public enum DynamicConstraintType
         {
-            Point,
-            PointToPoint
+            Point = 0,
+            PointToPoint = 1
         }
         public static string Param_DynamicConstraintType(DynamicConstraintType type)
         {

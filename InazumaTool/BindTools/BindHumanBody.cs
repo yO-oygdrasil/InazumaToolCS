@@ -67,17 +67,17 @@ namespace InazumaTool.BindTools
                 MFnDependencyNode dn_final = new MFnDependencyNode(finalJointDagPath.node);
 
                 /*MPlug plug_ctlTy = dn_ctl.findPlug("translateY");
-                MGlobal.displayInfo("plug name:" + plug_ctlTy.partialName() + " fullname:" + plug_ctlTy.name());*/
+                Debug.Log("plug name:" + plug_ctlTy.partialName() + " fullname:" + plug_ctlTy.name());*/
                 //MStatus status;
                 //MPlug plug_remapNode_root_input = remapNode_root.findPlug("inputValue", &status);
                 //if (status == MStatus::kSuccess)
                 //{
-                //	MGlobal.displayInfo("success 634634");
-                //	//MGlobal.displayInfo("plug name:" + plug_remapNode_root_input.partialName() + " fullname:" + plug_remapNode_root_input.name());
+                //	Debug.Log("success 634634");
+                //	//Debug.Log("plug name:" + plug_remapNode_root_input.partialName() + " fullname:" + plug_remapNode_root_input.name());
                 //}
                 //else
                 //{
-                //	MGlobal.displayInfo("failed a23234234");
+                //	Debug.Log("failed a23234234");
                 //}
                 MDGModifier dgModifier = new MDGModifier();
                 dgModifier.doIt();
@@ -110,7 +110,7 @@ namespace InazumaTool.BindTools
                 middleDagPath = BasicFunc.GetSelectedDagPath(0);
                 if (middleDagPath == null)
                 {
-                    MGlobal.displayInfo("please select middle joint");
+                    Debug.Log("please select middle joint");
                     return null;
                 }
             }
@@ -208,7 +208,7 @@ namespace InazumaTool.BindTools
                     //begin to add constriant
                     BasicFunc.AddConstraint(locDagPath.fullPathName, resultArr[0], ConstantValue.ConstraintType.PoleVector);
                     //string poleConstraintResult = MGlobal.executeCommandStringResult("poleVectorConstraint " + locDagPath.fullPathName + " " + resultArr[0]);
-                    //MGlobal.displayInfo(poleConstraintResult);
+                    //Debug.Log(poleConstraintResult);
                     return new MDagPath[3] { BasicFunc.GetDagPathByName(resultArr[0]), ctlDagPath, locDagPath };
                 }
             }
@@ -249,7 +249,7 @@ namespace InazumaTool.BindTools
             MVector rootPos = new MFnTransform(rootDagPath).getTranslation(MSpace.Space.kWorld);
             MVector middlePos = new MFnTransform(middleDagPath).getTranslation(MSpace.Space.kWorld);
             MVector endPos = new MFnTransform(endDagPath).getTranslation(MSpace.Space.kWorld);
-            //MGlobal.displayInfo("root:" + BasicFunc.ToCMDSParamStr(rootPos) + " middle:" + BasicFunc.ToCMDSParamStr(middlePos) + " end:" + BasicFunc.ToCMDSParamStr(endPos));
+            //Debug.Log("root:" + BasicFunc.ToCMDSParamStr(rootPos) + " middle:" + BasicFunc.ToCMDSParamStr(middlePos) + " end:" + BasicFunc.ToCMDSParamStr(endPos));
 
             MObject jt_ankle_Object = rootJoint.create();
             result[0] = new MFnIkJoint(MDagPath.getAPathTo(jt_ankle_Object));
@@ -288,7 +288,7 @@ namespace InazumaTool.BindTools
             result[7] = new MFnIkJoint(MDagPath.getAPathTo(jt_ankleIn_Object));
             result[7].setTranslation(rootPos, MSpace.Space.kWorld);
 
-            MGlobal.displayInfo("create joints ok");
+            Debug.Log("create joints ok");
 
             return result;
         }
@@ -320,7 +320,7 @@ namespace InazumaTool.BindTools
                 return false;
             }
 
-            MGlobal.displayInfo(rbs[7].fullPathName);
+            Debug.Log(rbs[7].fullPathName);
             MDagPath ikDagPath = BindIKControl(legRootDagPath, ankleDagPath, JointProcess.IKSolverType.RotatePlane, rbs[7].dagPath)[0];
             MGlobal.executeCommandStringResult("orientConstraint -mo " + rbs[4].fullPathName + " " + middleDagPath.fullPathName);
             MGlobal.executeCommandStringResult("orientConstraint -mo " + rbs[5].fullPathName + " " + ankleDagPath.fullPathName);
@@ -411,7 +411,7 @@ namespace InazumaTool.BindTools
             }
             if (jointList.length != 4)
             {
-                MGlobal.displayInfo("please select joints");
+                Debug.Log("please select joints");
                 return;
             }
 

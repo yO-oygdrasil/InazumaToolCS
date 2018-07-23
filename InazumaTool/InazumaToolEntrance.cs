@@ -30,7 +30,7 @@ namespace InazumaTool
         public static Dictionary<string, Dictionary<string, Action>> commandDic = new Dictionary<string, Dictionary<string, Action>>();
         void AddOneCommand(CommandData cd)
         {
-            //MGlobal.displayInfo("try add:" + cd.DebugMessage());
+            //Debug.Log("try add:" + cd.DebugMessage());
             string realSubMenuName = "";
             if (cd.subMenuName == null)
             {
@@ -173,7 +173,7 @@ namespace InazumaTool
 
             //paramInt = (int)MPCMap.MPCType.MakeHairJointsChain;
             //AddMenuItem("Make Hair Joints To Chain", subMenuName_bodyBind, "InazumaCommand", paramInt);
-            MGlobal.displayInfo("-回港了-");
+            Debug.Log("-回港了-");
             return true;
         }
 
@@ -199,7 +199,7 @@ namespace InazumaTool
                     MGlobal.executePythonCommand("cmds.deleteUI(" + menuNames[i] + ",m=True)");
                 }
             }
-            MGlobal.displayInfo("-远征去了-");
+            Debug.Log("-远征去了-");
             return true;
         }
 
@@ -214,7 +214,7 @@ namespace InazumaTool
         {
             MGlobal.executePythonCommand("import maya.cmds as cmds");
             string cmdStr = (tearOff ? "cmds.menuItem(tearOff = True, parent='" : "cmds.menuItem(parent='") + parentMenuName + "',subMenu = True, label='" + labelStr + "')";
-            //MGlobal.displayInfo("cmdStr:" + cmdStr);
+            //Debug.Log("cmdStr:" + cmdStr);
             string subMenuName = MGlobal.executePythonCommandStringResult(cmdStr);
             return subMenuName;
         }
@@ -222,7 +222,7 @@ namespace InazumaTool
         void AddMenuItem(string label, string parentMenuName, string command, int paramInt)
         {
             string cmdStr = "menuItem -l \"" + label + "\" -p \"" + parentMenuName + "\" -c \"" + command + " " + paramInt + "\"";
-            //MGlobal.displayInfo(cmdStr);
+            //Debug.Log(cmdStr);
             MGlobal.executeCommand(cmdStr);
             //MGlobal.executeCommand(cmdStr);
         }
@@ -231,7 +231,7 @@ namespace InazumaTool
         void AddMenuItemDivider(string labelStr, string parentMenuName)
         {
             string cmdStr = "menuItem -d 1 -dl \"" + labelStr + "\" -p \"" + parentMenuName + "\"";
-            //MGlobal.displayInfo(cmdStr);
+            //Debug.Log(cmdStr);
             MGlobal.executeCommand(cmdStr);
             //MGlobal.executeCommand(cmdStr);
         }
@@ -239,7 +239,7 @@ namespace InazumaTool
         void AddMenuItem(string label, string parentMenuName, string command, string paramStr)
         {
             string cmdStr = "menuItem -l \"" + label + "\" -p \"" + parentMenuName + "\" -c \"" + command + " " + paramStr + "\"";
-            //MGlobal.displayInfo(cmdStr);
+            //Debug.Log(cmdStr);
             MGlobal.executeCommand(cmdStr);
             //MGlobal.executeCommand(cmdStr);
         }
@@ -268,10 +268,10 @@ namespace InazumaTool
         public override void doIt(MArgList args)
         {
             
-            MGlobal.displayInfo("at least it enters");
+            Debug.Log("at least it enters");
             if (args.length == 0)
             {
-                MGlobal.displayInfo("no param!");
+                Debug.Log("no param!");
                 return;
             }
             string cmdTypeStr = args.asString(0);
@@ -279,11 +279,11 @@ namespace InazumaTool
             bool success = InazumaToolEntrance.Execute(cmdTypeStr, paramStr);
             if (success)
             {
-                MGlobal.displayInfo("yep");
+                Debug.Log("yep");
             }
             else
             {
-                MGlobal.displayInfo("nope");
+                Debug.Log("nope");
             }
 
 
@@ -309,7 +309,7 @@ namespace InazumaTool
             //        }
             //    case MPCType.BindFinger_CTL_R:
             //        {
-            //            MGlobal.displayInfo("oh my god it works333");
+            //            Debug.Log("oh my god it works333");
             //            break;
             //        }
             //    case MPCType.AddRPIK:

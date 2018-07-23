@@ -19,7 +19,7 @@ namespace InazumaTool.BasicTools
             bool result = false;
             if (basicWindowDic.ContainsKey(wName))
             {
-                //MGlobal.displayInfo("window data exist");
+                //Debug.Log("window data exist");
                 result = basicWindowDic[wName].Excute(lineIndex, btnIndex);
             }
             return result;
@@ -84,7 +84,7 @@ namespace InazumaTool.BasicTools
             {
                 if (pairs[lineIndex].Count > buttonIndex)
                 {
-                    MGlobal.displayInfo("excute");
+                    Debug.Log("excute");
                     pairs[lineIndex][buttonIndex].action.Invoke();
                     result = true;
                 }
@@ -147,17 +147,17 @@ namespace InazumaTool.BasicTools
         /// <param name="args">order: windowName, lineIndex , buttonIndex</param>
         public override void doIt(MArgList args)
         {
-            //MGlobal.displayInfo("at least do it....");
+            //Debug.Log("at least do it....");
             if (args.length != 3)
             {
-                //MGlobal.displayInfo("param count error:" + args.length);
+                //Debug.Log("param count error:" + args.length);
                 return;
             }
             string wName = args.asString(0);
             int lineIndex = args.asInt(1);
             int buttonIndex = args.asInt(2);
 
-            //MGlobal.displayInfo("name:" + wName + ",line:" + lineIndex + ",btn:" + buttonIndex);
+            //Debug.Log("name:" + wName + ",line:" + lineIndex + ",btn:" + buttonIndex);
 
             BasicWindow.ExcuteInDic(wName, lineIndex, buttonIndex);
             
