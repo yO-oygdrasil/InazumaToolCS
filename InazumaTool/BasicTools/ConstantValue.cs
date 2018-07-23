@@ -37,11 +37,20 @@ namespace InazumaTool.BasicTools
         public const string plugName_sy = "scaleY";
         public const string plugName_sz = "scaleZ";
 
+        public const string plugName_dynamicConstraintMethod = "constraintMethod";
 
         //public const string cmd_pointConstraint = "pointConstraint";
         //public const string cmd_poleVectorConstraint = "poleVectorConstraint";
         //public const string cmd_parentConstraint = "parentConstraint";
         //public const string cmd_orientConstraint = "orientConstraint";
+
+        public enum DynamicConstraintMethod
+        {
+            Weld = 0,
+            Spring = 1,
+            Elastic = 2
+        }
+
 
         public enum SampleType
         {
@@ -51,7 +60,26 @@ namespace InazumaTool.BasicTools
             ObjectTrans
         }
 
+        //0-none, 1-base, 2-end,3-both
+        public enum HairPointLockType
+        {
+            None = 0,
+            Base = 1,
+            End = 2,
+            Both = 3
+        }
 
+        public const string command_DynamicConstraint = "createNConstraint";
+        public static readonly string[] dynamicConstraintTypeStr = { "pointToPoint" };
+        public enum DynamicConstraintType
+        {
+            Point,
+            PointToPoint
+        }
+        public static string Param_DynamicConstraintType(DynamicConstraintType type)
+        {
+            return dynamicConstraintTypeStr[(int)type];
+        }
 
         public enum ConstraintType
         {

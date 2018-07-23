@@ -165,7 +165,7 @@ namespace InazumaTool.BasicTools
         }
         public static string[] AddIKHandle(MDagPath startJointDagPath, MDagPath endJointDagPath, IKSolverType solverType = IKSolverType.RotatePlane, string curveName = "")
         {
-            string typeStr = "";
+            //string typeStr = "";
             string resultStr = "";
 
             CmdStrConstructor csc = new CmdStrConstructor("ikHandle", CmdStrConstructor.CmdType.Python);
@@ -204,7 +204,7 @@ namespace InazumaTool.BasicTools
                         csc.UpdateParm("c", curveName);
                         csc.UpdateParm("pcv", false);
                         string excuteStr = csc.ToString();
-                        resultStr = MGlobal.executePythonCommandStringResult(excuteStr,true);
+                        resultStr = MGlobal.executePythonCommandStringResult(excuteStr);
                         //resultStr = MGlobal.executePythonCommandStringResult("cmds.ikHandle(sj='" + startJointDagPath.fullPathName + "',ee='" + endJointDagPath.fullPathName + "',sol='" + typeStr + "',c='" + curveName + "',n='ik_" + ikMainName + "')",true);
                         break;
                     }

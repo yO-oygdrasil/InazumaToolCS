@@ -616,7 +616,39 @@ namespace InazumaTool.BasicTools
             string cmdStr = string.Format(maintainOffset ? "{0} -mo {1} {2}" : "{0} {1} {2}", ConstantValue.Command_Constraint(ct), from, to);
             MGlobal.executeCommandStringResult(cmdStr);
         }
-        
+
+        public static void Rename(MDagPath dag, string newName)
+        {
+            new MFnDependencyNode(dag.node).setName(newName);
+        }
+
+        public static void RenameDagList(MDagPath[] dagList, string formatStr)
+        {
+            MDagModifier dagModifier = new MDagModifier();
+            for (int i = 0; i < dagList.Length; i++)
+            {
+                dagModifier.renameNode(dagList[i].node, string.Format(formatStr, i));
+            }
+            dagModifier.doIt();
+        }
+
+        public static void RenameDgList(MObject[] dgList, string formatStr)
+        {
+            MDGModifier dgModifier = new MDGModifier();
+            for (int i = 0; i < dgList.Length; i++)
+            {
+                dgModifier.renameNode(dgList[i], string.Format(formatStr, i));
+            }
+        }
+
+        public static void SetAttr(string attrFullName, string value)
+        {
+            MGlobal.executeCommand(string.Format("setAttr \"{0}\" {1}", attrFullName, value));
+        }
+        public static void SetAttr(string targetName, string attrName, string value)
+        {
+            MGlobal.executeCommand(string.Format("setAttr \"{0}.{1}\" {2}", targetName, attrName, value));
+        }
         #endregion
 
         #region DealResultStr

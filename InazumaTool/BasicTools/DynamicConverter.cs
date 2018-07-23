@@ -26,7 +26,7 @@ namespace InazumaTool.BasicTools
         /// <param name="curveList"></param>
         /// <param name="pointLock">0-none, 1-base, 2-end,3-both</param>
         /// <returns></returns>
-        public static MDagPath[] CurvesToHairs(ref MDagPath hairSystemDagPath, MSelectionList curveList = null, int pointLock = 1)
+        public static MDagPath[] CurvesToHairs(ref MDagPath hairSystemDagPath, MSelectionList curveList = null, ConstantValue.HairPointLockType pointLock = ConstantValue.HairPointLockType.Base)
         {
             if (curveList == null)
             {
@@ -34,11 +34,11 @@ namespace InazumaTool.BasicTools
             }
             MGlobal.setActiveSelectionList(curveList);
 
-            bool hairSystemReady = true;
+            bool hairSystemReady = false;
             if (!hairSystemDagPath.node.isNull)
             {
                 curveList.add(hairSystemDagPath);
-                hairSystemReady = false;
+                hairSystemReady = true;
             }
             string cmdStr = "cmds.MakeCurvesDynamic(0,0,0,1,0)";
             string resultStr = MGlobal.executePythonCommandStringResult(cmdStr);
@@ -59,7 +59,7 @@ namespace InazumaTool.BasicTools
                 if (curveTrans.parentCount > 0)
                 {
                     MDagPath follicleDagPath = MDagPath.getAPathTo(curveTrans.parent(0));
-                    MGlobal.executeCommand(string.Format("setAttr {0}.pointLock {1}", follicleDagPath.fullPathName, pointLock));
+                    MGlobal.executeCommand(string.Format("setAttr {0}.pointLock {1}", follicleDagPath.fullPathName, (int)pointLock));
                     if (follicleDagPath.hasFn(MFn.Type.kFollicle))
                     {
                         MGlobal.displayInfo("follicle exist!");
@@ -82,7 +82,7 @@ namespace InazumaTool.BasicTools
             return results.ToArray();
         }
 
-        public static MDagPath CurveToHair(ref MDagPath hairSystemDagPath, MDagPath curveDagPath = null, int pointLock = 1)
+        public static MDagPath CurveToHair(ref MDagPath hairSystemDagPath, MDagPath curveDagPath = null, ConstantValue.HairPointLockType pointLock = ConstantValue.HairPointLockType.Base)
         {
             if (curveDagPath == null)
             {
@@ -113,7 +113,7 @@ namespace InazumaTool.BasicTools
             if (curveTrans.parentCount > 0)
             {
                 MDagPath follicleDagPath = MDagPath.getAPathTo(curveTrans.parent(0));
-                MGlobal.executeCommand(string.Format("setAttr {0}.pointLock {1}", follicleDagPath.fullPathName, pointLock));
+                MGlobal.executeCommand(string.Format("setAttr {0}.pointLock {1}", follicleDagPath.fullPathName, (int)pointLock));
                 if (follicleDagPath.hasFn(MFn.Type.kFollicle))
                 {
                     MGlobal.displayInfo("follicle exist!");
@@ -133,7 +133,7 @@ namespace InazumaTool.BasicTools
         }
 
 
-        public static void AddDynamicChainControl(ref MDagPath hairSystem, MSelectionList jointChains = null)
+        public static void AddDynamicChainControl(ref MDagPath hairSystem, MSelectionList jointChains = null, ConstantValue.HairPointLockType pointLock = ConstantValue.HairPointLockType.Base)
         {
             //get bones
             if (jointChains == null)
@@ -159,7 +159,7 @@ namespace InazumaTool.BasicTools
             jointChains.getDagPath(jointChains.length - 1, dagPath_endJoint);
 
             MDagPath startCurveDagPath = JointProcess.CreateJointsCurve(jointChains);
-            MDagPath outCurveDagPath = CurveToHair(ref hairSystem, startCurveDagPath);
+            MDagPath outCurveDagPath = CurveToHair(ref hairSystem, startCurveDagPath, pointLock);
 
             JointProcess.AddIKHandle(dagPath_startJoint, dagPath_endJoint, JointProcess.IKSolverType.Spline, outCurveDagPath.fullPathName);
 
@@ -274,48 +274,7 @@ namespace InazumaTool.BasicTools
             }
             return BasicFunc.CreateCurve(vectors.ToArray(), ctlName, 1, closedArc ? MFnNurbsCurve.Form.kClosed : MFnNurbsCurve.Form.kOpen);
         }
-
-
-        //public static void CreateProxyModel(MSelectionList selected = null, ProxyBaseShape baseShape = ProxyBaseShape.Tube)
-        //{
-        //    if (selected == null)
-        //    {
-        //        //
-        //        selected = BasicFunc.GetSelectedList();
-        //    }
-
-        //    List<MVector> positions = new List<MVector>();
-        //    MItSelectionList it_selectionList = new MItSelectionList(selected);
-        //    MVector totalWeight = MVector.zero;
-        //    for (; !it_selectionList.isDone; it_selectionList.next())
-        //    {
-        //        MObject component = new MObject();
-        //        MDagPath item = new MDagPath();
-        //        it_selectionList.getDagPath(item, component);
-        //        MItMeshVertex it_verts = new MItMeshVertex(item, component);
-        //        for (; !it_verts.isDone; it_verts.next())
-        //        {
-        //            //MGlobal.displayInfo(it_verts.index().ToString());
-        //            MPoint point = it_verts.position(MSpace.Space.kWorld);
-        //            MVector pos = new MVector(point.x, point.y, point.z);
-        //            //BasicFunc.CreateLocator(pos, "vert_" + it_verts.index());
-        //            positions.Add(pos);
-        //            totalWeight += pos;
-        //        }
-
-        //    }
-        //    //merge the nearest
-        //    //float rangeSize = 1;
-
-
-
-        //    //MVector center = totalWeight * (1.0f / positions.Count);
-        //    //MFnMesh newMesh = new MFnMesh();
-        //    CreateVertLoopCircle(positions);
-
-
-        //}
-
+        
         public static void CreateRelativeCurve(MSelectionList selected = null, ConstantValue.SampleType st = ConstantValue.SampleType.ObjectTrans, bool reOrder = true, bool closedArc = true,string ctlName = null)
         {
             if (selected == null)
@@ -376,13 +335,17 @@ namespace InazumaTool.BasicTools
 
         }
 
-        public static void CreateSpiderNetCurves(MSelectionList selected = null)
+        public static void CreateSpiderNetCurves(MSelectionList selected = null, bool convertToHair = true, bool addConstraint = true, bool bindJoints = true)
         {
             if (selected == null)
             {
                 selected = BasicFunc.GetSelectedList();
             }
+            List<MDagPath> verticalCurves = new List<MDagPath>(), horizontalCurves = new List<MDagPath>();
             List<List<MVector>> colList = new List<List<MVector>>();
+
+            List<MDagPath[]> jointPairToBind = new List<MDagPath[]>();
+            
             int rowCount = 0;
             foreach (MDagPath dag in selected.DagPaths())
             {
@@ -396,8 +359,12 @@ namespace InazumaTool.BasicTools
                 {
                     vectorList.Add(transList[i].getTranslation(MSpace.Space.kWorld));
                 }
+                if (bindJoints)
+                {
+                    jointPairToBind.Add(new MDagPath[2] { transList[0].dagPath, transList[transList.Count - 1].dagPath });
+                }
                 colList.Add(vectorList);
-                CreateLoopCircleByPos(vectorList, false, true, string.Format("netCurve_column_{0:d4}", (colList.Count - 1)));
+                verticalCurves.Add(CreateLoopCircleByPos(vectorList, false, false, string.Format("netCurve_column_{0:d4}", (colList.Count - 1))));
             }
             List<List<MVector>> rowList = new List<List<MVector>>();
             for (int i = 0; i < rowCount; i++)
@@ -408,13 +375,72 @@ namespace InazumaTool.BasicTools
                     rowCircle.Add(colList[j][i]);
                 }
                 rowList.Add(rowCircle);
-                CreateLoopCircleByPos(rowCircle, false, true, string.Format("netCurve_row_{0:d4}", (rowCircle.Count - 1)));
+                horizontalCurves.Add(CreateLoopCircleByPos(rowCircle, false, true, string.Format("netCurve_row_{0:d4}", (rowCircle.Count - 1))));
             }
-
-
-
+            if (convertToHair)
+            {
+                MDagPath hairSystem = new MDagPath();
+                MSelectionList listToDynamicCurve = new MSelectionList();
+                MGlobal.displayInfo("vertical to dynamic count:" + verticalCurves.Count);
+                for (int i = 0; i < verticalCurves.Count; i++)
+                {
+                    listToDynamicCurve.add(verticalCurves[i]);
+                }
+                MDagPath[] verticalOutputCurves = CurvesToHairs(ref hairSystem, listToDynamicCurve, ConstantValue.HairPointLockType.Base);
+                MGlobal.displayInfo("vertical dynamic result count:" + verticalOutputCurves.Length);
+                BasicFunc.RenameDagList(verticalOutputCurves, "netDyCurve_vertical_{0:d2}");
+                listToDynamicCurve.clear();
+                MGlobal.displayInfo("horizontal to dynamic count:" + horizontalCurves.Count);
+                for (int i = 1; i < horizontalCurves.Count; i++)
+                {
+                    listToDynamicCurve.add(horizontalCurves[i]);
+                }
+                MDagPath[] horizontalOutputCurves = CurvesToHairs(ref hairSystem, listToDynamicCurve, ConstantValue.HairPointLockType.None);
+                MGlobal.displayInfo("horizontal dynamic result count:" + horizontalOutputCurves.Length);
+                BasicFunc.RenameDagList(horizontalOutputCurves, "netDyCurve_horizontal_{0:d2}");
+                if (bindJoints)
+                {
+                    for (int i = 0; i < verticalOutputCurves.Length; i++)
+                    {
+                        JointProcess.AddIKHandle(jointPairToBind[i][0], jointPairToBind[i][1], JointProcess.IKSolverType.Spline, verticalOutputCurves[i].fullPathName);
+                    }
+                }
+                if (addConstraint)
+                {
+                    MSelectionList outputCurveList = new MSelectionList();
+                    for (int i = 0; i < verticalOutputCurves.Length; i++)
+                    {
+                        outputCurveList.add(verticalOutputCurves[i]);
+                    }
+                    for (int i = 0; i < horizontalOutputCurves.Length; i++)
+                    {
+                        outputCurveList.add(horizontalOutputCurves[i]);
+                    }
+                    AddDynamicConstraint(outputCurveList);
+                }
+            }
+            else if (bindJoints)
+            {
+                for (int i = 0; i < jointPairToBind.Count; i++)
+                {
+                    JointProcess.AddIKHandle(jointPairToBind[i][0], jointPairToBind[i][1], JointProcess.IKSolverType.Spline, verticalCurves[i].fullPathName);
+                }
+            }
         }
         #endregion
+
+        public static void AddDynamicConstraint(MSelectionList list, ConstantValue.DynamicConstraintType dynamicConstraintType = ConstantValue.DynamicConstraintType.PointToPoint, ConstantValue.DynamicConstraintMethod method = ConstantValue.DynamicConstraintMethod.Weld)
+        {
+            if (list == null)
+            {
+                list = BasicFunc.GetSelectedList();
+            }
+            BasicFunc.Select(list);
+            string typeStr = ConstantValue.Param_DynamicConstraintType(dynamicConstraintType);
+            string cmdStr = "createNConstraint " + typeStr + " 0";
+            string dynamicConstraintShapeName = MGlobal.executeCommandStringResult(cmdStr);
+            BasicFunc.SetAttr(dynamicConstraintShapeName, ConstantValue.plugName_dynamicConstraintMethod, "" + (int)method);
+        }
 
 
         const string cmdStr = "DynamicConverter";
@@ -439,7 +465,11 @@ namespace InazumaTool.BasicTools
             }));
             cmdList.Add(new CommandData("动力学", cmdStr, "chainNet", "链骨网络", () =>
             {
-                CreateSpiderNetCurves();
+                CreateSpiderNetCurves(null, false, false, false);
+            }));
+            cmdList.Add(new CommandData("动力学", cmdStr, "chainNetDynamic", "链骨网络-动力学附加", () =>
+            {
+                CreateSpiderNetCurves(null, true, true, true);
             }));
             cmdList.Add(new CommandData("动力学", cmdStr, "multiJointChainsToHair", "为链骨们增加动力学", () =>
             {
