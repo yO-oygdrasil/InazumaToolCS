@@ -62,6 +62,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AnimationTools\AnimationPass.cs" />
     <Compile Include="BasicTools\BasicWindow.cs" />
     <Compile Include="BasicTools\Selector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

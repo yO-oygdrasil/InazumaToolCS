@@ -215,7 +215,21 @@ namespace InazumaTool.BasicTools
             return resultArr;
         }
 
-
+        public static void ClearHierachyJointsRotation(MSelectionList selectionList = null)
+        {
+            if (selectionList == null || selectionList.length == 0)
+            {
+                selectionList = BasicFunc.GetSelectedList();
+            }
+            foreach (MDagPath dag in selectionList.DagPaths())
+            {
+                List<MFnTransform> transList = BasicFunc.GetHierachyChainTrans(dag, MFn.Type.kJoint);
+                foreach (MFnTransform trans in transList)
+                {
+                    trans.setRotatePivotTranslation(MVector.zero, MSpace.Space.kTransform);
+                }
+            }
+        }
 
         const string cmdStr = "JointProcess";
         public static List<CommandData> GetCommandDatas()
