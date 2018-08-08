@@ -48,7 +48,7 @@ namespace InazumaTool.BasicTools
             }
             if (list.length <= 1)
             {
-                MGlobal.displayInfo("please choose at least 2 materials");
+                Debug.Log("please choose at least 2 materials");
                 return false;
             }
             string firstMatName = "";
@@ -59,7 +59,7 @@ namespace InazumaTool.BasicTools
 
             for (uint i = 0; i < list.length; i++)
             {
-                //MGlobal.displayInfo(i + " mat test");
+                //Debug.Log(i + " mat test");
                 MObject matObject = new MObject();
                 list.getDependNode(i, matObject);
                 MFnDependencyNode dnode = new MFnDependencyNode(matObject);
@@ -72,28 +72,28 @@ namespace InazumaTool.BasicTools
                 {
                     deleteList.Add(matObject);
                 }
-                //MGlobal.displayInfo(i + " node:" + dnode.absoluteName);
+                //Debug.Log(i + " node:" + dnode.absoluteName);
                 if (matObject.hasFn(MFn.Type.kLambert) || matObject.hasFn(MFn.Type.kBlinn) || matObject.hasFn(MFn.Type.kPhong))
                 {
-                    MGlobal.displayInfo("has mat fn");
+                    Debug.Log("has mat fn");
                     //MMaterial mat = new MMaterial(matObject);
                     //MColor color = new MColor();
                     //mat.getDiffuse(color);
-                    //MGlobal.displayInfo("mat:" + dnode.absoluteName + " ,color:" + BasicFunc.MToString(color));
+                    //Debug.Log("mat:" + dnode.absoluteName + " ,color:" + BasicFunc.MToString(color));
                     SelectObjectsWithMat(dnode);
-                    MGlobal.displayInfo("finish select");
+                    Debug.Log("finish select");
                     
 
                     //waitForAssign.Add(BasicFunc.GetSelectedList());
                     AssignMat(firstMatName);
-                    MGlobal.displayInfo("finish assign");
+                    Debug.Log("finish assign");
                     BasicFunc.DeleteByCMD(dnode.absoluteName);
-                    MGlobal.displayInfo("finish delete");
+                    Debug.Log("finish delete");
 
                 }
                 else
                 {
-                    MGlobal.displayInfo("no mat fn");
+                    Debug.Log("no mat fn");
                 }
             }
 
@@ -132,7 +132,7 @@ namespace InazumaTool.BasicTools
             }
             if (list.length <= 1)
             {
-                MGlobal.displayInfo("please choose at least 2 materials");
+                Debug.Log("please choose at least 2 materials");
                 return false;
             }
             //string texFilePath = "";
@@ -151,21 +151,21 @@ namespace InazumaTool.BasicTools
                 MFnDependencyNode texDN = new MFnDependencyNode(texObject);
                 MPlug texPlug = texDN.findPlug(ConstantValue.plugName_fileTexPath);
                 MPlug texOutputPlug = texDN.findPlug(ConstantValue.plugName_fileTexOutput);
-                //MGlobal.displayInfo("texplug name:" + texPlug.name);
+                //Debug.Log("texplug name:" + texPlug.name);
                 texOutputPlugs.Add(texOutputPlug);
                 string filePath = texPlug.asString();
-                //MGlobal.displayInfo("path:" + filePath);
+                //Debug.Log("path:" + filePath);
                 if (combineDic.ContainsKey(filePath))
                 {
                     //combine
                     int targetIndex = combineDic[filePath];
-                    //MGlobal.displayInfo("combine " + i + " to " + targetIndex);
+                    //Debug.Log("combine " + i + " to " + targetIndex);
 
                     MPlugArray destPlugs = new MPlugArray();
                     texOutputPlug.destinations(destPlugs);
                     for (int j = 0; j < destPlugs.Count; j++)
                     {
-                        //MGlobal.displayInfo("texPlugs[targetIndex]:" + texOutputPlugs[targetIndex].name + " , destPlugs[j]" + destPlugs[j].name);
+                        //Debug.Log("texPlugs[targetIndex]:" + texOutputPlugs[targetIndex].name + " , destPlugs[j]" + destPlugs[j].name);
                         dGModifier.disconnect(texOutputPlug, destPlugs[j]);
                         dGModifier.connect(texOutputPlugs[targetIndex], destPlugs[j]);
                     }
@@ -205,9 +205,9 @@ namespace InazumaTool.BasicTools
                 MFnDependencyNode imageNode = new MFnDependencyNode(mo);
                 MPlug plug = imageNode.findPlug(ConstantValue.plugName_fileTexPath);
                 string filePath = plug.asString();
-                MGlobal.displayInfo("filePath:" + filePath);
+                Debug.Log("filePath:" + filePath);
                 string fileName = BasicFunc.GetFileName(filePath);
-                MGlobal.displayInfo("fileName:" + fileName);
+                Debug.Log("fileName:" + fileName);
                 imageNode.setName(fileName);
 
 
@@ -259,7 +259,7 @@ namespace InazumaTool.BasicTools
                 if (destPlugs.Count == 0)
                 {
                     deleteList.Add(mo);
-                    MGlobal.displayInfo("remove no use:" + imageNode.absoluteName);
+                    Debug.Log("remove no use:" + imageNode.absoluteName);
                 }
             }
             BasicFunc.DeleteObjects(deleteList);

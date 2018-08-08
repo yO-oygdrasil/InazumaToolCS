@@ -116,10 +116,10 @@ namespace InazumaTool.BasicTools
                 }
                 MFnTransform ptTrans = new MFnTransform(dagPath);
                 vectors[i] = ptTrans.getTranslation(MSpace.Space.kWorld);
-                //MGlobal.displayInfo(BasicFunc::ToCMDSParamStr(vectors[i]));
+                //Debug.Log(BasicFunc::ToCMDSParamStr(vectors[i]));
             }
             MDagPath curveDagPath = BasicFunc.CreateCurve(vectors, curveName);
-            //MGlobal.displayInfo("create Finish");
+            //Debug.Log("create Finish");
             
 
             return curveDagPath;
@@ -133,7 +133,7 @@ namespace InazumaTool.BasicTools
             string resultStr = MGlobal.executePythonCommandStringResult(cmdStr);
 
             //string resultStr = MGlobal.executeCommandStringResult("makeCurvesDynamic 2 {\"0\",\"0\",\"0\",\"1\",\"0\"}");
-            MGlobal.displayInfo("message" + resultStr);
+            Debug.Log("message" + resultStr);
         }
 
         public static MDagPath CreateJoint(string jtName)

@@ -30,7 +30,7 @@ namespace InazumaTool.BindTools
             //if (dagPath != null)
             //{
             //    string cmdStr = string.Format("addAttr -ln {0} -min {1} -max {2} -at \"float\" -dv {3} -k {4} {5}", attrLongName, min, max, defaultValue, keyable ? 1 : 0, dagPath.fullPathName);
-            //    MGlobal.displayInfo("cmdStr:" + cmdStr);
+            //    Debug.Log("cmdStr:" + cmdStr);
             //    MGlobal.executeCommand(cmdStr);
             //}
         }
@@ -54,7 +54,7 @@ namespace InazumaTool.BindTools
             MDagPath dag_target = MDagPath.getAPathTo(targetObject);
             MFnDependencyNode node_target = new MFnDependencyNode(targetObject);
             MPlug plug = node_target.findPlug("inMesh");
-            MGlobal.displayInfo("node_target:" + node_target.name+" plug:"+ plug.name);
+            Debug.Log("node_target:" + node_target.name+" plug:"+ plug.name);
             MItDependencyGraph mit = new MItDependencyGraph(plug, MFn.Type.kBlendShape, MItDependencyGraph.Direction.kUpstream);
             //MDagPath dagPath = new MDagPath();
             //MItDependencyNodes mitnode = new MItDependencyNodes(MFn.Type.kBlendShape);
@@ -64,10 +64,10 @@ namespace InazumaTool.BindTools
             {
                 MObject mo = mit.currentItem();
                 MFnDependencyNode dnode = new MFnDependencyNode(mo);
-                MGlobal.displayInfo("moing:" + dnode.absoluteName);
+                Debug.Log("moing:" + dnode.absoluteName);
                 if (mo.hasFn(MFn.Type.kBlendShape))
                 {
-                    MGlobal.displayInfo("find blendshape");
+                    Debug.Log("find blendshape");
                     return new MFnBlendShapeDeformer(mo);
 
                 }
@@ -83,10 +83,10 @@ namespace InazumaTool.BindTools
             //MFnDependencyNode ctlNode = new MFnDependencyNode(ctlDagPath.node);
             if (bs == null)
             {
-                MGlobal.displayInfo("null blendShape");
+                Debug.Log("null blendShape");
                 return false;
             }
-            //MGlobal.displayInfo("here i am");
+            //Debug.Log("here i am");
 
             if (ctlDagPath == null)
             {
@@ -97,12 +97,12 @@ namespace InazumaTool.BindTools
 
             MPlug weightPlug = bs.findPlug(ConstantValue.plugName_blendShapeWeight);
             int count = (int)weightPlug.numElements;
-            //MGlobal.displayInfo("target count:" + count);
+            //Debug.Log("target count:" + count);
 
             MDGModifier dGModifier = new MDGModifier();
             for (int i = 0; i < count; i++)
             {
-                //MGlobal.displayInfo("process:" + i);
+                //Debug.Log("process:" + i);
                 MPlug singleWeightPlug = weightPlug.elementByLogicalIndex((uint)i);
                 string weightName = singleWeightPlug.name.Split('.').Last();
                 MPlug ctlAttrPlug = AddFloatAttr(ctlDagPath, weightName);
