@@ -116,10 +116,10 @@ namespace InazumaTool.BasicTools
                 }
                 MFnTransform ptTrans = new MFnTransform(dagPath);
                 vectors[i] = ptTrans.getTranslation(MSpace.Space.kWorld);
-                //Debug.Log(BasicFunc::ToCMDSParamStr(vectors[i]));
+                //MGlobal.displayInfo(BasicFunc::ToCMDSParamStr(vectors[i]));
             }
             MDagPath curveDagPath = BasicFunc.CreateCurve(vectors, curveName);
-            //Debug.Log("create Finish");
+            //MGlobal.displayInfo("create Finish");
             
 
             return curveDagPath;
@@ -133,7 +133,7 @@ namespace InazumaTool.BasicTools
             string resultStr = MGlobal.executePythonCommandStringResult(cmdStr);
 
             //string resultStr = MGlobal.executeCommandStringResult("makeCurvesDynamic 2 {\"0\",\"0\",\"0\",\"1\",\"0\"}");
-            Debug.Log("message" + resultStr);
+            MGlobal.displayInfo("message" + resultStr);
         }
 
         public static MDagPath CreateJoint(string jtName)
@@ -223,12 +223,17 @@ namespace InazumaTool.BasicTools
             }
             foreach (MDagPath dag in selectionList.DagPaths())
             {
-                List<MFnTransform> transList = BasicFunc.GetHierachyChainTrans(dag, MFn.Type.kJoint);
+                List<MFnTransform> transList = BasicFunc.GetHierachyAllTrans(dag, MFn.Type.kJoint);
                 foreach (MFnTransform trans in transList)
                 {
-                    trans.setRotatePivotTranslation(MVector.zero, MSpace.Space.kTransform);
+                    //Debug.Log("trans:" + trans.fullPathName);
+                    trans.setRotation(new MEulerRotation(0, 0, 0));
+                    MEulerRotation result = new MEulerRotation();
+                    trans.getRotation(result);
+                    //Debug.LogEuler(result, "value");
                 }
             }
+
         }
 
         const string cmdStr = "JointProcess";
@@ -238,6 +243,10 @@ namespace InazumaTool.BasicTools
             cmdList.Add(new CommandData("骨骼", cmdStr, "add", "沿骨骼生成曲线", () =>
             {
                 CreateJointsCurve(BasicFunc.GetSelectedList());
+            }));
+            cmdList.Add(new CommandData("骨骼", cmdStr, "clearRotation", "清除层级下骨骼旋转",()=>
+            {
+                ClearHierachyJointsRotation();
             }));
             return cmdList;
         }

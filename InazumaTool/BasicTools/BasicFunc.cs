@@ -251,6 +251,62 @@ namespace InazumaTool.BasicTools
             return result;
         }
 
+        public static List<MDagPath> GetHierachyAll(MDagPath startDag, MFn.Type filterType = MFn.Type.kInvalid)
+        {
+            MFnTransform currentTrans = new MFnTransform(startDag);
+            //no need for trans data , so mfntransform(mobject) is used
+            List<MDagPath> result = new List<MDagPath>();
+
+            AddChildrenToList(result, currentTrans, filterType);
+
+            return result;
+        }
+
+        public static List<MFnTransform> GetHierachyAllTrans(MDagPath startDag, MFn.Type filterType = MFn.Type.kInvalid)
+        {
+            MFnTransform currentTrans = new MFnTransform(startDag);
+            //no need for trans data , so mfntransform(mobject) is used
+            List<MFnTransform> result = new List<MFnTransform>();
+
+            AddChildrenToList(result, currentTrans, filterType);
+
+            return result;
+        }
+
+        private static void AddChildrenToList(List<MFnTransform> list, MFnTransform rootTrans, MFn.Type filterType = MFn.Type.kInvalid)
+        {
+            if (filterType == MFn.Type.kInvalid || rootTrans.dagPath.hasFn(filterType))
+            {
+                list.Add(rootTrans);
+            }
+            if (rootTrans.childCount > 0)
+            {
+                for (int i = 0; i < rootTrans.childCount; i++)
+                {
+                    MObject mo = rootTrans.child((uint)i);
+                    MDagPath dag = MDagPath.getAPathTo(mo);
+                    AddChildrenToList(list, new MFnTransform(dag), filterType);
+                }                
+            }
+        }
+
+        private static void AddChildrenToList(List<MDagPath> dagList, MFnTransform rootTrans, MFn.Type filterType = MFn.Type.kInvalid)
+        {
+            if (filterType == MFn.Type.kInvalid || rootTrans.dagPath.hasFn(filterType))
+            {
+                dagList.Add(rootTrans.dagPath);
+            }
+            if (rootTrans.childCount > 0)
+            {
+                for (int i = 0; i < rootTrans.childCount; i++)
+                {
+                    MObject mo = rootTrans.child((uint)i);
+                    MDagPath dag = MDagPath.getAPathTo(mo);
+                    AddChildrenToList(dagList, new MFnTransform(dag), filterType);
+                }
+            }
+        }
+
         public static List<MFnTransform> GetHierachyChainTrans(MDagPath startDag, MFn.Type filterType = MFn.Type.kInvalid, MDagPath endDag = null)
         {
             MFnTransform currentTrans = new MFnTransform(startDag);
@@ -344,7 +400,9 @@ namespace InazumaTool.BasicTools
                 MFnTransform parellelGrpTrans = new MFnTransform(AddEmptyGroup(new MFnTransform(targetTrans.parent(0))));
                 parellelGrpTrans.setTranslation(targetTrans.getTranslation(MSpace.Space.kTransform), MSpace.Space.kTransform);
                 //Debug.Log("finalLocalPos:"+BasicFunc.ToCMDSParamStr(parellelGrpTrans.getTranslation(MSpace.kTransform)));
-                parellelGrpTrans.setRotatePivotTranslation(targetTrans.rotatePivotTranslation(MSpace.Space.kTransform), MSpace.Space.kTransform);
+                MEulerRotation rot = new MEulerRotation();
+                targetTrans.getRotation(rot);
+                parellelGrpTrans.setRotation(rot);
                 SetTransformParent(ctlName, parellelGrpTrans.fullPathName);
             }
 
