@@ -62,6 +62,7 @@ namespace InazumaTool.BindTools
             na.create(attrLongName, shortName, MFnNumericData.Type.kBoolean);
             na.setDefault(defaultValue);
             na.isKeyable = keyable;
+            na.setChannelBox(true);
             dnode.addAttribute(na.objectProperty);
             return dnode.findPlug(attrLongName);
             //if (dagPath != null)
