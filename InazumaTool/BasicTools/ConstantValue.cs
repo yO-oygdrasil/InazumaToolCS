@@ -39,10 +39,21 @@ namespace InazumaTool.BasicTools
 
         public const string plugName_dynamicConstraintMethod = "constraintMethod";
 
+        public const string plugName_nCloth_currentTime = "currentTime";
+        public const string plugName_nCloth_isDynamic = "isDynamic";
+        public const string plugName_nClothTime_nodeState = "nodeState";
+
         //public const string cmd_pointConstraint = "pointConstraint";
         //public const string cmd_poleVectorConstraint = "poleVectorConstraint";
         //public const string cmd_parentConstraint = "parentConstraint";
         //public const string cmd_orientConstraint = "orientConstraint";
+
+        public enum TimeNodeState
+        {
+            Normal = 0,
+            NoEffect = 1,
+            Stuck = 2
+        }
 
         public enum DynamicConstraintMethod
         {

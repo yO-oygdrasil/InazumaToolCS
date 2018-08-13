@@ -35,6 +35,43 @@ namespace InazumaTool.BindTools
             //}
         }
 
+        public static MPlug AddBoolAttr(MDagPath dagPath, string attrLongName, bool defaultValue = true, string shortName = "", bool keyable = true)
+        {
+            return AddBoolAttr(new MFnDependencyNode(dagPath.node), attrLongName, defaultValue, shortName, keyable);
+
+            //if (shortName.Length == 0)
+            //{
+            //    shortName = attrLongName;
+            //}
+            //MFnDependencyNode dnode = new MFnDependencyNode(dagPath.node);
+            //MFnNumericAttribute na = new MFnNumericAttribute();
+            //na.create(attrLongName, shortName, MFnNumericData.Type.kBoolean);
+            //na.setDefault(defaultValue);
+            //na.isKeyable = keyable;
+            //dnode.addAttribute(na.objectProperty);
+            //return dnode.findPlug(attrLongName);
+        }
+
+        public static MPlug AddBoolAttr(MFnDependencyNode dnode, string attrLongName, bool defaultValue = true, string shortName = "", bool keyable = true)
+        {
+            if (shortName.Length == 0)
+            {
+                shortName = attrLongName;
+            }
+            MFnNumericAttribute na = new MFnNumericAttribute();
+            na.create(attrLongName, shortName, MFnNumericData.Type.kBoolean);
+            na.setDefault(defaultValue);
+            na.isKeyable = keyable;
+            dnode.addAttribute(na.objectProperty);
+            return dnode.findPlug(attrLongName);
+            //if (dagPath != null)
+            //{
+            //    string cmdStr = string.Format("addAttr -ln {0} -min {1} -max {2} -at \"float\" -dv {3} -k {4} {5}", attrLongName, min, max, defaultValue, keyable ? 1 : 0, dagPath.fullPathName);
+            //    Debug.Log("cmdStr:" + cmdStr);
+            //    MGlobal.executeCommand(cmdStr);
+            //}
+        }
+
         public static bool ProjectPlug(MPlug from, MPlug to, float fromMin, float fromMax, float toMin, float toMax)
         {
             MFnDependencyNode remapValueNode = BasicFunc.CreateRemapValueNode(fromMin, fromMax, toMin, toMax);

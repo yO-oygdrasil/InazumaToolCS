@@ -64,6 +64,7 @@
   <ItemGroup>
     <Compile Include="AnimationTools\AnimationPass.cs" />
     <Compile Include="BasicTools\BasicWindow.cs" />
+    <Compile Include="BasicTools\DependModules.cs" />
     <Compile Include="BasicTools\Selector.cs" />
     <Compile Include="BindTools\BindSwitch.cs" />
     <Compile Include="Debug.cs" />

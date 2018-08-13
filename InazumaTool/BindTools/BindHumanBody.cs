@@ -139,7 +139,7 @@ namespace InazumaTool.BindTools
                     MVector direct_projectPolePos = BasicFunc.VerticalProject(direct_pole, direct_fitLine).normal;
 
                     //MVector nmPos = (rootPos * len0 + endPos * len1) * (1 / (len0 + len1));
-                    float factor = 2;
+                    float factor = (float)((rootPos - endPos).length / 3);
                     MVector polePos = factor * direct_projectPolePos + middlePos;
                     
                     string locName = "loc_" + rootJoint.name + "_" + endJoint.name;

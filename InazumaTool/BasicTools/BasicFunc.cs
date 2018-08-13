@@ -668,6 +668,44 @@ namespace InazumaTool.BasicTools
             }
             MGlobal.executeCommand(cmdStr, showInIdle);
         }
+
+        public static bool ConnectPlug(MFnDependencyNode dn_from, string plugName_from, MFnDependencyNode dn_to, string plugName_to, MDGModifier dGModifier = null, bool doit = true)
+        {
+            if (dn_from != null && dn_to != null)
+            {
+                MPlug from = dn_from.findPlug(plugName_from);
+                if (from != null)
+                {
+                    MPlug to = dn_to.findPlug(plugName_to);
+                    if (to != null)
+                    {
+                        return ConnectPlug(from, to, dGModifier, doit);
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        public static bool ConnectPlug(MPlug from, MPlug to,MDGModifier dGModifier = null,bool doit = true)
+        {
+            if (from != null && to != null)
+            {
+                if (dGModifier == null)
+                {
+                    dGModifier = new MDGModifier();
+                    doit = true;
+                }
+                dGModifier.connect(from, to);
+                if (doit)
+                {
+                    dGModifier.doIt();
+                }
+                return true;
+            }
+
+            return false;
+        }
         
         public static void AddConstraint(string from, string to, ConstantValue.ConstraintType ct, bool maintainOffset = true)
         {
@@ -708,14 +746,17 @@ namespace InazumaTool.BasicTools
             MGlobal.executeCommand(string.Format("setAttr \"{0}.{1}\" {2}", targetName, attrName, value));
         }
 
-        public static void IterateSelectedDags(Action<MDagPath> dealMethod, MFn.Type type = MFn.Type.kInvalid)
+        public static void IterateSelectedDags(Action<MDagPath> dealMethod, MFn.Type typeFilter = MFn.Type.kInvalid,MSelectionList list = null)
         {
-            MSelectionList list = GetSelectedList();
+            if (list == null)
+            {
+                list = GetSelectedList();
+            }
             foreach (MDagPath dag in list.DagPaths())
             {
-                if (type != MFn.Type.kInvalid)
+                if (typeFilter != MFn.Type.kInvalid)
                 {
-                    if (!dag.hasFn(type))
+                    if (!dag.hasFn(typeFilter))
                     {
                         continue;
                     }
