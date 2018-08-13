@@ -707,6 +707,24 @@ namespace InazumaTool.BasicTools
         {
             MGlobal.executeCommand(string.Format("setAttr \"{0}.{1}\" {2}", targetName, attrName, value));
         }
+
+        public static void IterateSelectedDags(Action<MDagPath> dealMethod, MFn.Type type = MFn.Type.kInvalid)
+        {
+            MSelectionList list = GetSelectedList();
+            foreach (MDagPath dag in list.DagPaths())
+            {
+                if (type != MFn.Type.kInvalid)
+                {
+                    if (!dag.hasFn(type))
+                    {
+                        continue;
+                    }
+                }
+                dealMethod(dag);
+            }
+        }
+
+
         #endregion
 
         #region DealResultStr
@@ -763,6 +781,11 @@ namespace InazumaTool.BasicTools
                 radian = -radian;
             }
             return radian;
+        }
+
+        public static MVector Lerp(MVector v0, MVector v1,float percent)
+        {
+            return v0 * (1 - percent) + v1 * percent;
         }
 
         #endregion

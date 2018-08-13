@@ -236,6 +236,55 @@ namespace InazumaTool.BasicTools
 
         }
 
+        private static void MoveSkinJointsTool(MDagPath dag = null)
+        {
+            if (dag != null)
+            {
+                BasicFunc.Select(dag);
+            }
+            MGlobal.executeCommand("MoveSkinJointsTool");
+        }
+
+        public static void BeautifulPole(MDagPath middleDag = null,bool useMoveSkinJointsTool = true)
+        {
+            if (middleDag == null || middleDag.node.isNull)
+            {
+                middleDag = BasicFunc.GetSelectedDagPath(0);
+                if (middleDag == null || middleDag.node.isNull)
+                {
+                    Debug.Log("please select middle joint");
+                    return;
+                }
+            }
+
+            MFnTransform middleTrans = new MFnTransform(middleDag);
+            if (middleTrans.parentCount == 0 || middleTrans.childCount == 0)
+            {
+                return;
+            }
+            MDagPath parentDag = MDagPath.getAPathTo(middleTrans.parent(0));
+            MDagPath childDag = MDagPath.getAPathTo(middleTrans.child(0));
+            MFnTransform parentTrans = new MFnTransform(parentDag);
+            MFnTransform childTrans = new MFnTransform(childDag);
+            MVector parentWorldPos = parentTrans.getTranslation(MSpace.Space.kWorld);
+            MVector middleWorldPos = middleTrans.getTranslation(MSpace.Space.kWorld);
+            MVector childWorldPos = childTrans.getTranslation(MSpace.Space.kWorld);
+            //MVector vec_middleToParent = parentWorldPos - middleWorldPos;
+            //MVector vec_childToMiddle = middleWorldPos - childWorldPos;
+            //MVector verticalBack = BasicFunc.Cross(vec_middleToParent, vec_childToMiddle);
+            
+            float length0 = (float) (middleWorldPos - parentWorldPos).length;
+            float length1 = (float) (middleWorldPos - childWorldPos).length;
+            MVector posByWeight = BasicFunc.Lerp(parentWorldPos, childWorldPos, length0 / (length0 + length1));
+            if (useMoveSkinJointsTool)
+            {
+                MoveSkinJointsTool(middleDag);
+            }
+            middleTrans.setTranslation(posByWeight, MSpace.Space.kWorld);
+        }
+
+
+
         const string cmdStr = "JointProcess";
         public static List<CommandData> GetCommandDatas()
         {
@@ -247,6 +296,14 @@ namespace InazumaTool.BasicTools
             cmdList.Add(new CommandData("骨骼", cmdStr, "clearRotation", "清除层级下骨骼旋转",()=>
             {
                 ClearHierachyJointsRotation();
+            }));
+            cmdList.Add(new CommandData("骨骼", cmdStr, "beautifulPole", "为漂亮的极向量铺路", () =>
+            {
+                BeautifulPole(null);
+            }));
+            cmdList.Add(new CommandData("骨骼", cmdStr, "manyBeautifulPole", "为很多漂亮的极向量铺路", () =>
+            {
+                BasicFunc.IterateSelectedDags((dag) => { BeautifulPole(dag, true); });
             }));
             return cmdList;
         }
