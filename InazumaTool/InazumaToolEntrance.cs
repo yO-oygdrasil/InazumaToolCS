@@ -133,6 +133,7 @@ namespace InazumaTool
             cds.AddRange(MaterialManage.GetCommandDatas());
             cds.AddRange(BindAttr.GetCommandDatas());
             cds.AddRange(Selector.GetCommandDatas());
+            cds.AddRange(BindSwitch.GetCommandDatas());
 
             foreach (CommandData cd in cds)
             {

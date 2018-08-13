@@ -25,7 +25,13 @@ namespace InazumaTool.BindTools
 
         }
 
-
+        public static void TestNClothNodeRecognize()
+        {
+            BasicFunc.IterateSelectedDags((dag) =>
+            {
+                Debug.Log(dag.fullPathName);
+            }, MFn.Type.kNCloth);
+        }
 
 
         const string cmdStr = "BindSwitch";
@@ -35,6 +41,10 @@ namespace InazumaTool.BindTools
             cmdList.Add(new CommandData("绑定切换", cmdStr, "switchNCloth", "添加nCloth到纯蒙皮的切换", () =>
             {
                 BindNCloth();
+            }));
+            cmdList.Add(new CommandData("绑定切换", cmdStr, "testNClothNodeRecognize", "测试寻找ncloth节点", () =>
+            {
+                TestNClothNodeRecognize();
             }));
             return cmdList;
         }
