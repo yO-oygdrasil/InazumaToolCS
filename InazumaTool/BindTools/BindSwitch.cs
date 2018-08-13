@@ -28,7 +28,7 @@ namespace InazumaTool.BindTools
             MFnDependencyNode dn_ctl = new MFnDependencyNode(ctlDag.node);
             BasicFunc.IterateSelectedDags((dag) =>
             {
-                MPlug ctlNewAttrPlug = BindAttr.AddBoolAttr(dn_ctl, "Dynamic_" + dag.partialPathName, true);
+                MPlug ctlNewAttrPlug = BindAttr.AddBoolAttr(dn_ctl, "Dynamic_" + dag.partialPathName, true, "", false);
                 MFnDependencyNode dn_nCloth = new MFnDependencyNode(dag.node);
                 MPlug plug_isDynamic = dn_nCloth.findPlug(ConstantValue.plugName_nCloth_isDynamic);
                 MPlug plug_currentTime = dn_nCloth.findPlug(ConstantValue.plugName_nCloth_currentTime);
