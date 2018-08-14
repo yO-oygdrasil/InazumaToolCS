@@ -280,7 +280,10 @@ namespace InazumaTool.BasicTools
             {
                 MoveSkinJointsTool(middleDag);
             }
+            //middleTrans.setTranslation(posByWeight, MSpace.Space.kWorld);
             middleTrans.setTranslation(posByWeight, MSpace.Space.kWorld);
+            childTrans.setTranslation(childWorldPos, MSpace.Space.kWorld);
+            //MFnIkJoint middleJoint = new MFnIkJoint(middleDag);
         }
 
 
