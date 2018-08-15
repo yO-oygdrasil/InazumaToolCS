@@ -245,7 +245,7 @@ namespace InazumaTool.BasicTools
             MGlobal.executeCommand("MoveSkinJointsTool");
         }
 
-        public static void BeautifulPole(MDagPath middleDag = null,bool useMoveSkinJointsTool = true)
+        public static void BeautifulPole(MDagPath middleDag = null, bool clearFlag_x = true,bool clearFlag_y = true,bool clearFlag_z =true, bool useMoveSkinJointsTool = true)
         {
             if (middleDag == null || middleDag.node.isNull)
             {
