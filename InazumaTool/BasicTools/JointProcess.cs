@@ -245,6 +245,14 @@ namespace InazumaTool.BasicTools
             MGlobal.executeCommand("MoveSkinJointsTool");
         }
 
+        public static MVector GetLinearPosByWeight(MVector middleWorldPos, MVector parentWorldPos, MVector childWorldPos)
+        {
+            float length0 = (float)(middleWorldPos - parentWorldPos).length;
+            float length1 = (float)(middleWorldPos - childWorldPos).length;
+            MVector posByWeight = BasicFunc.Lerp(parentWorldPos, childWorldPos, length0 / (length0 + length1));
+            return posByWeight;
+        }
+
         public static void BeautifulPole(MDagPath middleDag = null, bool clearFlag_x = true,bool clearFlag_y = true,bool clearFlag_z =true, bool useMoveSkinJointsTool = true)
         {
             if (middleDag == null || middleDag.node.isNull)
@@ -281,9 +289,28 @@ namespace InazumaTool.BasicTools
                 MoveSkinJointsTool(middleDag);
             }
             //middleTrans.setTranslation(posByWeight, MSpace.Space.kWorld);
+            if (!clearFlag_x)
+            {
+                posByWeight.x = middleWorldPos.x;
+            }
+            if (!clearFlag_y)
+            {
+                posByWeight.y = middleWorldPos.y;
+            }
+            if (!clearFlag_z)
+            {
+                posByWeight.z = middleWorldPos.z;
+            }
             middleTrans.setTranslation(posByWeight, MSpace.Space.kWorld);
             childTrans.setTranslation(childWorldPos, MSpace.Space.kWorld);
             //MFnIkJoint middleJoint = new MFnIkJoint(middleDag);
+        }
+
+        private static void BeautifulPoleWindow()
+        {
+            BasicWindow bw = new BasicWindow("Beautiful Pole");
+            Action[] acts = new Action[8];
+
         }
 
 
