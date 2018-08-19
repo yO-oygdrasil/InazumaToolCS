@@ -765,6 +765,29 @@ namespace InazumaTool.BasicTools
             }
         }
 
+        public static void IterateSelectedObjects(Action<MObject> dealMethod, MFn.Type typeFilter = MFn.Type.kInvalid, MSelectionList list = null)
+        {
+            if (list == null)
+            {
+                list = GetSelectedList();
+            }
+            int count = (int)list.length;
+            for (int i = 0; i < count; i++)
+            {
+                MObject mo = new MObject();
+                list.getDependNode((uint)i, mo);
+                if (typeFilter != MFn.Type.kInvalid)
+                {
+                    if (!mo.hasFn(typeFilter))
+                    {
+                        continue;
+                    }
+                }
+                dealMethod(mo);
+            }
+
+        }
+
 
         #endregion
 

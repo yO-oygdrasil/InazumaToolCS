@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Autodesk.Maya.OpenMayaRender;
 using Autodesk.Maya.OpenMaya;
 using Autodesk.Maya.OpenMayaUI;
 
@@ -40,11 +41,12 @@ namespace InazumaTool.BasicTools
         /// </summary>
         /// <param name="list"></param>
         /// <returns></returns>
-        public static bool CombineMaterials(MSelectionList list = null,bool deleteRepeated = true)
+        public static bool CombineMaterials(MSelectionList list, bool deleteRepeated = true)
         {
             if (list == null)
             {
-                list = BasicFunc.GetSelectedList();
+                Debug.Log("list null");
+                return false;
             }
             if (list.length <= 1)
             {
@@ -103,7 +105,7 @@ namespace InazumaTool.BasicTools
             return true;
         }
 
-        public static int SelectMaterialWithSameTex(MObject imageObject)
+        public static MSelectionList GetMaterialsWithSameTex(MObject imageObject)
         {
             //MImage img = new MImage();
             //img.readFromTextureNode(imageObject, MImage.MPixelType.kUnknown);
@@ -118,17 +120,18 @@ namespace InazumaTool.BasicTools
             {
                 newSelection.add(destPlugs[i].node);
             }
-            BasicFunc.Select(newSelection);
-            return 0;
+            //BasicFunc.Select(newSelection);
+            return newSelection;
         }
 
 
 
-        public static bool CombineSameTextures(MSelectionList list = null,bool deleteRepeated = true)
+        public static bool CombineSameTextures(MSelectionList list,bool deleteRepeated = true)
         {
             if (list == null)
             {
-                list = BasicFunc.GetSelectedList();
+                Debug.Log("list null");
+                return false;
             }
             if (list.length <= 1)
             {
@@ -192,11 +195,12 @@ namespace InazumaTool.BasicTools
 
         }
 
-        public static void RenameTextures(MSelectionList list = null)
+        public static void RenameTextures(MSelectionList list)
         {
             if (list == null)
             {
-                list = BasicFunc.GetSelectedList();
+                Debug.Log("list null");
+                return;
             }
             for (int i = 0; i < list.length; i++)
             {
@@ -216,11 +220,12 @@ namespace InazumaTool.BasicTools
 
         }
 
-        public static void RenameMaterials(MSelectionList list = null)
+        public static void RenameMaterials(MSelectionList list)
         {
             if (list == null)
             {
-                list = BasicFunc.GetSelectedList();
+                Debug.Log("list null");
+                return;
             }
             for (int i = 0; i < list.length; i++)
             {
@@ -241,11 +246,12 @@ namespace InazumaTool.BasicTools
 
         }
 
-        public static void RemoveUnusedTextures(MSelectionList list = null)
+        public static void RemoveUnusedTextures(MSelectionList list)
         {
             if (list == null)
             {
-                list = BasicFunc.GetSelectedList();
+                Debug.Log("list null");
+                return;
             }
             List<MObject> deleteList = new List<MObject>();
             for (int i = 0; i < list.length; i++)
@@ -266,6 +272,35 @@ namespace InazumaTool.BasicTools
 
         }
 
+        public static List<MObject> GetMaterialsOfDag(MDagPath dag)
+        {
+            if (dag == null)
+            {
+                Debug.Log("dag null");
+            }
+            dag.extendToShape();
+            MFnDependencyNode dn = new MFnDependencyNode(dag.node);
+            Debug.Log(dn.absoluteName);
+
+            return null;
+
+        }
+
+
+        public static void CombineDagsWithSameMat(MSelectionList list)
+        {
+            if (list == null)
+            {
+                Debug.Log("list null");
+                return;
+            }
+            foreach (MDagPath dag in list.DagPaths())
+            {
+                GetMaterialsOfDag(dag);
+            }
+        }
+
+
         const string cmdStr = "MaterialManage";
         public static List<CommandData> GetCommandDatas()
         {
@@ -275,37 +310,45 @@ namespace InazumaTool.BasicTools
             cmdList.Add(new CommandData("材质", "图片"));
             cmdList.Add(new CommandData("材质", cmdStr, "matsWithSameTex", "选择同图片材质", () =>
             {
-                SelectMaterialWithSameTex(BasicFunc.GetSelectedObject(0));
+                GetMaterialsWithSameTex(BasicFunc.GetSelectedObject(0));
             }));
             cmdList.Add(new CommandData("材质", cmdStr, "combineMats", "合并选中材质", () =>
             {
-                CombineMaterials();
+                CombineMaterials(BasicFunc.GetSelectedList());
             }));
             cmdList.Add(new CommandData("材质", cmdStr, "renameMaterials", "重命名材质节点（根据图片名）", () =>
             {
-                RenameMaterials();
+                RenameMaterials(BasicFunc.GetSelectedList());
             }));
-            cmdList.Add(new CommandData("材质", cmdStr, "combineMatSharingTexture", "合并相同贴图材质", () =>
+            cmdList.Add(new CommandData("材质", cmdStr, "combineMatSharing", "合并相同贴图材质（选中的每个图片）", () =>
             {
-                SelectMaterialWithSameTex(BasicFunc.GetSelectedObject(0));
-                CombineMaterials();
+                BasicFunc.IterateSelectedObjects((imgObject) =>
+                {
+                    CombineMaterials(GetMaterialsWithSameTex(imgObject));
+                }, MFn.Type.kFileTexture);
+                
             }));
 
             cmdList.Add(new CommandData("材质", "材质"));
             cmdList.Add(new CommandData("材质", cmdStr, "combineTextures", "合并相同路径图片", () =>
             {
-                CombineSameTextures();
+                CombineSameTextures(BasicFunc.GetSelectedList());
             }));
             cmdList.Add(new CommandData("材质", cmdStr, "renameTextures", "重命名图片节点", () =>
             {
-                RenameTextures();
+                RenameTextures(BasicFunc.GetSelectedList());
             }));
             cmdList.Add(new CommandData("材质", cmdStr, "removeUnused", "删除无用图片", () =>
             {
-                RemoveUnusedTextures();
+                RemoveUnusedTextures(BasicFunc.GetSelectedList());
             }));
 
-            
+            cmdList.Add(new CommandData("材质", "物体"));
+            cmdList.Add(new CommandData("材质", cmdStr, "combineSameMatObjects", "合并材质完全相同的物体", () =>
+            {
+                CombineDagsWithSameMat(BasicFunc.GetSelectedList());
+            }));
+
             return cmdList;
         }
 
