@@ -43,6 +43,9 @@ namespace InazumaTool.BasicTools
         public const string plugName_nCloth_isDynamic = "isDynamic";
         public const string plugName_nClothTime_nodeState = "nodeState";
 
+        //public const string plugName_shapeInstanceObjGroup
+        //public const string plugName_shadingGroup = "dagSetMembers";
+
         //public const string cmd_pointConstraint = "pointConstraint";
         //public const string cmd_poleVectorConstraint = "poleVectorConstraint";
         //public const string cmd_parentConstraint = "parentConstraint";

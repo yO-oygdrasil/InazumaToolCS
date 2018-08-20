@@ -79,6 +79,7 @@
     <Compile Include="BindTools\BindHumanBody.cs" />
     <Compile Include="CommandData.cs" />
     <Compile Include="InazumaToolEntrance.cs" />
+    <Compile Include="TopoTools\MeshTool.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

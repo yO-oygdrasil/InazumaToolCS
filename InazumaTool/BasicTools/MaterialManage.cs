@@ -272,7 +272,13 @@ namespace InazumaTool.BasicTools
 
         }
 
-        public static List<MObject> GetMaterialsOfDag(MDagPath dag)
+        public class ShapeData
+        {
+            public MFnMesh mesh;
+
+        }
+
+        public static List<MFnDependencyNode> GetMaterialsOfDag(MDagPath dag)
         {
             if (dag == null)
             {
@@ -280,9 +286,27 @@ namespace InazumaTool.BasicTools
             }
             dag.extendToShape();
             MFnDependencyNode dn = new MFnDependencyNode(dag.node);
-            Debug.Log(dn.absoluteName);
+            //Debug.Log(dn.absoluteName);
+            //dn.findPlug("connectAttr pCubeShape3.instObjGroups[0] blinn2SG.dagSetMembers[1]");
+            MFnMesh shapeNode = new MFnMesh(dag);
+            
+            //int instanceCount = (int)shapeNode.instanceCount(false);
+            //Debug.Log("dn instanceCount:" + instanceCount);
+            uint instanceNumber = dag.instanceNumber;
+            Debug.Log("dag instanceNumber:" + instanceNumber);
 
-            return null;
+            MObjectArray sets = new MObjectArray(), comps = new MObjectArray();
+            shapeNode.getConnectedSetsAndMembers(instanceNumber, sets, comps, true);
+
+
+            List<MFnDependencyNode> result = new List<MFnDependencyNode>();
+            for (int i = 0; i < sets.length; ++i)
+            {
+                MFnDependencyNode fnDepSGNode = new MFnDependencyNode(sets[i]);
+                result.Add(fnDepSGNode);
+                //Debug.Log(fnDepSGNode.name);
+            }
+            return result;
 
         }
 
