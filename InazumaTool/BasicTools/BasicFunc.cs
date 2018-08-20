@@ -812,6 +812,51 @@ namespace InazumaTool.BasicTools
         }
         #endregion
 
+        #region Compare
+        public static bool IsSame(List<string> strList0, List<string> strList1)
+        {
+            int count = strList0.Count;
+
+            Dictionary<string, int> freqDic = new Dictionary<string, int>();
+            if (count != strList1.Count)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < count; i++)
+            {
+                int freq;
+                if (freqDic.TryGetValue(strList0[i], out freq))
+                {
+                    freqDic[strList0[i]] = freq + 1;
+                }
+                else
+                {
+                    freqDic.Add(strList0[i], 1);
+                }
+
+                if (freqDic.TryGetValue(strList1[i], out freq))
+                {
+                    freqDic[strList1[i]] = freq - 1;
+                }
+                else
+                {
+                    freqDic.Add(strList1[i], -1);
+                }
+            }
+
+            foreach (int value in freqDic.Values)
+            {
+                if (value != 0)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+        #endregion
+
         #region Calculate
 
         public static MVector Cross(MVector u, MVector v)

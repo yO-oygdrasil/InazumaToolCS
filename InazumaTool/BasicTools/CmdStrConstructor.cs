@@ -21,7 +21,8 @@ namespace InazumaTool.BasicTools
         string mainOrder;
         CmdType type = CmdType.Mel;
         Dictionary<string, string> parmsDic = new Dictionary<string, string>();
-
+        List<string> targetNames = new List<string>();
+        List<string> toggles = new List<string>();
         public void UpdateParm(string parmName, float value)
         {
             UpdateCMDParmStr(parmName, value + "");
@@ -38,7 +39,40 @@ namespace InazumaTool.BasicTools
         {
             UpdateCMDParmStr(parmName, "\"" + value + "\"");
         }
+        /// <summary>
+        /// 暂时只有mel模式下加入了
+        /// </summary>
+        /// <param name="toggleName"></param>
+        /// <param name="exist"></param>
+        public void UpdateToggle(string toggleName,bool exist = true)
+        {
+            if (toggles.Contains(toggleName))
+            {
+                if (!exist)
+                {
+                    toggles.Remove(toggleName);
+                }
+            }
+            else if (exist)
+            {
+                toggles.Add(toggleName);
+            }
+        }
 
+
+        public bool UpdateTargets(List<string> names)
+        {
+            if (type == CmdType.Mel)
+            {
+                targetNames = names;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+                
         private void UpdateCMDParmStr(string parmName,string cmdValue)
         {
             if (!parmsDic.ContainsKey(parmName))
@@ -62,7 +96,15 @@ namespace InazumaTool.BasicTools
                         foreach (string key in parmsDic.Keys)
                         {
                             result += string.Format(" -{0} {1}", key, parmsDic[key]);
-                        }                        
+                        }
+                        for (int i = 0; i < toggles.Count; i++)
+                        {
+                            result += " -" + toggles[i];
+                        }
+                        for (int i = 0; i < targetNames.Count; i++)
+                        {
+                            result += " " + targetNames[i];
+                        }
                         break;
                     }
                 case CmdType.Python:

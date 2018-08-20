@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Autodesk.Maya.OpenMayaRender;
 using Autodesk.Maya.OpenMaya;
 using Autodesk.Maya.OpenMayaUI;
+using InazumaTool.TopoTools;
 
 namespace InazumaTool.BasicTools
 {
@@ -275,10 +276,17 @@ namespace InazumaTool.BasicTools
         public class ShapeData
         {
             public MFnMesh mesh;
-
+            public MDagPath dag;
+            public List<string> sgList;
+            public ShapeData(MFnMesh m, MDagPath d, List<string> list)
+            {
+                mesh = m;
+                dag = d;
+                sgList = list;
+            }
         }
 
-        public static List<MFnDependencyNode> GetMaterialsOfDag(MDagPath dag)
+        public static ShapeData GetMaterialsOfDag(MDagPath dag)
         {
             if (dag == null)
             {
@@ -288,7 +296,7 @@ namespace InazumaTool.BasicTools
             MFnDependencyNode dn = new MFnDependencyNode(dag.node);
             //Debug.Log(dn.absoluteName);
             //dn.findPlug("connectAttr pCubeShape3.instObjGroups[0] blinn2SG.dagSetMembers[1]");
-            MFnMesh shapeNode = new MFnMesh(dag);
+            MFnMesh mesh = new MFnMesh(dag);
             
             //int instanceCount = (int)shapeNode.instanceCount(false);
             //Debug.Log("dn instanceCount:" + instanceCount);
@@ -296,17 +304,18 @@ namespace InazumaTool.BasicTools
             Debug.Log("dag instanceNumber:" + instanceNumber);
 
             MObjectArray sets = new MObjectArray(), comps = new MObjectArray();
-            shapeNode.getConnectedSetsAndMembers(instanceNumber, sets, comps, true);
+            mesh.getConnectedSetsAndMembers(instanceNumber, sets, comps, true);
 
 
-            List<MFnDependencyNode> result = new List<MFnDependencyNode>();
+            List<string> sgList = new List<string>();
             for (int i = 0; i < sets.length; ++i)
             {
                 MFnDependencyNode fnDepSGNode = new MFnDependencyNode(sets[i]);
-                result.Add(fnDepSGNode);
+                sgList.Add(fnDepSGNode.absoluteName);
                 //Debug.Log(fnDepSGNode.name);
             }
-            return result;
+            //Debug.Log("sgList Count:" + sgList.Count);
+            return new ShapeData(mesh, dag, sgList);
 
         }
 
@@ -318,10 +327,46 @@ namespace InazumaTool.BasicTools
                 Debug.Log("list null");
                 return;
             }
+            List<List<string>> matClusterList = new List<List<string>>();
+            List<List<MDagPath>> dagClusterList = new List<List<MDagPath>>();
+            //Dictionary<List<string>, List<MDagPath>> matDic = new Dictionary<List<MFnDependencyNode>, List<MDagPath>>();
             foreach (MDagPath dag in list.DagPaths())
             {
-                GetMaterialsOfDag(dag);
+                ShapeData sd = GetMaterialsOfDag(dag);
+                bool exist = false;
+                for (int i = 0; i < matClusterList.Count; i++)
+                {
+                    if (BasicFunc.IsSame(sd.sgList, matClusterList[i]))
+                    {
+                        exist = true;
+                        dagClusterList[i].Add(dag);
+                    }
+                }
+                if (!exist)
+                {
+                    matClusterList.Add(sd.sgList);
+                    List<MDagPath> newDagList = new List<MDagPath>();
+                    newDagList.Add(dag);
+                    dagClusterList.Add(newDagList);
+                }
             }
+            for (int i = 0; i < matClusterList.Count; i++)
+            {
+                string matStr = "combined_";
+                for (int j = 0; j < matClusterList[i].Count; j++)
+                {
+                    matStr += matClusterList[i][j] + "_";
+                }
+                MeshTool.CombineMeshesUsingMEL(dagClusterList[i], matStr);
+
+                //matStr += ":";
+                //for (int j = 0; j < dagClusterList[i].Count; j++)
+                //{
+                //    matStr += "," + dagClusterList[i][j].fullPathName;
+                //}
+                //Debug.Log(matStr);
+            }
+            
         }
 
 

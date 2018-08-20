@@ -8,7 +8,7 @@ using Autodesk.Maya.OpenMayaUI;
 using Autodesk.Maya.OpenMaya;
 using InazumaTool.BasicTools;
 using InazumaTool.BindTools;
-
+using InazumaTool.TopoTools;
 
 
 [assembly: ExtensionPlugin(typeof(InazumaTool.InazumaToolEntrance), "Any")]
@@ -134,6 +134,7 @@ namespace InazumaTool
             cds.AddRange(BindAttr.GetCommandDatas());
             cds.AddRange(Selector.GetCommandDatas());
             cds.AddRange(BindSwitch.GetCommandDatas());
+            cds.AddRange(MeshTool.GetCommandDatas());
 
             foreach (CommandData cd in cds)
             {
