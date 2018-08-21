@@ -24,6 +24,13 @@ namespace InazumaTool.TopoTools
             Origin = 2
         }
 
+        public class Edge
+        {
+            public int indice0, indice1;
+            public MPoint point0, point1;
+
+        }
+
         public static MDagPath CombineMeshesUsingMEL(MSelectionList list, string resultName = null, bool keepHistory = true, MergeUVSetMethod mergeUVSetMethod = MergeUVSetMethod.ByName)
         {
             if (list == null || list.length == 0)
@@ -83,6 +90,7 @@ namespace InazumaTool.TopoTools
         public static int CombineOverLappingEdge(MFnMesh mesh,float threshold)
         {
             int edgeCount = mesh.numEdges;
+            
             for (int i = 0; i < edgeCount; i++)
             {
                 int[] edgeVerts = new int[2];
@@ -112,7 +120,9 @@ namespace InazumaTool.TopoTools
             {
                 BasicFunc.IterateSelectedDags((dag) =>
                 {
-                    
+                    dag.extendToShape();
+                    MFnMesh mesh = new MFnMesh(dag);
+                    CombineOverLappingEdge(mesh, 0.01f);
                 }, MFn.Type.kMesh);
             }));
 
