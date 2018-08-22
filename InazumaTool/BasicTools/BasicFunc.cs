@@ -638,8 +638,26 @@ namespace InazumaTool.BasicTools
             return true;
         }
 
+        public static bool DeleteObjects(List<MFnDependencyNode> list)
+        {
+            if (list == null)
+            {
+                return false;
+            }
+            MDGModifier dGModifier = new MDGModifier();
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (list[i] == null)
+                {
+                    continue;
+                }
+                dGModifier.deleteNode(list[i].objectProperty);
+            }
+            dGModifier.doIt();
+            return true;
+        }
 
-        
+
         #endregion
 
         #region Select

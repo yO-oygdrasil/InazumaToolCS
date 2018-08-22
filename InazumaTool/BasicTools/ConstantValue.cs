@@ -20,6 +20,8 @@ namespace InazumaTool.BasicTools
         public const string plugName_fileTexPath = "fileTextureName";
         public const string plugName_fileTexOutput = "outColor";
         public const string plugName_matColorInput = "color";
+        public const string plugName_matColorOutput = "outColor";
+        public const string plugName_dagSetMembers = "dagSetMembers";
 
         public const string plugName_remapValueInput = "inputValue";
         public const string plugName_remapValueOutput = "outValue";

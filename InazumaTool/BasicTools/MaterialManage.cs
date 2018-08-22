@@ -319,6 +319,64 @@ namespace InazumaTool.BasicTools
 
         }
 
+        public static void DeleteUnusedMats(MSelectionList list)
+        {
+            if (list == null)
+            {
+                Debug.Log("list null");
+                return;
+            }
+            List<MFnDependencyNode> deleteList = new List<MFnDependencyNode>();
+            for (int i = 0; i < list.length; i++)
+            {
+                MObject mo = new MObject();
+                list.getDependNode((uint)i, mo);
+                MFnDependencyNode matNode = new MFnDependencyNode(mo);
+                MPlug plug = matNode.findPlug(ConstantValue.plugName_matColorOutput);
+                MPlugArray plugArr = new MPlugArray();
+                plug.destinations(plugArr);
+                MFnDependencyNode sgNode = new MFnDependencyNode(plugArr[0].node);
+                Debug.Log(sgNode.name);
+
+                
+
+                MPlug plug_dagSetMemebers = sgNode.findPlug(ConstantValue.plugName_dagSetMembers);
+                Debug.Log("numelements:" + plug_dagSetMemebers.numElements);
+                if (plug_dagSetMemebers.numElements == 0)
+                {
+                    deleteList.Add(matNode);
+                    deleteList.Add(sgNode);
+                }
+            }
+            BasicFunc.DeleteObjects(deleteList);
+        }
+
+        public static void DeleteUnusedShadingNode(MSelectionList list)
+        {
+            if (list == null)
+            {
+                Debug.Log("list null");
+                return;
+            }
+            List<MFnDependencyNode> deleteList = new List<MFnDependencyNode>();
+            for (int i = 0; i < list.length; i++)
+            {
+                MObject mo = new MObject();
+                list.getDependNode((uint)i, mo);
+                if (mo.hasFn(MFn.Type.kShadingEngine))
+                {
+                    MFnDependencyNode sgNode = new MFnDependencyNode(mo);
+                    MPlug plug_dagSetMemebers = sgNode.findPlug(ConstantValue.plugName_dagSetMembers);
+                    Debug.Log("numelements:" + plug_dagSetMemebers.numElements);
+                    if (plug_dagSetMemebers.numElements == 0)
+                    {
+                        deleteList.Add(sgNode);
+                    }
+                }
+                //Debug.Log(sgNode.name);
+            }
+            BasicFunc.DeleteObjects(deleteList);
+        }
 
         public static void CombineDagsWithSameMat(MSelectionList list)
         {
@@ -396,6 +454,14 @@ namespace InazumaTool.BasicTools
                     CombineMaterials(GetMaterialsWithSameTex(imgObject));
                 }, MFn.Type.kFileTexture);
                 
+            }));
+            cmdList.Add(new CommandData("材质", cmdStr, "deleteUnusedMats", "删除无用材质", () =>
+            {
+                DeleteUnusedMats(BasicFunc.GetSelectedList());
+            }));
+            cmdList.Add(new CommandData("材质", cmdStr, "deleteUnusedMats", "删除无用着色组", () =>
+            {
+                DeleteUnusedShadingNode(BasicFunc.GetSelectedList());
             }));
 
             cmdList.Add(new CommandData("材质", "材质"));
