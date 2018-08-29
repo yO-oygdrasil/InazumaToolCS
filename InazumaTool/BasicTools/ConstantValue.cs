@@ -111,5 +111,16 @@ namespace InazumaTool.BasicTools
 
         }
 
+        public enum PolySelectType
+        {
+            Vertex = 0,
+            Edge = 1,
+            Facet = 2
+        }
+        private static readonly string[] componentSelectionExtType = { "vertex", "edge", "facet" };
+        public static string ComponentSelectionExt(PolySelectType pst)
+        {
+            return componentSelectionExtType[(int)pst];
+        }
     }
 }

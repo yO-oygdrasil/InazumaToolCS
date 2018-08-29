@@ -107,7 +107,42 @@ namespace InazumaTool.TopoTools
             return 0;
         }
 
+        public static void ExtractFacesIntoOneObject(MSelectionList faceList)
+        {
+            if (faceList == null)
+            {
+                return;
+            }
 
+            MDagPath originDag = new MDagPath();
+            faceList.getDagPath(0, originDag);
+
+            Selector selector = new Selector();
+            selector.SetFromSelection(faceList);
+            MDagPath newDag = BasicFunc.Duplicate(originDag);
+            MSelectionList targetPartInDuplicated = selector.RestoreSelectionOnDag(newDag, true);
+            //new MFnTransform(newDag).setTranslation(new MVector(0, 2, 0), MSpace.Space.kWorld);
+
+            //BasicFunc.Select(faceList);
+            BasicFunc.DoDelete(faceList);
+            MDagPath dag_targetPartInD = new MDagPath();
+
+            MSelectionList invertSelection = BasicFunc.InvertSelect(targetPartInDuplicated, newDag, ConstantValue.PolySelectType.Facet);
+            
+            BasicFunc.DoDelete(invertSelection);
+        }
+
+        public static MDagPath DuplicateMesh(MDagPath targetDag)
+        {
+            if (targetDag == null)
+            {
+                return null;
+            }
+            MFnMesh newMesh = new MFnMesh();
+            targetDag.extendToShape();
+            return MDagPath.getAPathTo(newMesh.copy(targetDag.node));
+
+        }
 
         const string cmdStr = "MeshTool";
         public static List<CommandData> GetCommandDatas()
@@ -125,6 +160,12 @@ namespace InazumaTool.TopoTools
                     CombineOverLappingEdge(mesh, 0.01f);
                 }, MFn.Type.kMesh);
             }));
+
+            cmdList.Add(new CommandData("网格", cmdStr, "realExtract", "老实地提取", () =>
+            {
+                ExtractFacesIntoOneObject(BasicFunc.GetSelectedList());
+            }));
+
 
             return cmdList;
         }
