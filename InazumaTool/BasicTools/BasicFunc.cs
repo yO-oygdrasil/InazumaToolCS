@@ -570,6 +570,38 @@ namespace InazumaTool.BasicTools
             return resultGrpDagPath;
         }
 
+        public static MDagPath Duplicate(MDagPath targetDag)
+        {
+            string resultName = MGlobal.executePythonCommandStringResult(string.Format("cmds.duplicate(\"{0}\",rr = 1)", targetDag.fullPathName), true);
+            Debug.Log("duplicate result:" + resultName);
+            resultName = SubUShell(resultName);
+            return GetDagPathByName(resultName);
+        }
+
+        public static MSelectionList DuplicateDags(MSelectionList list)
+        {
+            if (list == null)
+            {
+                return null;
+            }
+            MSelectionList originSelect = GetSelectedList();
+
+            CmdStrConstructor cc = new CmdStrConstructor("duplicate");
+            cc.UpdateToggle("rr", true);
+            List<string> targets = new List<string>();
+            foreach (MDagPath dag in list.DagPaths())
+            {
+                targets.Add(dag.fullPathName);
+            }
+            cc.UpdateTargets(targets);
+            MGlobal.executeCommand(cc.ToString());
+
+            //string resultName = MGlobal.executeCommandStringResult("duplicate -rr");
+            MSelectionList newList = GetSelectedList();
+            Select(originSelect);
+            return newList;
+        }
+
         #endregion
         
         #region Delete
@@ -659,7 +691,25 @@ namespace InazumaTool.BasicTools
 
         public static void Select(MSelectionList list)
         {
+
             MGlobal.setActiveSelectionList(list);
+
+            //bool hasDag = false;
+            
+            //if (hasDag)
+            //{
+            //    Debug.Log("has dag length:" + list.length);
+            //    foreach (MDagPath dag in list.DagPaths())
+            //    {
+            //        Debug.Log(dag.fullPathName);
+            //    }
+            //    MGlobal.setActiveSelectionList(list);
+            //}
+            //else
+            //{
+            //    Debug.Log("no dag but length:" + list.length);
+            //    MGlobal.setActiveSelectionList(list);
+            //}
         }
 
         public static void Select(MDagPath dagPath)
@@ -668,6 +718,29 @@ namespace InazumaTool.BasicTools
             list.add(dagPath);
             Select(list);
         }
+
+        public static MSelectionList InvertSelect(MSelectionList list,MDagPath targetDag,ConstantValue.PolySelectType pst, bool recoverOriginSelection = false)
+        {
+            if (list == null)
+            {
+                return null;
+            }
+            MSelectionList originSelection = GetSelectedList();
+            if (targetDag != null)
+            {
+                Select(targetDag);
+            }
+            Select(list);
+            MGlobal.executeCommand(string.Format("doMenuComponentSelectionExt(\"{0}\", \"{1}\", 0)", targetDag.fullPathName, ConstantValue.ComponentSelectionExt(pst)));
+            MGlobal.executeCommand("InvertSelection");
+            MSelectionList result = GetSelectedList();
+            if (recoverOriginSelection)
+            {
+                Select(originSelection);
+            }
+            return result;
+        }
+
         #endregion
 
         #region Modify

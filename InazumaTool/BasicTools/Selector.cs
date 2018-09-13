@@ -90,7 +90,7 @@ namespace InazumaTool.BasicTools
             return resultCount;
         }
 
-        public MSelectionList RestoreSelection(MSelectionList targetList = null, bool selectResult = false)
+        public MSelectionList RestoreSelectionOnList(MSelectionList targetList = null, bool selectResult = false)
         {
             
             if (targetList == null || targetList.length == 0)
@@ -112,8 +112,32 @@ namespace InazumaTool.BasicTools
                 MObject components = sic.create(MFn.Type.kMeshPolygonComponent);
                 sic.addElements(new MIntArray(selectedIndicesList[i]));
                 resultSelection.add(dag, components);
+                //resultSelection.add(dag);
 
             }
+            if (selectResult)
+            {
+                BasicFunc.Select(resultSelection);
+            }
+            return resultSelection;
+
+        }
+
+        public MSelectionList RestoreSelectionOnDag(MDagPath targetDag = null, bool selectResult = false)
+        {
+
+            if (targetDag == null)
+            {
+                return null;
+            }
+
+            MSelectionList resultSelection = new MSelectionList();
+
+            MFnSingleIndexedComponent sic = new MFnSingleIndexedComponent();
+            MObject components = sic.create(MFn.Type.kMeshPolygonComponent);
+            sic.addElements(new MIntArray(selectedIndicesList[0]));
+            resultSelection.add(targetDag, components);
+            //resultSelection.add(targetDag);
             if (selectResult)
             {
                 BasicFunc.Select(resultSelection);
@@ -140,7 +164,7 @@ namespace InazumaTool.BasicTools
                     targetList.getDagPath((uint)index, dag);
                     groupList.add(dag);
                 }
-                dealMethod(RestoreSelection(groupList));
+                dealMethod(RestoreSelectionOnList(groupList));
             }
         }
 
@@ -171,7 +195,7 @@ namespace InazumaTool.BasicTools
             };
             actions[2] = () =>
             {
-                RestoreSelection(null, true);
+                RestoreSelectionOnList(null, true);
             };
 
             Action[] actions2 = new Action[2]
@@ -179,7 +203,7 @@ namespace InazumaTool.BasicTools
                 ()=>
                 {
                     //Delete For One Group
-                    BasicFunc.DoDelete(RestoreSelection(), true);
+                    BasicFunc.DoDelete(RestoreSelectionOnList(), true);
                 },
                 ()=>
                 {
@@ -202,7 +226,7 @@ namespace InazumaTool.BasicTools
         public static List<CommandData> GetCommandDatas()
         {
             List<CommandData> cmdList = new List<CommandData>();
-            cmdList.Add(new CommandData("选择", cmdStr, "testBtnWindow", "测试创建选择集成器", () =>
+            cmdList.Add(new CommandData("选择", cmdStr, "testBtnWindow", "创建选择集成器", () =>
             {
                 Selector selector = new Selector();
                 selector.SetFromSelection();
