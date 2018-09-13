@@ -571,12 +571,7 @@ namespace InazumaTool.BasicTools
         }
 
         #endregion
-
-        public static void IterateChidren(Action<MDagPath> dealMethod, MDagPath rootNode)
-        {
-
-        }
-
+        
         #region Delete
         public static void DeleteByCMD(string name)
         {
