@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 using Autodesk.Maya.OpenMaya;
 using Autodesk.Maya.OpenMayaAnim;
-using InazumaTool.BasicTools.UI;
 
 namespace InazumaTool.BasicTools
 {
@@ -328,12 +327,31 @@ namespace InazumaTool.BasicTools
             {
                 ClearHierachyJointsRotation();
             }));
-            cmdList.Add(new CommandData("骨骼", cmdStr, "beautifulPole", "为漂亮的极向量铺路(UI)", () =>
+            cmdList.Add(new CommandData("骨骼/优雅极向量", cmdStr, "beautifulPole_x", "极向量清除X", () =>
             {
-                TestWPFWindow wnd = new TestWPFWindow();
-                
+                BeautifulPole(null, true, false, false);
             }));
-            cmdList.Add(new CommandData("骨骼", cmdStr, "beautifulPole", "为漂亮的极向量铺路", () =>
+            cmdList.Add(new CommandData("骨骼/优雅极向量", cmdStr, "beautifulPole_y", "极向量清除Y", () =>
+            {
+                BeautifulPole(null, false, true, false);
+            }));
+            cmdList.Add(new CommandData("骨骼/优雅极向量", cmdStr, "beautifulPole_z", "极向量清除Z", () =>
+            {
+                BeautifulPole(null, false, false, true);
+            }));
+            cmdList.Add(new CommandData("骨骼/优雅极向量", cmdStr, "beautifulPole_y", "极向量清除XY", () =>
+            {
+                BeautifulPole(null, true, true, false);
+            }));
+            cmdList.Add(new CommandData("骨骼/优雅极向量", cmdStr, "beautifulPole_y", "极向量清除XZ", () =>
+            {
+                BeautifulPole(null, true, false);
+            }));
+            cmdList.Add(new CommandData("骨骼/优雅极向量", cmdStr, "beautifulPole_y", "极向量清除YZ", () =>
+            {
+                BeautifulPole(null, false);
+            }));
+            cmdList.Add(new CommandData("骨骼/优雅极向量", cmdStr, "beautifulPole_y", "极向量清除XYZ", () =>
             {
                 BeautifulPole(null);
             }));
