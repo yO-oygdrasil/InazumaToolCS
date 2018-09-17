@@ -52,20 +52,27 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\mayaDlls\openmayacs.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AnimationTools\AnimationPass.cs" />
     <Compile Include="BasicTools\BasicWindow.cs" />
     <Compile Include="BasicTools\DependModules.cs" />
     <Compile Include="BasicTools\Selector.cs" />
+    <Compile Include="BasicTools\UI\TestWPFWindow.xaml.cs">
+      <DependentUpon>TestWPFWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="BindTools\BindSwitch.cs" />
     <Compile Include="Debug.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -80,6 +87,12 @@
     <Compile Include="CommandData.cs" />
     <Compile Include="InazumaToolEntrance.cs" />
     <Compile Include="TopoTools\MeshTool.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="BasicTools\UI\TestWPFWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

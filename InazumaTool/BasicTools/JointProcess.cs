@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 using Autodesk.Maya.OpenMaya;
 using Autodesk.Maya.OpenMayaAnim;
+using InazumaTool.BasicTools.UI;
 
 namespace InazumaTool.BasicTools
 {
@@ -326,6 +327,11 @@ namespace InazumaTool.BasicTools
             cmdList.Add(new CommandData("骨骼", cmdStr, "clearRotation", "清除层级下骨骼旋转",()=>
             {
                 ClearHierachyJointsRotation();
+            }));
+            cmdList.Add(new CommandData("骨骼", cmdStr, "beautifulPole", "为漂亮的极向量铺路(UI)", () =>
+            {
+                TestWPFWindow wnd = new TestWPFWindow();
+                
             }));
             cmdList.Add(new CommandData("骨骼", cmdStr, "beautifulPole", "为漂亮的极向量铺路", () =>
             {
