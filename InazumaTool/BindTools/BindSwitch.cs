@@ -20,7 +20,12 @@ namespace InazumaTool.BindTools
             int count = (int)selecteList.length;
             if (count <= 1)
             {
+                //Debug.Log("ncloth control switch target: select [ctl,ncloth0,ncloth1...]");
                 return;
+            }
+            else
+            {
+                //Debug.Log("ncloth control switch target count:" + count);
             }
             MDagPath ctlDag = new MDagPath();
             selecteList.getDagPath(0, ctlDag);
@@ -28,7 +33,9 @@ namespace InazumaTool.BindTools
             MFnDependencyNode dn_ctl = new MFnDependencyNode(ctlDag.node);
             BasicFunc.IterateSelectedDags((dag) =>
             {
+                //Debug.Log("ncloth control set for:"+dag.fullPathName);
                 MPlug ctlNewAttrPlug = BindAttr.AddBoolAttr(dn_ctl, "Dynamic_" + dag.partialPathName, true, "", false);
+                dag.extendToShape();
                 MFnDependencyNode dn_nCloth = new MFnDependencyNode(dag.node);
                 MPlug plug_isDynamic = dn_nCloth.findPlug(ConstantValue.plugName_nCloth_isDynamic);
                 MPlug plug_currentTime = dn_nCloth.findPlug(ConstantValue.plugName_nCloth_currentTime);

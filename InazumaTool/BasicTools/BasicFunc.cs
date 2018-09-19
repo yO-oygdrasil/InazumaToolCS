@@ -1030,6 +1030,11 @@ namespace InazumaTool.BasicTools
             {
                 BasicFunc.PrintObjects(BasicFunc.GetSelectedList());
             }));
+            cmdList.Add(new CommandData(null, cmdStr, "testWindow", "test window", () =>
+            {
+                BasicTools.UI.TestWPFWindow window = new UI.TestWPFWindow();
+                window.Show();
+            }));
             cmdList.Add(new CommandData("基本操作", cmdStr, "childCircle", "增加子层级圆环", () =>
             {
                 AddChildCircle(GetSelectedDagPath(0));                
