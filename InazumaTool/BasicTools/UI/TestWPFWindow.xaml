@@ -77,6 +77,10 @@
                     </Viewport3D>
                 </Grid>
             </TabItem>
+            <TabItem Header="Images" Name="tabItem4" Background="#FF424242" Foreground="#FFC8C8C8">
+                <Image Source="textures\mystery.jpg" Height="32" Width="32"></Image>
+                
+            </TabItem>
         </TabControl>
     </Grid>
 </Window>
