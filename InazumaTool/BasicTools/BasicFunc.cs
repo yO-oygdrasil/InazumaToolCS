@@ -144,6 +144,32 @@ namespace InazumaTool.BasicTools
             return mObject;
         }
 
+        public static List<MFnDependencyNode> GetSelectedDependencyNodeList()
+        {
+            MSelectionList list = GetSelectedList();
+            List<MFnDependencyNode> nodes = new List<MFnDependencyNode>();
+            for (int i = 0; i < list.length; i++)
+            {
+                MObject mo = new MObject();
+                list.getDependNode((uint)i, mo);
+                nodes.Add(new MFnDependencyNode(mo));
+            }
+            return nodes;
+        }
+
+        public static List<MObject> GetSelectedObjectList()
+        {
+            MSelectionList list = GetSelectedList();
+            List<MObject> nodes = new List<MObject>();
+            for (int i = 0; i < list.length; i++)
+            {
+                MObject mo = new MObject();
+                list.getDependNode((uint)i, mo);
+                nodes.Add(mo);
+            }
+            return nodes;
+        }
+
         public static MDagPath GetSelectedDagPath(int index)
         {
             MSelectionList selected = new MSelectionList();
@@ -171,10 +197,10 @@ namespace InazumaTool.BasicTools
                         selected.remove((uint)i);
                     }
                 }
-            }            
+            }
             return selected;
         }
-        
+
 
         public static MSelectionList GetObjectsByName(string name)
         {
@@ -206,10 +232,10 @@ namespace InazumaTool.BasicTools
             return mDagPath;
         }
 
-        public static string GetFileName(string fullPath,bool subSuffix = true)
+        public static string GetFileName(string fullPath, bool subSuffix = true)
         {
             return subSuffix ? Path.GetFileNameWithoutExtension(fullPath) : Path.GetFileName(fullPath);
-            
+
         }
 
 
@@ -286,7 +312,7 @@ namespace InazumaTool.BasicTools
                     MObject mo = rootTrans.child((uint)i);
                     MDagPath dag = MDagPath.getAPathTo(mo);
                     AddChildrenToList(list, new MFnTransform(dag), filterType);
-                }                
+                }
             }
         }
 
@@ -456,10 +482,10 @@ namespace InazumaTool.BasicTools
             points.Add(new MPoint(0, 0, 1));
             points.Add(new MPoint(-1, 0, 0));
             points.Add(new MPoint(0, 1, 0));
-            return CreateCurve(points, ctlName, 1, MFnNurbsCurve.Form.kClosed);            
+            return CreateCurve(points, ctlName, 1, MFnNurbsCurve.Form.kClosed);
         }
 
-        public static MDagPath CreateCTL_Square(string ctlName = "square",float height = 1, float width = 1)
+        public static MDagPath CreateCTL_Square(string ctlName = "square", float height = 1, float width = 1)
         {
             MPointArray points = new MPointArray();
             float up = height / 2;
@@ -538,7 +564,7 @@ namespace InazumaTool.BasicTools
             return curveDagPath;
         }
 
-        
+
 
         public static MFnDependencyNode CreateRemapValueNode(float inputMin, float inputMax, float outputMin, float outputMax)
         {
@@ -603,7 +629,7 @@ namespace InazumaTool.BasicTools
         }
 
         #endregion
-        
+
         #region Delete
         public static void DeleteByCMD(string name)
         {
@@ -611,7 +637,7 @@ namespace InazumaTool.BasicTools
 
         }
 
-        public static void DoDelete(MSelectionList target = null,bool recoverOriginSelection = false)
+        public static void DoDelete(MSelectionList target = null, bool recoverOriginSelection = false)
         {
             if (target != null)
             {
@@ -695,7 +721,7 @@ namespace InazumaTool.BasicTools
             MGlobal.setActiveSelectionList(list);
 
             //bool hasDag = false;
-            
+
             //if (hasDag)
             //{
             //    Debug.Log("has dag length:" + list.length);
@@ -719,7 +745,21 @@ namespace InazumaTool.BasicTools
             Select(list);
         }
 
-        public static MSelectionList InvertSelect(MSelectionList list,MDagPath targetDag,ConstantValue.PolySelectType pst, bool recoverOriginSelection = false)
+        public static void SelectAll()
+        {
+            MGlobal.executeCommand("SelectAll");
+        }
+
+        public static void SelectComponent(string targetDagName, ConstantValue.PolySelectType pst,bool selectAll = false)
+        {
+            MGlobal.executeCommand(string.Format("doMenuComponentSelectionExt(\"{0}\", \"{1}\", 0)", targetDagName, ConstantValue.ComponentSelectionExt(pst)));
+            if (selectAll)
+            {
+                SelectAll();
+            }
+        }
+
+        public static MSelectionList InvertSelect(MSelectionList list, MDagPath targetDag, ConstantValue.PolySelectType pst, bool recoverOriginSelection = false)
         {
             if (list == null)
             {
@@ -745,7 +785,7 @@ namespace InazumaTool.BasicTools
 
         #region Modify
 
-        public static void ConnectAttr(string from, string to, bool force = true,bool showInIdle = false)
+        public static void ConnectAttr(string from, string to, bool force = true, bool showInIdle = false)
         {
             string cmdStr = string.Format("connectAttr {0} {1}", from, to);
             if (force)
@@ -773,7 +813,7 @@ namespace InazumaTool.BasicTools
             return false;
         }
 
-        public static bool ConnectPlug(MPlug from, MPlug to,MDGModifier dGModifier = null,bool doit = true)
+        public static bool ConnectPlug(MPlug from, MPlug to, MDGModifier dGModifier = null, bool doit = true)
         {
             if (from != null && to != null)
             {
@@ -792,7 +832,7 @@ namespace InazumaTool.BasicTools
 
             return false;
         }
-        
+
         public static void AddConstraint(string from, string to, ConstantValue.ConstraintType ct, bool maintainOffset = true)
         {
             string cmdStr = string.Format(maintainOffset ? "{0} -mo {1} {2}" : "{0} {1} {2}", ConstantValue.Command_Constraint(ct), from, to);
@@ -832,7 +872,7 @@ namespace InazumaTool.BasicTools
             MGlobal.executeCommand(string.Format("setAttr \"{0}.{1}\" {2}", targetName, attrName, value));
         }
 
-        public static void IterateSelectedDags(Action<MDagPath> dealMethod, MFn.Type typeFilter = MFn.Type.kInvalid,MSelectionList list = null)
+        public static void IterateSelectedDags(Action<MDagPath> dealMethod, MFn.Type typeFilter = MFn.Type.kInvalid, MSelectionList list = null)
         {
             if (list == null)
             {
@@ -935,6 +975,39 @@ namespace InazumaTool.BasicTools
             {
                 if (value != 0)
                 {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+        #endregion
+
+        #region Check
+        public static bool CheckSelectionList(MSelectionList list, int minCount = 0, int maxCount = 0, bool debugLog = true)
+        {
+            if (list == null)
+            {
+                if (debugLog)
+                {
+                    Debug.Log("list null");
+                }
+                return false;
+            }
+            
+            if (minCount > 0)
+            {
+                if (list.length < minCount)
+                {
+                    Debug.Log("current count:" + list.length + " less than " + minCount);
+                    return false;
+                }
+            }
+            if (maxCount > 0)
+            {
+                if (list.length > maxCount)
+                {
+                    Debug.Log("current count:" + list.length + " more than " + maxCount);
                     return false;
                 }
             }

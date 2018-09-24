@@ -17,11 +17,19 @@ namespace InazumaTool.BasicTools
         public const float Radian75 = 1.3089969375f;
         public const float Radian90 = 1.570796325f;
 
+        public const string nodeName_place2dTexture = "place2dTexture";
+
         public const string plugName_fileTexPath = "fileTextureName";
         public const string plugName_fileTexOutput = "outColor";
+        public const string plugName_fileTexDefaultColorR = "defaultColorR";
+        public const string plugName_fileTexDefaultColorG = "defaultColorG";
+        public const string plugName_fileTexDefaultColorB = "defaultColorB";
         public const string plugName_matColorInput = "color";
         public const string plugName_matColorOutput = "outColor";
+        public const string plugName_texFileUVCoord = "uvCoord";
+        public const string plugName_place2dOutUV = "outUV";
         public const string plugName_dagSetMembers = "dagSetMembers";
+
 
         public const string plugName_remapValueInput = "inputValue";
         public const string plugName_remapValueOutput = "outValue";
@@ -121,6 +129,29 @@ namespace InazumaTool.BasicTools
         public static string ComponentSelectionExt(PolySelectType pst)
         {
             return componentSelectionExtType[(int)pst];
+        }
+
+        public const string plugName_layeredTextureInputs = "inputs";
+        public const string plugName_layeredTextureBlendMode = "blendMode";
+        public enum LayeredTextureBlendMode
+        {
+            None = 0,
+            Override = 1,
+            In = 2,
+            Out = 3,
+            Add = 4,
+            Sub = 5,
+            Multiply = 6,
+            Differ = 7,
+            Greater = 8,
+            Lower = 9
+        }
+        public enum LayeredTextureInputDataIndex
+        {
+            Color = 0,
+            Alpha = 1,
+            BlendMode = 2,
+            Visible = 3
         }
     }
 }
