@@ -210,7 +210,7 @@ namespace InazumaTool.BasicTools
             return matched;
         }
 
-        public static MObject GetObjectByName(string name, int index)
+        public static MObject GetObjectByName(string name, int index = 0)
         {
             MSelectionList matched = GetObjectsByName(name);
             MObject mObject = new MObject();

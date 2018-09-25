@@ -5,7 +5,7 @@
     
     <Grid Height="Auto" Width="Auto" Margin="0,0,0,10">
         <TabControl Height="Auto" Name="tabControl1" Width="Auto" BorderBrush="#FF444444" SelectionChanged="tabControl1_SelectionChanged" Margin="10">
-            <TabItem Header="Search Condition" Name="tabItem1" Background="#FF424242" Foreground="#FFC8C8C8">
+            <TabItem Header="Material" Name="tabItem_material" Background="#FF424242" Foreground="#FFC8C8C8">
                 <Grid Background="#FF444444">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -31,11 +31,7 @@
                     </Grid>
                 </Grid>
             </TabItem>
-            <TabItem Header="Result Grid" Name="tabItem2" Background="#FF404040" Foreground="#FFC8C8C8">
-                <Grid Background="#FF444444">
-                    <DataGrid AutoGenerateColumns="True" Height="Auto" Name="ResultGrid" Width="Auto" ItemsSource="{Binding}" CanUserReorderColumns="True" IsReadOnly="True" SelectionChanged="ResultGrid_SelectionChanged" FontSize="10" Margin="10" FontFamily="Verdana" MouseDoubleClick="ResultGrid_MouseDoubleClick" />
-                </Grid>
-            </TabItem>
+            
             <TabItem Header="Polygon 3D View" Name="tabItem3" Background="#FF444444" Foreground="#FFC8C8C8">
                 <Grid Background="#FF444444" Margin="0">
                     <Viewport3D Name="viewport" Height="Auto" Margin="6,6,6,0">

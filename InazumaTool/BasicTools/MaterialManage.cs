@@ -74,7 +74,7 @@ namespace InazumaTool.BasicTools
                 Debug.Log("matName:" + matName);
                 SelectObjectsWithMat(matName, true);
             }
-            MGlobal.executeCommand(string.Format("polyEditUV -u {0} -v {1}", uValue, vValue));
+            MGlobal.executeCommand(string.Format("polyEditUV -u {0} -v {1}", uValue, vValue), true);
         }
 
         /// <summary>
@@ -144,7 +144,7 @@ namespace InazumaTool.BasicTools
 
         public static bool CombineMaterials(List<MObject> list, bool deleteRepeated = true)
         {
-            if (list.Count <= 2)
+            if (list.Count < 2)
             {
                 Debug.Log("please choose at least 2 materials");
                 return false;
@@ -186,7 +186,7 @@ namespace InazumaTool.BasicTools
             return true;
         }
 
-        public static List<MObject> GetMaterialsWithTex(MObject imageObject)
+        public static MSelectionList GetMaterialsWithTex(MObject imageObject)
         {
             //MImage img = new MImage();
             //img.readFromTextureNode(imageObject, MImage.MPixelType.kUnknown);
@@ -195,17 +195,17 @@ namespace InazumaTool.BasicTools
 
         }
 
-        public static List<MObject> GetMaterialsWithTex(MFnDependencyNode imageNode)
+        public static MSelectionList GetMaterialsWithTex(MFnDependencyNode imageNode)
         {
             MPlug plug = imageNode.findPlug(ConstantValue.plugName_fileTexOutput);
             MPlugArray destPlugs = new MPlugArray();
             plug.destinations(destPlugs);
-            BasicFunc.PrintPlugs(destPlugs);
+            //BasicFunc.PrintPlugs(destPlugs);
 
-            List<MObject> newSelection = new List<MObject>();
+            MSelectionList newSelection = new MSelectionList();
             for (int i = 0; i < destPlugs.length; i++)
             {
-                newSelection.Add(destPlugs[i].node);
+                newSelection.add(destPlugs[i].node);
             }
             //BasicFunc.Select(newSelection);
             return newSelection;
@@ -348,6 +348,14 @@ namespace InazumaTool.BasicTools
                     deleteList.Add(mo);
                     Debug.Log("remove no use:" + imageNode.absoluteName);
                 }
+                else
+                {
+                    Debug.Log("still used:" + imageNode.absoluteName);
+                    for (int j = 0; j < destPlugs.length; j++)
+                    {
+                        Debug.Log(" by:" + destPlugs[0].partialName(true));
+                    }
+                }
             }
             BasicFunc.DeleteObjects(deleteList);
         }
@@ -367,8 +375,7 @@ namespace InazumaTool.BasicTools
                 //no input
                 if (createIfNotExist)
                 {
-                    MFnDependencyNode place2dTexNode = new MFnDependencyNode();
-                    place2dTexNode.create("place2dTexture");
+                    MFnDependencyNode place2dTexNode = CreateShadingNode(ShadingNodeType.Utility, "place2dTexture");
                     MPlug p2tUVOut = place2dTexNode.findPlug(ConstantValue.plugName_place2dOutUV);
                     string nodeName = place2dTexNode.absoluteName;
                     MDGModifier dgModifier = new MDGModifier();
@@ -412,8 +419,9 @@ namespace InazumaTool.BasicTools
 
         public static MFnDependencyNode CreateLayeredTextureNode(List<MFnDependencyNode> imageNodes)
         {
-            MFnDependencyNode layeredTextureNode = new MFnDependencyNode();
-            layeredTextureNode.create("layeredTexture");
+            //MFnDependencyNode layeredTextureNode = new MFnDependencyNode();
+            //layeredTextureNode.create("layeredTexture");
+            MFnDependencyNode layeredTextureNode = CreateShadingNode(ShadingNodeType.Utility, "layeredTexture");
             MPlug layeredTexInputsPlug = layeredTextureNode.findPlug(ConstantValue.plugName_layeredTextureInputs);
             //check place2DTextures
             MDGModifier dGModifier = new MDGModifier();
@@ -430,9 +438,11 @@ namespace InazumaTool.BasicTools
                 imageNodes[i].findPlug(ConstantValue.plugName_fileTexDefaultColorB).setFloat(0);
 
                 //move uv
-                List<MObject> matObjects = GetMaterialsWithTex(imageNodes[i]);
-                foreach (MObject matObj in matObjects)
+                MSelectionList matList = GetMaterialsWithTex(imageNodes[i]);
+                for (int j = 0; j < matList.length; j++)
                 {
+                    MObject matObj = new MObject();
+                    matList.getDependNode((uint)j, matObj);
                     string matName = new MFnDependencyNode(matObj).absoluteName;
                     Debug.Log("move uv for mat:" + matName);
                     MoveUV(i, 0, matName);
@@ -460,6 +470,40 @@ namespace InazumaTool.BasicTools
             return layeredTextureNode;
         }
 
+        public enum ShadingNodeType
+        {
+            Light,
+            PostProcess,
+            Rendering,
+            Shader,
+            Texture,
+            Utility
+        }
+        public static MFnDependencyNode CreateShadingNode(ShadingNodeType snt, string nodeType)
+        {
+            //Debug.Log("try create shadingNode:" + snt + " :" + nodeType);
+            CmdStrConstructor csc = new CmdStrConstructor("shadingNode");
+            switch (snt)
+            {                
+                case ShadingNodeType.Texture:
+                    {
+                        csc.UpdateToggle("at", true);
+                        break;
+                    }
+                case ShadingNodeType.Utility:
+                    {
+                        csc.UpdateToggle("au", true);
+                        break;
+                    }
+            }
+            csc.UpdateFinalAppend(nodeType);
+            string cmdStr = csc.ToString();
+            //Debug.Log("command:" + cmdStr);
+            string nodeName = MGlobal.executeCommandStringResult(cmdStr, true);
+            //Debug.Log("create node result:" + nodeName);
+            return new MFnDependencyNode(BasicFunc.GetObjectByName(nodeName));
+        }
+
         public static MFnDependencyNode CombineToUDIM(List<MObject> imageObjects, string prename, string newFolder = "UDIM", int maxUCount = 5)
         {
             List<MFnDependencyNode> dnNodes = new List<MFnDependencyNode>();
@@ -473,12 +517,15 @@ namespace InazumaTool.BasicTools
 
         public static MFnDependencyNode CombineToUDIM(List<MFnDependencyNode> imageNodes, string prename,string newFolder = "UDIM", int maxUCount = 5)
         {
-            if (imageNodes.Count <= 2)
+            if (imageNodes.Count < 2)
             {
                 return null;
             }
-            MFnDependencyNode udimImgNode = new MFnDependencyNode();
-            udimImgNode.create(ConstantValue.nodeName_fileTex);
+            MFnDependencyNode udimImgNode = CreateShadingNode(ShadingNodeType.Texture, ConstantValue.nodeName_fileTex);
+
+            //MFnDependencyNode udimImgNode = new MFnDependencyNode();
+            //udimImgNode.create("file");
+
             MPlug texOutColorPlug = udimImgNode.findPlug(ConstantValue.plugName_fileTexOutput);
             udimImgNode.findPlug(ConstantValue.plugName_fileTexUVTilingMode).setInt((int)ConstantValue.UVTilingMode.UDIM);
             
@@ -499,9 +546,11 @@ namespace InazumaTool.BasicTools
                 }
 
                 //move uv
-                List<MObject> matObjects = GetMaterialsWithTex(imageNodes[i]);
-                foreach (MObject matObj in matObjects)
+                MSelectionList matList = GetMaterialsWithTex(imageNodes[i]);
+                for (int j = 0; j < matList.length; j++)
                 {
+                    MObject matObj = new MObject();
+                    matList.getDependNode((uint)j, matObj);
                     MFnDependencyNode matNode = new MFnDependencyNode(matObj);
                     string matName = matNode.absoluteName;
                     //Debug.Log("move uv for mat:" + matName);
@@ -511,9 +560,9 @@ namespace InazumaTool.BasicTools
                     {
                         dGModifier.disconnect(plug_matColorInput.source, plug_matColorInput);
                         dGModifier.connect(texOutColorPlug, plug_matColorInput);
-                        //dGModifier.doIt();
+                        dGModifier.doIt();
                     }
-                }                
+                }            
             }
             dGModifier.doIt();
 
@@ -750,6 +799,11 @@ namespace InazumaTool.BasicTools
             }));
 
             cmdList.Add(new CommandData("材质", "整合"));
+            cmdList.Add(new CommandData("材质", cmdStr, "selectMatComponent", "选择属于此材质的所有组件", () =>
+            {
+                SelectObjectsWithMat(new MFnDependencyNode(BasicFunc.GetSelectedObject(0)), true);
+            }));
+
             cmdList.Add(new CommandData("材质", cmdStr, "moveMatUV", "移动此材质UV", () =>
             {
                 CombineDagsWithSameMat(BasicFunc.GetSelectedList());
@@ -758,9 +812,25 @@ namespace InazumaTool.BasicTools
             {
                 CreateLayeredTextureNode(BasicFunc.GetSelectedObjectList());
             }));
-            cmdList.Add(new CommandData("材质", cmdStr, "conbineToUDIM", "合并为UDIM", () =>
+            cmdList.Add(new CommandData("材质", cmdStr, "conbineToUDIM1", "合并为UDIM-1", () =>
             {
-                CombineToUDIM(BasicFunc.GetSelectedObjectList(), "udim");
+                CombineToUDIM(BasicFunc.GetSelectedObjectList(), "udim","UDIM",1);
+            }));
+            cmdList.Add(new CommandData("材质", cmdStr, "conbineToUDIM2", "合并为UDIM-2", () =>
+            {
+                CombineToUDIM(BasicFunc.GetSelectedObjectList(), "udim", "UDIM", 2);
+            }));
+            cmdList.Add(new CommandData("材质", cmdStr, "conbineToUDIM3", "合并为UDIM-3", () =>
+            {
+                CombineToUDIM(BasicFunc.GetSelectedObjectList(), "udim", "UDIM", 3);
+            }));
+            cmdList.Add(new CommandData("材质", cmdStr, "conbineToUDIM4", "合并为UDIM-4", () =>
+            {
+                CombineToUDIM(BasicFunc.GetSelectedObjectList(), "udim", "UDIM", 4);
+            }));
+            cmdList.Add(new CommandData("材质", cmdStr, "conbineToUDIM5", "合并为UDIM-5", () =>
+            {
+                CombineToUDIM(BasicFunc.GetSelectedObjectList(), "udim", "UDIM", 5);
             }));
             return cmdList;
         }

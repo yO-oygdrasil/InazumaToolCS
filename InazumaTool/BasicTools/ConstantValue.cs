@@ -165,5 +165,6 @@ namespace InazumaTool.BasicTools
             UDIM = 3,
             Obvious = 4
         }
+
     }
 }

@@ -23,6 +23,7 @@ namespace InazumaTool.BasicTools
         Dictionary<string, string> parmsDic = new Dictionary<string, string>();
         List<string> targetNames = new List<string>();
         List<string> toggles = new List<string>();
+        string finalAppend;
         public void UpdateParm(string parmName, float value)
         {
             UpdateCMDParmStr(parmName, value + "");
@@ -59,6 +60,10 @@ namespace InazumaTool.BasicTools
             }
         }
 
+        public void UpdateFinalAppend(string append)
+        {
+            finalAppend = append;
+        }
 
         public bool UpdateTargets(List<string> names)
         {
@@ -105,6 +110,7 @@ namespace InazumaTool.BasicTools
                         {
                             result += " " + targetNames[i];
                         }
+                        result += " " + finalAppend;
                         break;
                     }
                 case CmdType.Python:
