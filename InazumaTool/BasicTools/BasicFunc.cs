@@ -738,6 +738,16 @@ namespace InazumaTool.BasicTools
             //}
         }
 
+        public static void Select(List<MObject> list)
+        {
+            MSelectionList sl = new MSelectionList();
+            foreach (MObject mo in list)
+            {
+                sl.add(mo);
+            }
+            MGlobal.setActiveSelectionList(sl);
+        }
+
         public static void Select(MDagPath dagPath)
         {
             MSelectionList list = new MSelectionList();
@@ -915,6 +925,56 @@ namespace InazumaTool.BasicTools
         }
 
 
+        #endregion
+
+        #region File
+
+        public static string RenameFile(string originFullPath, string newPartialName, string newFolder = null, bool deleteOrigin = false, bool overwrite = false)
+        {
+            string originFolder = Path.GetDirectoryName(originFullPath);
+            string originPartialName = Path.GetFileNameWithoutExtension(originFullPath);
+            string originFileExtension = Path.GetExtension(originFullPath);
+            if (newFolder != null && newFolder.Length > 0)
+            {
+                if (!Directory.Exists(newFolder))
+                {
+                    //if folder is not a complete path, create subFolder
+                    newFolder = Path.Combine(originFolder, newFolder);
+                    if (!Directory.Exists(newFolder))
+                    {
+                        Directory.CreateDirectory(newFolder);
+                    }
+                }
+            }
+            else
+            {
+                newFolder = originFolder;
+            }
+            if (newPartialName == null || newPartialName.Length == 0)
+            {
+                newPartialName = originPartialName;
+            }
+
+            string newFileFullPath = Path.Combine(newFolder, newPartialName) + originFileExtension;
+            try
+            {
+                if (deleteOrigin)
+                {
+                    //move
+                    File.Move(originFullPath, newFileFullPath);
+                }
+                else
+                {
+                    //copy
+                    File.Copy(originFullPath, newFileFullPath, overwrite);
+                }
+            }
+            catch (IOException e)
+            {
+                Debug.Log((deleteOrigin ? "Move Exception:" : "Copy Exception:") + e.Message);
+            }
+            return newFileFullPath;
+        }
         #endregion
 
         #region DealResultStr

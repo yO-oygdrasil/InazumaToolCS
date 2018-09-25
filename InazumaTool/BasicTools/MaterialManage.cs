@@ -8,6 +8,7 @@ using Autodesk.Maya.OpenMayaRender;
 using Autodesk.Maya.OpenMaya;
 using Autodesk.Maya.OpenMayaUI;
 using InazumaTool.TopoTools;
+using System.IO;
 
 namespace InazumaTool.BasicTools
 {
@@ -209,8 +210,7 @@ namespace InazumaTool.BasicTools
             //BasicFunc.Select(newSelection);
             return newSelection;
         }
-
-
+        
         public static bool CombineSameTextures(MSelectionList list,bool deleteRepeated = true)
         {
             if (!BasicFunc.CheckSelectionList(list, 2))
@@ -460,6 +460,78 @@ namespace InazumaTool.BasicTools
             return layeredTextureNode;
         }
 
+        public static MFnDependencyNode CombineToUDIM(List<MObject> imageObjects, string prename, string newFolder = "UDIM", int maxUCount = 5)
+        {
+            List<MFnDependencyNode> dnNodes = new List<MFnDependencyNode>();
+            for (int i = 0; i < imageObjects.Count; i++)
+            {
+                dnNodes.Add(new MFnDependencyNode(imageObjects[i]));
+            }
+
+            return CombineToUDIM(dnNodes, prename, newFolder, maxUCount);
+        }
+
+        public static MFnDependencyNode CombineToUDIM(List<MFnDependencyNode> imageNodes, string prename,string newFolder = "UDIM", int maxUCount = 5)
+        {
+            if (imageNodes.Count <= 2)
+            {
+                return null;
+            }
+            MFnDependencyNode udimImgNode = new MFnDependencyNode();
+            udimImgNode.create(ConstantValue.nodeName_fileTex);
+            MPlug texOutColorPlug = udimImgNode.findPlug(ConstantValue.plugName_fileTexOutput);
+            udimImgNode.findPlug(ConstantValue.plugName_fileTexUVTilingMode).setInt((int)ConstantValue.UVTilingMode.UDIM);
+            
+
+            MDGModifier dGModifier = new MDGModifier();
+            for (int i = 0; i < imageNodes.Count; i++)
+            {                
+                MPlug plug_fileTexPath = imageNodes[i].findPlug(ConstantValue.plugName_fileTexPath);
+                string originFullPath = plug_fileTexPath.asString();
+
+                int uIndex = i % maxUCount;
+                int vIndex = i / maxUCount;
+                string mariIndexStr = string.Format("{0}.10{1}{2}", prename, vIndex, uIndex + 1);
+                string newFullPath = RenameTexFile(imageNodes[i], mariIndexStr, newFolder);
+                if (i == 0)
+                {
+                    udimImgNode.findPlug(ConstantValue.plugName_fileTexPath).setString(newFullPath);
+                }
+
+                //move uv
+                List<MObject> matObjects = GetMaterialsWithTex(imageNodes[i]);
+                foreach (MObject matObj in matObjects)
+                {
+                    MFnDependencyNode matNode = new MFnDependencyNode(matObj);
+                    string matName = matNode.absoluteName;
+                    //Debug.Log("move uv for mat:" + matName);
+                    MoveUV(uIndex, vIndex, matName);
+                    MPlug plug_matColorInput = matNode.findPlug(ConstantValue.plugName_matColorInput);
+                    if (plug_matColorInput != null)
+                    {
+                        dGModifier.disconnect(plug_matColorInput.source, plug_matColorInput);
+                        dGModifier.connect(texOutColorPlug, plug_matColorInput);
+                        //dGModifier.doIt();
+                    }
+                }                
+            }
+            dGModifier.doIt();
+
+            return udimImgNode;
+        }
+        
+        public static string RenameTexFile(MFnDependencyNode imageNode, string newPartialName, string newFolder = null, bool relinkImgNode = false, bool deleteOrigin = false,bool overwrite = false)
+        {
+            MPlug plug_fileTexPath = imageNode.findPlug(ConstantValue.plugName_fileTexPath);
+            string originFullPath = plug_fileTexPath.asString();
+            string newFullPath = BasicFunc.RenameFile(originFullPath, newPartialName, newFolder, deleteOrigin, overwrite);
+            if (relinkImgNode)
+            {
+                plug_fileTexPath.setString(newFullPath);
+            }
+            return newFullPath;
+        }
+
         public class ShapeData
         {
             public MFnMesh mesh;
@@ -626,7 +698,7 @@ namespace InazumaTool.BasicTools
             cmdList.Add(new CommandData("材质", "图片"));
             cmdList.Add(new CommandData("材质", cmdStr, "matsWithSameTex", "选择同图片材质", () =>
             {
-                GetMaterialsWithTex(BasicFunc.GetSelectedObject(0));
+                BasicFunc.Select(GetMaterialsWithTex(BasicFunc.GetSelectedObject(0)));
             }));
             cmdList.Add(new CommandData("材质", cmdStr, "combineMats", "合并选中材质", () =>
             {
@@ -685,6 +757,10 @@ namespace InazumaTool.BasicTools
             cmdList.Add(new CommandData("材质", cmdStr, "convertToLayered", "转换为LayeredTextures", () =>
             {
                 CreateLayeredTextureNode(BasicFunc.GetSelectedObjectList());
+            }));
+            cmdList.Add(new CommandData("材质", cmdStr, "conbineToUDIM", "合并为UDIM", () =>
+            {
+                CombineToUDIM(BasicFunc.GetSelectedObjectList(), "udim");
             }));
             return cmdList;
         }

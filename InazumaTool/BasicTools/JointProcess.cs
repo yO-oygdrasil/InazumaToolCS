@@ -339,19 +339,19 @@ namespace InazumaTool.BasicTools
             {
                 BeautifulPole(null, false, false, true);
             }));
-            cmdList.Add(new CommandData("骨骼/优雅极向量", cmdStr, "beautifulPole_y", "极向量清除XY", () =>
+            cmdList.Add(new CommandData("骨骼/优雅极向量", cmdStr, "beautifulPole_xy", "极向量清除XY", () =>
             {
                 BeautifulPole(null, true, true, false);
             }));
-            cmdList.Add(new CommandData("骨骼/优雅极向量", cmdStr, "beautifulPole_y", "极向量清除XZ", () =>
+            cmdList.Add(new CommandData("骨骼/优雅极向量", cmdStr, "beautifulPole_xz", "极向量清除XZ", () =>
             {
                 BeautifulPole(null, true, false);
             }));
-            cmdList.Add(new CommandData("骨骼/优雅极向量", cmdStr, "beautifulPole_y", "极向量清除YZ", () =>
+            cmdList.Add(new CommandData("骨骼/优雅极向量", cmdStr, "beautifulPole_yz", "极向量清除YZ", () =>
             {
                 BeautifulPole(null, false);
             }));
-            cmdList.Add(new CommandData("骨骼/优雅极向量", cmdStr, "beautifulPole_y", "极向量清除XYZ", () =>
+            cmdList.Add(new CommandData("骨骼/优雅极向量", cmdStr, "beautifulPole_xyz", "极向量清除XYZ", () =>
             {
                 BeautifulPole(null);
             }));

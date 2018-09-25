@@ -17,8 +17,11 @@ namespace InazumaTool.BasicTools
         public const float Radian75 = 1.3089969375f;
         public const float Radian90 = 1.570796325f;
 
-        public const string nodeName_place2dTexture = "place2dTexture";
+        public const string 
+            nodeName_place2dTexture = "place2dTexture",
+            nodeName_fileTex = "file";
 
+        public const string plugName_fileTexUVTilingMode = "uvTilingMode";
         public const string plugName_fileTexPath = "fileTextureName";
         public const string plugName_fileTexOutput = "outColor";
         public const string plugName_fileTexDefaultColorR = "defaultColorR";
@@ -152,6 +155,15 @@ namespace InazumaTool.BasicTools
             Alpha = 1,
             BlendMode = 2,
             Visible = 3
+        }
+
+        public enum UVTilingMode
+        {
+            None = 0,
+            ZBrush = 1,
+            MudBox = 2,
+            UDIM = 3,
+            Obvious = 4
         }
     }
 }
