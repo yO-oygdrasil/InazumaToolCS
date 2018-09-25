@@ -42,11 +42,20 @@ namespace InazumaTool.BasicTools
                     //有完整的物体在内，这样的物体是不会被选择为组件模式的
                     for (int i = (int)list.length - 1; i >= 0; i--)
                     {
-                        MDagPath dag = new MDagPath();
-                        list.getDagPath((uint)i, dag);
-                        BasicFunc.SelectComponent(dag.fullPathName, ConstantValue.PolySelectType.Facet, true);
-                        facesList.Add(BasicFunc.GetSelectedList());
-                        list.remove((uint)i);
+                        MObject mo = new MObject();
+                        list.getDependNode((uint)i, mo);
+                        if (mo.apiType == MFn.Type.kMesh)
+                        {
+                            //component,no change
+                        }
+                        else if (mo.apiType == MFn.Type.kTransform)
+                        {
+                            //full object,select the faces
+                            BasicFunc.SelectComponent(MDagPath.getAPathTo(mo).fullPathName, ConstantValue.PolySelectType.Facet, true);
+                            facesList.Add(BasicFunc.GetSelectedList());
+                        }
+
+
                     }
 
                     MGlobal.setActiveSelectionList(list);
