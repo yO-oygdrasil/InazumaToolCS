@@ -32,42 +32,15 @@ namespace InazumaTool.BasicTools
                 return false;
             }
             MGlobal.executeCommand("hyperShade -objects " + matName);
+
+
             if (selectInComponentMode)
             {
                 Debug.Log("select in component mode");
                 MSelectionList list = BasicFunc.GetSelectedList();
-                List<MSelectionList> facesListToAdd = new List<MSelectionList>();
-
-                MItSelectionList it_selectionList = new MItSelectionList(list);
-                for (; !it_selectionList.isDone; it_selectionList.next())
-                {
-                    MObject component = new MObject();
-                    MDagPath item = new MDagPath();
-                    it_selectionList.getDagPath(item, component);
-
-                    List<int> selectedIndcies = new List<int>();
-                    MItMeshPolygon it_poly = new MItMeshPolygon(item, component);
-                    bool componentSelected = false;
-                    for (; !it_poly.isDone; it_poly.next())
-                    {
-                        componentSelected = true;
-                    }
-                    if (!componentSelected)
-                    {
-                        Debug.Log("没有组件被选择,怀疑是一整个物体:" + item.fullPathName);
-                        BasicFunc.SelectComponent(MDagPath.getAPathTo(component).fullPathName, ConstantValue.PolySelectType.Facet, true);
-                        facesListToAdd.Add(BasicFunc.GetSelectedList());
-                    }
-                }
-                if (facesListToAdd.Count > 0)
-                {
-                    MGlobal.setActiveSelectionList(list);
-                    for (int i = 0; i < facesListToAdd.Count; i++)
-                    {
-                        MGlobal.setActiveSelectionList(facesListToAdd[i], MGlobal.ListAdjustment.kAddToList);
-                    }
-                }
-
+                BasicFunc.Select(list, true);
+                //List<MSelectionList> facesListToAdd = new List<MSelectionList>();
+                
                 //if (list.length > 0)
                 //{
 

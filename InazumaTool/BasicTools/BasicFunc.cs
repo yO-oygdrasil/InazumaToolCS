@@ -198,6 +198,7 @@ namespace InazumaTool.BasicTools
                     }
                 }
             }
+            
             return selected;
         }
 
@@ -715,11 +716,48 @@ namespace InazumaTool.BasicTools
 
         #region Select
 
-        public static void Select(MSelectionList list)
+        public static void Select(MSelectionList list, bool selectInComponentMode = false)
         {
 
             MGlobal.setActiveSelectionList(list);
 
+            if (selectInComponentMode)
+            {
+                Debug.Log("select in component mode");
+                List<MSelectionList> facesListToAdd = new List<MSelectionList>();
+
+                MItSelectionList it_selectionList = new MItSelectionList(list);
+                Debug.Log("has components:" + it_selectionList.hasComponents);
+
+                for (; !it_selectionList.isDone; it_selectionList.next())
+                {
+                    MObject component = new MObject();
+                    MDagPath item = new MDagPath();
+                    it_selectionList.getDagPath(item, component);
+
+                    //Debug.Log(item.fullPathName + " has components:" + it_selectionList.hasComponents);
+                    //List<int> selectedIndcies = new List<int>();
+                    //MItMeshPolygon it_poly = new MItMeshPolygon(item, component);                    
+                    if (!it_selectionList.hasComponents)
+                    {
+                        //Debug.Log("没有组件被选择,怀疑是一整个物体:" + item.fullPathName);
+                        BasicFunc.SelectComponent(item.fullPathName, ConstantValue.PolySelectType.Facet, true);
+                        facesListToAdd.Add(BasicFunc.GetSelectedList());
+                    }
+                    //else
+                    //{
+                    //    Debug.Log("有组件被选择:" + it_poly.count());
+                    //}
+                }
+                if (facesListToAdd.Count > 0)
+                {
+                    MGlobal.setActiveSelectionList(list);
+                    for (int i = 0; i < facesListToAdd.Count; i++)
+                    {
+                        MGlobal.setActiveSelectionList(facesListToAdd[i], MGlobal.ListAdjustment.kAddToList);
+                    }
+                }
+            }
             //bool hasDag = false;
 
             //if (hasDag)
@@ -762,10 +800,16 @@ namespace InazumaTool.BasicTools
 
         public static void SelectComponent(string targetDagName, ConstantValue.PolySelectType pst,bool selectAll = false)
         {
-            MGlobal.executeCommand(string.Format("doMenuComponentSelectionExt(\"{0}\", \"{1}\", 0)", targetDagName, ConstantValue.ComponentSelectionExt(pst)));
+            
             if (selectAll)
             {
+                MGlobal.clearSelectionList();
+                MGlobal.executeCommand(string.Format("doMenuComponentSelectionExt(\"{0}\", \"{1}\", 0)", targetDagName, ConstantValue.ComponentSelectionExt(pst)));
                 SelectAll();
+            }
+            else
+            {
+                MGlobal.executeCommand(string.Format("doMenuComponentSelectionExt(\"{0}\", \"{1}\", 0)", targetDagName, ConstantValue.ComponentSelectionExt(pst)));
             }
         }
 
@@ -1162,6 +1206,10 @@ namespace InazumaTool.BasicTools
             cmdList.Add(new CommandData(null, cmdStr, "test", "test", () => 
             {
                 BasicFunc.PrintObjects(BasicFunc.GetSelectedList());
+            }));
+            cmdList.Add(new CommandData(null, cmdStr, "testSelectComp", "选择组件", () =>
+            {
+                BasicFunc.Select(BasicFunc.GetSelectedList(), true);
             }));
             cmdList.Add(new CommandData(null, cmdStr, "testWindow", "test window", () =>
             {
