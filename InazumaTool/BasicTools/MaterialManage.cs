@@ -36,34 +36,66 @@ namespace InazumaTool.BasicTools
             {
                 Debug.Log("select in component mode");
                 MSelectionList list = BasicFunc.GetSelectedList();
-                List<MSelectionList> facesList = new List<MSelectionList>();
-                if (list.length > 0)
+                List<MSelectionList> facesListToAdd = new List<MSelectionList>();
+
+                MItSelectionList it_selectionList = new MItSelectionList(list);
+                for (; !it_selectionList.isDone; it_selectionList.next())
                 {
-                    //有完整的物体在内，这样的物体是不会被选择为组件模式的
-                    for (int i = (int)list.length - 1; i >= 0; i--)
+                    MObject component = new MObject();
+                    MDagPath item = new MDagPath();
+                    it_selectionList.getDagPath(item, component);
+
+                    List<int> selectedIndcies = new List<int>();
+                    MItMeshPolygon it_poly = new MItMeshPolygon(item, component);
+                    bool componentSelected = false;
+                    for (; !it_poly.isDone; it_poly.next())
                     {
-                        MObject mo = new MObject();
-                        list.getDependNode((uint)i, mo);
-                        if (mo.apiType == MFn.Type.kMesh)
-                        {
-                            //component,no change
-                        }
-                        else if (mo.apiType == MFn.Type.kTransform)
-                        {
-                            //full object,select the faces
-                            BasicFunc.SelectComponent(MDagPath.getAPathTo(mo).fullPathName, ConstantValue.PolySelectType.Facet, true);
-                            facesList.Add(BasicFunc.GetSelectedList());
-                        }
-
-
+                        componentSelected = true;
                     }
-
-                    MGlobal.setActiveSelectionList(list);
-                    for (int i = 0; i < facesList.Count; i++)
+                    if (!componentSelected)
                     {
-                        MGlobal.setActiveSelectionList(facesList[i], MGlobal.ListAdjustment.kAddToList);
+                        Debug.Log("没有组件被选择,怀疑是一整个物体:" + item.fullPathName);
+                        BasicFunc.SelectComponent(MDagPath.getAPathTo(component).fullPathName, ConstantValue.PolySelectType.Facet, true);
+                        facesListToAdd.Add(BasicFunc.GetSelectedList());
                     }
                 }
+                if (facesListToAdd.Count > 0)
+                {
+                    MGlobal.setActiveSelectionList(list);
+                    for (int i = 0; i < facesListToAdd.Count; i++)
+                    {
+                        MGlobal.setActiveSelectionList(facesListToAdd[i], MGlobal.ListAdjustment.kAddToList);
+                    }
+                }
+
+                //if (list.length > 0)
+                //{
+
+
+                //    for (int i = (int)list.length - 1; i >= 0; i--)
+                //    {
+                //        MObject mo = new MObject();
+                //        list.getDependNode((uint)i, mo);
+                //        if (mo.apiType == MFn.Type.kMesh)
+                //        {
+                //            //component,no change
+                //        }
+                //        else if (mo.apiType == MFn.Type.kTransform)
+                //        {
+                //            //full object,select the faces
+                //            BasicFunc.SelectComponent(MDagPath.getAPathTo(mo).fullPathName, ConstantValue.PolySelectType.Facet, true);
+                //            facesListToAdd.Add(BasicFunc.GetSelectedList());
+                //        }
+
+
+                //    }
+
+                //    MGlobal.setActiveSelectionList(list);
+                //    for (int i = 0; i < facesListToAdd.Count; i++)
+                //    {
+                //        MGlobal.setActiveSelectionList(facesListToAdd[i], MGlobal.ListAdjustment.kAddToList);
+                //    }
+                //}
             }
 
             return true;

@@ -33,6 +33,7 @@ namespace InazumaTool.BasicTools
         public const string plugName_place2dOutUV = "outUV";
         public const string plugName_dagSetMembers = "dagSetMembers";
 
+        public const string command_ConvertSelectionToFaces = "ConvertSelectionToFaces";
 
         public const string plugName_remapValueInput = "inputValue";
         public const string plugName_remapValueOutput = "outValue";

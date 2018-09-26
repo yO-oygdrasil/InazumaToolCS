@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 
 using Autodesk.Maya;
 using Autodesk.Maya.OpenMaya;
+using System.Text.RegularExpressions;
 
 namespace InazumaTool.BasicTools.UI
 {
@@ -33,9 +34,9 @@ namespace InazumaTool.BasicTools.UI
 
         }
 
-        private void LogSth(object sender, RoutedEventArgs e)
+        private void ConvertToUDIM(object sender, RoutedEventArgs e)
         {
-            Debug.Log("yeah! wpf work");
+            MaterialManage.CombineToUDIM(BasicFunc.GetSelectedObjectList(), text_prename.Text, text_newFolder.Text, int.Parse(text_uCount.Text));
         }
 
         private void AllPreset_Click(object sender, RoutedEventArgs e)
@@ -55,6 +56,23 @@ namespace InazumaTool.BasicTools.UI
 
         private void ResultGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+
+        }
+
+        private void text_uCount_preview(object sender, TextCompositionEventArgs e)
+        {
+            Regex re = new Regex("[^0-9.-]+");
+
+            if (re.IsMatch(e.Text))
+            {
+                int value = int.Parse(e.Text);
+                if (value > 0 && value < 10)
+                {
+                    e.Handled = true;
+                    return;
+                }
+            }
+            e.Handled = false;
 
         }
     }
