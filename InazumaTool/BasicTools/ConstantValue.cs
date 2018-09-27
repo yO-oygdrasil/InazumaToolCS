@@ -23,7 +23,8 @@ namespace InazumaTool.BasicTools
 
         public const string plugName_fileTexUVTilingMode = "uvTilingMode";
         public const string plugName_fileTexPath = "fileTextureName";
-        public const string plugName_fileTexOutput = "outColor";
+        public const string plugName_fileTexOutputColor = "outColor";
+        public const string plugName_fileTexOutputTransparency = "outTransparency";
         public const string plugName_fileTexDefaultColorR = "defaultColorR";
         public const string plugName_fileTexDefaultColorG = "defaultColorG";
         public const string plugName_fileTexDefaultColorB = "defaultColorB";
@@ -33,7 +34,12 @@ namespace InazumaTool.BasicTools
         public const string plugName_place2dOutUV = "outUV";
         public const string plugName_dagSetMembers = "dagSetMembers";
 
-        public const string command_ConvertSelectionToFaces = "ConvertSelectionToFaces";
+        public const string 
+            command_ConvertSelectionToFaces = "ConvertSelectionToFaces",
+            command_ConvertSelectionToEdgePerimeter = "ConvertSelectionToEdgePerimeter";
+
+        public const string
+            command_CutUVs = "CutUVs";
 
         public const string plugName_remapValueInput = "inputValue";
         public const string plugName_remapValueOutput = "outValue";
@@ -41,15 +47,16 @@ namespace InazumaTool.BasicTools
 
         public const string plugName_blendShapeWeight = "weight";
 
-        public const string plugName_tx = "translateX";
-        public const string plugName_ty = "translateY";
-        public const string plugName_tz = "translateZ";
-        public const string plugName_rx = "rotateX";
-        public const string plugName_ry = "rotateY";
-        public const string plugName_rz = "rotateZ";
-        public const string plugName_sx = "scaleX";
-        public const string plugName_sy = "scaleY";
-        public const string plugName_sz = "scaleZ";
+        public const string
+            plugName_tx = "translateX",
+            plugName_ty = "translateY",
+            plugName_tz = "translateZ",
+            plugName_rx = "rotateX",
+            plugName_ry = "rotateY",
+            plugName_rz = "rotateZ",
+            plugName_sx = "scaleX",
+            plugName_sy = "scaleY",
+            plugName_sz = "scaleZ";
 
         public const string plugName_dynamicConstraintMethod = "constraintMethod";
 

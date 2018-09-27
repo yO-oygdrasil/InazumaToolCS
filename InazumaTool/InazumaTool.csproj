@@ -70,8 +70,8 @@
     <Compile Include="BasicTools\BasicWindow.cs" />
     <Compile Include="BasicTools\DependModules.cs" />
     <Compile Include="BasicTools\Selector.cs" />
-    <Compile Include="BasicTools\UI\TestWPFWindow.xaml.cs">
-      <DependentUpon>TestWPFWindow.xaml</DependentUpon>
+    <Compile Include="BasicTools\UI\MaterialManageWindow.xaml.cs">
+      <DependentUpon>MaterialManageWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="BindTools\BindSwitch.cs" />
     <Compile Include="Debug.cs" />
@@ -89,7 +89,7 @@
     <Compile Include="TopoTools\MeshTool.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="BasicTools\UI\TestWPFWindow.xaml">
+    <Page Include="BasicTools\UI\MaterialManageWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

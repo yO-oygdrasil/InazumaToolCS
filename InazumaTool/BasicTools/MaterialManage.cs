@@ -81,14 +81,36 @@ namespace InazumaTool.BasicTools
             MGlobal.executeCommand("hyperShade -assign " + matName);
         }
 
-        static void MoveUV(float uValue, float vValue, string matName = null)
+        static void MoveUV(float uValue, float vValue, string matName = null, bool splitUVBlockBeforeMove = true)
         {
             if (matName != null)
             {
                 Debug.Log("matName:" + matName);
                 SelectObjectsWithMat(matName, true);
             }
+            if (splitUVBlockBeforeMove)
+            {
+                SplitUVBlock(BasicFunc.GetSelectedList(), true);
+            }
             MGlobal.executeCommand(string.Format("polyEditUV -u {0} -v {1}", uValue, vValue), true);
+        }
+
+        static void SplitUVBlock(MSelectionList faceSelection, bool recoverSelection = true)
+        {
+            if (recoverSelection)
+            {
+                MSelectionList originList = BasicFunc.GetSelectedList();
+                BasicFunc.Select(faceSelection);
+                MGlobal.executeCommand(ConstantValue.command_ConvertSelectionToEdgePerimeter);
+                MGlobal.executeCommand(ConstantValue.command_CutUVs);
+                BasicFunc.Select(originList);
+            }
+            else
+            {
+                BasicFunc.Select(faceSelection);
+                MGlobal.executeCommand(ConstantValue.command_ConvertSelectionToEdgePerimeter);
+                MGlobal.executeCommand(ConstantValue.command_CutUVs);
+            }
         }
 
         /// <summary>
@@ -211,7 +233,7 @@ namespace InazumaTool.BasicTools
 
         public static MSelectionList GetMaterialsWithTex(MFnDependencyNode imageNode)
         {
-            MPlug plug = imageNode.findPlug(ConstantValue.plugName_fileTexOutput);
+            MPlug plug = imageNode.findPlug(ConstantValue.plugName_fileTexOutputColor);
             MPlugArray destPlugs = new MPlugArray();
             plug.destinations(destPlugs);
             //BasicFunc.PrintPlugs(destPlugs);
@@ -224,7 +246,26 @@ namespace InazumaTool.BasicTools
             //BasicFunc.Select(newSelection);
             return newSelection;
         }
-        
+
+        public static MSelectionList GetMaterialsWithTex(MFnDependencyNode imageNode,out MPlugArray texColorDestPlugs,out MPlugArray texTransparencyDestPlugs)
+        {
+            MPlug plug = imageNode.findPlug(ConstantValue.plugName_fileTexOutputColor);
+            texColorDestPlugs = new MPlugArray();
+            plug.destinations(texColorDestPlugs);
+            MPlug plug_outTransparency = imageNode.findPlug(ConstantValue.plugName_fileTexOutputTransparency);
+            texTransparencyDestPlugs = new MPlugArray();
+            plug_outTransparency.destinations(texTransparencyDestPlugs);
+            //BasicFunc.PrintPlugs(destPlugs);
+
+            MSelectionList newSelection = new MSelectionList();
+            for (int i = 0; i < texColorDestPlugs.length; i++)
+            {
+                newSelection.add(texColorDestPlugs[i].node);
+            }
+            //BasicFunc.Select(newSelection);
+            return newSelection;
+        }
+
         public static bool CombineSameTextures(MSelectionList list,bool deleteRepeated = true)
         {
             if (!BasicFunc.CheckSelectionList(list, 2))
@@ -248,7 +289,7 @@ namespace InazumaTool.BasicTools
                 //img.readFromTextureNode(texObject, MImage.MPixelType.kUnknown);
                 MFnDependencyNode texDN = new MFnDependencyNode(texObject);
                 MPlug texPlug = texDN.findPlug(ConstantValue.plugName_fileTexPath);
-                MPlug texOutputPlug = texDN.findPlug(ConstantValue.plugName_fileTexOutput);
+                MPlug texOutputPlug = texDN.findPlug(ConstantValue.plugName_fileTexOutputColor);
                 //Debug.Log("texplug name:" + texPlug.name);
                 texOutputPlugs.Add(texOutputPlug);
                 string filePath = texPlug.asString();
@@ -308,11 +349,7 @@ namespace InazumaTool.BasicTools
                 string fileName = BasicFunc.GetFileName(filePath);
                 Debug.Log("fileName:" + fileName);
                 imageNode.setName(fileName);
-
-
             }
-
-
         }
 
         public static void RenameMaterials(MSelectionList list)
@@ -331,14 +368,10 @@ namespace InazumaTool.BasicTools
                 MPlug sourcePlug = plug.source;
                 if (sourcePlug != null)
                 {
-
                     MFnDependencyNode sourceNode = new MFnDependencyNode(sourcePlug.node);
                     matNode.setName("mat_" + sourceNode.name);
-
                 }
             }
-
-
         }
 
         public static void RemoveUnusedTextures(MSelectionList list)
@@ -354,7 +387,7 @@ namespace InazumaTool.BasicTools
                 MObject mo = new MObject();
                 list.getDependNode((uint)i, mo);
                 MFnDependencyNode imageNode = new MFnDependencyNode(mo);
-                MPlug texOutputPlug = imageNode.findPlug(ConstantValue.plugName_fileTexOutput);
+                MPlug texOutputPlug = imageNode.findPlug(ConstantValue.plugName_fileTexOutputColor);
                 MPlugArray destPlugs = new MPlugArray();
                 texOutputPlug.destinations(destPlugs);
                 if (destPlugs.Count == 0)
@@ -395,7 +428,6 @@ namespace InazumaTool.BasicTools
                     MDGModifier dgModifier = new MDGModifier();
                     dgModifier.connect(p2tUVOut, uvPlug);
                     dgModifier.doIt();
-
                     return place2dTexNode;
                 }
                 else
@@ -427,7 +459,6 @@ namespace InazumaTool.BasicTools
             {
                 dnNodes.Add(new MFnDependencyNode(imageObjects[i]));
             }
-
             return CreateLayeredTextureNode(dnNodes);
         }
 
@@ -461,12 +492,10 @@ namespace InazumaTool.BasicTools
                     Debug.Log("move uv for mat:" + matName);
                     MoveUV(i, 0, matName);
                 }
-
                 MPlug layeredTexInputPlug = layeredTexInputsPlug.elementByLogicalIndex((uint)i);
-                MPlug texOutColorPlug = imageNodes[i].findPlug(ConstantValue.plugName_fileTexOutput);
+                MPlug texOutColorPlug = imageNodes[i].findPlug(ConstantValue.plugName_fileTexOutputColor);
                 MPlug layeredTexInputColor = layeredTexInputPlug.child((int)ConstantValue.LayeredTextureInputDataIndex.Color);
-                dGModifier.connect(texOutColorPlug, layeredTexInputColor);
-                
+                dGModifier.connect(texOutColorPlug, layeredTexInputColor);                
                 //set blendMode to add
                 MPlug blendMode = layeredTexInputPlug.child((int)ConstantValue.LayeredTextureInputDataIndex.BlendMode);
                 if (i < imageNodes.Count - 1)
@@ -477,10 +506,8 @@ namespace InazumaTool.BasicTools
                 {
                     blendMode.setInt((int)ConstantValue.LayeredTextureBlendMode.None);
                 }
-
             }
             dGModifier.doIt();
-
             return layeredTextureNode;
         }
 
@@ -540,7 +567,8 @@ namespace InazumaTool.BasicTools
             //MFnDependencyNode udimImgNode = new MFnDependencyNode();
             //udimImgNode.create("file");
 
-            MPlug texOutColorPlug = udimImgNode.findPlug(ConstantValue.plugName_fileTexOutput);
+            MPlug texOutColorPlug = udimImgNode.findPlug(ConstantValue.plugName_fileTexOutputColor);
+            MPlug texOutTransparencyPlug = udimImgNode.findPlug(ConstantValue.plugName_fileTexOutputTransparency);
             udimImgNode.findPlug(ConstantValue.plugName_fileTexUVTilingMode).setInt((int)ConstantValue.UVTilingMode.UDIM);
             
 
@@ -559,8 +587,10 @@ namespace InazumaTool.BasicTools
                     udimImgNode.findPlug(ConstantValue.plugName_fileTexPath).setString(newFullPath);
                 }
 
-                //move uv
-                MSelectionList matList = GetMaterialsWithTex(imageNodes[i]);
+                //move uv and reconnect link
+                MPlugArray plugArr_transparencyDest, plugArr_colorDest;
+                MSelectionList matList = GetMaterialsWithTex(imageNodes[i], out plugArr_colorDest, out plugArr_transparencyDest);
+                //move uv for every material
                 for (int j = 0; j < matList.length; j++)
                 {
                     MObject matObj = new MObject();
@@ -569,14 +599,26 @@ namespace InazumaTool.BasicTools
                     string matName = matNode.absoluteName;
                     //Debug.Log("move uv for mat:" + matName);
                     MoveUV(uIndex, vIndex, matName);
-                    MPlug plug_matColorInput = matNode.findPlug(ConstantValue.plugName_matColorInput);
-                    if (plug_matColorInput != null)
-                    {
-                        dGModifier.disconnect(plug_matColorInput.source, plug_matColorInput);
-                        dGModifier.connect(texOutColorPlug, plug_matColorInput);
-                        dGModifier.doIt();
-                    }
-                }            
+                    //MPlug plug_matColorInput = matNode.findPlug(ConstantValue.plugName_matColorInput);
+                    //if (plug_matColorInput != null)
+                    //{
+                    //    dGModifier.disconnect(plug_matColorInput.source, plug_matColorInput);
+                    //    dGModifier.connect(texOutColorPlug, plug_matColorInput);
+                    //    dGModifier.doIt();
+                    //}
+                }
+                //reconnect alpha
+                for (int j = 0; j < plugArr_transparencyDest.length; j++)
+                {
+                    dGModifier.disconnect(plugArr_transparencyDest[j].source, plugArr_transparencyDest[j]);
+                    dGModifier.connect(texOutTransparencyPlug, plugArr_transparencyDest[j]);
+                }
+                //reconnect color
+                for (int j = 0; j < plugArr_colorDest.length; j++)
+                {
+                    dGModifier.disconnect(plugArr_colorDest[j].source, plugArr_colorDest[j]);
+                    dGModifier.connect(texOutColorPlug, plugArr_colorDest[j]);
+                }
             }
             dGModifier.doIt();
 
@@ -818,33 +860,38 @@ namespace InazumaTool.BasicTools
                 SelectObjectsWithMat(new MFnDependencyNode(BasicFunc.GetSelectedObject(0)), true);
             }));
 
-            cmdList.Add(new CommandData("材质", cmdStr, "moveMatUV", "移动此材质UV", () =>
-            {
-                CombineDagsWithSameMat(BasicFunc.GetSelectedList());
-            }));
+            //cmdList.Add(new CommandData("材质", cmdStr, "moveMatUV", "移动此材质UV", () =>
+            //{
+            //    CombineDagsWithSameMat(BasicFunc.GetSelectedList());
+            //}));
             cmdList.Add(new CommandData("材质", cmdStr, "convertToLayered", "转换为LayeredTextures", () =>
             {
                 CreateLayeredTextureNode(BasicFunc.GetSelectedObjectList());
             }));
-            cmdList.Add(new CommandData("材质", cmdStr, "conbineToUDIM1", "合并为UDIM-1", () =>
+            //cmdList.Add(new CommandData("材质", cmdStr, "conbineToUDIM1", "合并为UDIM-1", () =>
+            //{
+            //    CombineToUDIM(BasicFunc.GetSelectedObjectList(), "udim","UDIM",1);
+            //}));
+            //cmdList.Add(new CommandData("材质", cmdStr, "conbineToUDIM2", "合并为UDIM-2", () =>
+            //{
+            //    CombineToUDIM(BasicFunc.GetSelectedObjectList(), "udim", "UDIM", 2);
+            //}));
+            //cmdList.Add(new CommandData("材质", cmdStr, "conbineToUDIM3", "合并为UDIM-3", () =>
+            //{
+            //    CombineToUDIM(BasicFunc.GetSelectedObjectList(), "udim", "UDIM", 3);
+            //}));
+            //cmdList.Add(new CommandData("材质", cmdStr, "conbineToUDIM4", "合并为UDIM-4", () =>
+            //{
+            //    CombineToUDIM(BasicFunc.GetSelectedObjectList(), "udim", "UDIM", 4);
+            //}));
+            //cmdList.Add(new CommandData("材质", cmdStr, "conbineToUDIM5", "合并为UDIM-5", () =>
+            //{
+            //    CombineToUDIM(BasicFunc.GetSelectedObjectList(), "udim", "UDIM", 5);
+            //}));
+            cmdList.Add(new CommandData("材质", cmdStr, "udimEditor", "UDIM编辑器", () =>
             {
-                CombineToUDIM(BasicFunc.GetSelectedObjectList(), "udim","UDIM",1);
-            }));
-            cmdList.Add(new CommandData("材质", cmdStr, "conbineToUDIM2", "合并为UDIM-2", () =>
-            {
-                CombineToUDIM(BasicFunc.GetSelectedObjectList(), "udim", "UDIM", 2);
-            }));
-            cmdList.Add(new CommandData("材质", cmdStr, "conbineToUDIM3", "合并为UDIM-3", () =>
-            {
-                CombineToUDIM(BasicFunc.GetSelectedObjectList(), "udim", "UDIM", 3);
-            }));
-            cmdList.Add(new CommandData("材质", cmdStr, "conbineToUDIM4", "合并为UDIM-4", () =>
-            {
-                CombineToUDIM(BasicFunc.GetSelectedObjectList(), "udim", "UDIM", 4);
-            }));
-            cmdList.Add(new CommandData("材质", cmdStr, "conbineToUDIM5", "合并为UDIM-5", () =>
-            {
-                CombineToUDIM(BasicFunc.GetSelectedObjectList(), "udim", "UDIM", 5);
+                UI.MaterialManageWindow window = new UI.MaterialManageWindow();
+                window.Show();
             }));
             return cmdList;
         }

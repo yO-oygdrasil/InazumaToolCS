@@ -1,4 +1,4 @@
-﻿<Window x:Class="InazumaTool.BasicTools.UI.TestWPFWindow"
+﻿<Window x:Class="InazumaTool.BasicTools.UI.MaterialManageWindow"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              Title="DAGExplorer" Height="465" Width="1420" Loaded="Window_Loaded" Background="#FF444444" Margin="0,0,0,10">

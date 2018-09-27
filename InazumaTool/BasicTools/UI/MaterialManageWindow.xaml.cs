@@ -22,9 +22,9 @@ namespace InazumaTool.BasicTools.UI
     /// <summary>
     /// Interaction logic for test.xaml
     /// </summary>
-    public partial class TestWPFWindow : Window
+    public partial class MaterialManageWindow : Window
     {
-        public TestWPFWindow()
+        public MaterialManageWindow()
         {
             InitializeComponent();
         }
