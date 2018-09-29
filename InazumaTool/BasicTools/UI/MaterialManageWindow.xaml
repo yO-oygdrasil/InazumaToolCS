@@ -71,7 +71,7 @@
                 </Grid>
             </TabItem>
             
-            <TabItem Header="Polygon 3D View" Name="tabItem3" Background="#FF444444" Foreground="#FFC8C8C8">
+            <TabItem Header="Redshift Convert" Name="tabItem3" Background="#FF444444" Foreground="#FFC8C8C8">
                 <Grid Background="#FF444444" Margin="0">
                     <Viewport3D Name="viewport" Height="Auto" Margin="6,6,6,0">
                         <Viewport3D.Camera>

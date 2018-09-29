@@ -791,7 +791,38 @@ namespace InazumaTool.BasicTools
             
         }
 
+        #region RedShift
 
+
+        public static void ConvertToRSMaterial(MFnDependencyNode matNode)
+        {
+            //replace output to shadingEngine
+            MPlug plug_matColorOutput = matNode.findPlug(ConstantValue.plugName_matColorOutput);
+            MPlugArray plugArr_matColorOutDest = new MPlugArray();
+            plug_matColorOutput.destinations(plugArr_matColorOutDest);
+            //get textures
+            MPlug plug_matColorInput = matNode.findPlug(ConstantValue.plugName_matColorInput);
+            MPlug plug_matTransparency = matNode.findPlug(ConstantValue.plugName_matTransparency);
+
+            MFnDependencyNode rsArchiNode = CreateShadingNode(ShadingNodeType.Shader, ConstantValue.nodeName_RS_Architectural);
+            MPlug plug_rsArchiDiffuse = rsArchiNode.findPlug(ConstantValue.plugName_RS_diffuse);
+            MPlug plug_rsArchiTransColor = rsArchiNode.findPlug(ConstantValue.plugName_RS_transColor);
+            MPlug plug_rsArchiTransWeight = rsArchiNode.findPlug(ConstantValue.plugName_RS_transWeight);
+            MPlug plug_rsArchiOutColor = rsArchiNode.findPlug(ConstantValue.plugName_RS_outColor);
+            MDGModifier dGModifier = new MDGModifier();
+            for (int i = 0; i < plugArr_matColorOutDest.length; i++)
+            {
+                dGModifier.disconnect(plug_matColorOutput, plugArr_matColorOutDest[i]);
+                dGModifier.connect(plug_rsArchiOutColor, plugArr_matColorOutDest[i]);
+            }
+            if (plug_matColorInput.source == null)
+            {
+
+            }
+
+
+        }
+        #endregion
 
 
         const string cmdStr = "MaterialManage";

@@ -17,7 +17,7 @@ namespace InazumaTool.BasicTools
         public const float Radian75 = 1.3089969375f;
         public const float Radian90 = 1.570796325f;
 
-        public const string 
+        public const string
             nodeName_place2dTexture = "place2dTexture",
             nodeName_fileTex = "file";
 
@@ -30,11 +30,13 @@ namespace InazumaTool.BasicTools
         public const string plugName_fileTexDefaultColorB = "defaultColorB";
         public const string plugName_matColorInput = "color";
         public const string plugName_matColorOutput = "outColor";
+        public const string plugName_matTransparency = "transparency";
+
         public const string plugName_texFileUVCoord = "uvCoord";
         public const string plugName_place2dOutUV = "outUV";
         public const string plugName_dagSetMembers = "dagSetMembers";
 
-        public const string 
+        public const string
             command_ConvertSelectionToFaces = "ConvertSelectionToFaces",
             command_ConvertSelectionToEdgePerimeter = "ConvertSelectionToEdgePerimeter";
 
@@ -105,7 +107,7 @@ namespace InazumaTool.BasicTools
         }
 
         public const string command_DynamicConstraint = "createNConstraint";
-        public static readonly string[] dynamicConstraintTypeStr = {"point", "pointToPoint" };
+        public static readonly string[] dynamicConstraintTypeStr = { "point", "pointToPoint" };
         public enum DynamicConstraintType
         {
             Point = 0,
@@ -174,5 +176,18 @@ namespace InazumaTool.BasicTools
             Obvious = 4
         }
 
+
+
+        #region RedShift Nodes
+        public const string nodeName_RS_Architectural = "RedshiftArchitectural";
+
+        public const string plugName_RS_diffuse = "diffuse",
+            plugName_RS_transColor = "refr_color",
+            plugName_RS_transWeight = "transparency",
+            plugName_RS_outColor = "outColor";
+
+
+
+        #endregion
     }
 }
