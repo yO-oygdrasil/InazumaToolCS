@@ -113,6 +113,47 @@ namespace InazumaTool.BasicTools
             }
         }
 
+        public enum ShaderParamType
+        {
+            Float,
+            Color
+        }
+        static bool CopyShaderParam(MPlug from, MPlug to,ShaderParamType spt = ShaderParamType.Color)
+        {
+            if (from == null || to == null)
+            {
+                return false;
+            }
+            MPlugArray plugArr = new MPlugArray();
+            from.connectedTo(plugArr, true, false);
+            if (plugArr.length == 0)
+            {
+                switch (spt)
+                {
+                    case ShaderParamType.Color:
+                        {
+                            to.child(0).setFloat(from.child(0).asFloat());
+                            to.child(1).setFloat(from.child(1).asFloat());
+                            to.child(2).setFloat(from.child(2).asFloat());
+                            break;
+                        }
+                    case ShaderParamType.Float:
+                        {
+                            to.setFloat(from.asFloat());
+                            break;
+                        }
+                }
+            }
+            else
+            {
+                MDGModifier dGModifier = new MDGModifier();
+                Debug.Log(from.source.partialName(true));
+                dGModifier.connect(from.source, to);
+                dGModifier.doIt();
+            }
+            return true;
+        }
+
         /// <summary>
         /// well, this action is truely dangerous
         /// </summary>
@@ -536,6 +577,26 @@ namespace InazumaTool.BasicTools
                         csc.UpdateToggle("au", true);
                         break;
                     }
+                case ShadingNodeType.Shader:
+                    {
+                        csc.UpdateToggle("as", true);
+                        break;
+                    }
+                case ShadingNodeType.Light:
+                    {
+                        csc.UpdateToggle("al", true);
+                        break;
+                    }
+                case ShadingNodeType.PostProcess:
+                    {
+                        csc.UpdateToggle("app", true);
+                        break;
+                    }
+                case ShadingNodeType.Rendering:
+                    {
+                        csc.UpdateToggle("ar", true);
+                        break;
+                    }                    
             }
             csc.UpdateFinalAppend(nodeType);
             string cmdStr = csc.ToString();
@@ -794,7 +855,7 @@ namespace InazumaTool.BasicTools
         #region RedShift
 
 
-        public static void ConvertToRSMaterial(MFnDependencyNode matNode)
+        public static void ConvertToRSMaterial(MFnDependencyNode matNode,bool deleteOrigin)
         {
             //replace output to shadingEngine
             MPlug plug_matColorOutput = matNode.findPlug(ConstantValue.plugName_matColorOutput);
@@ -815,12 +876,57 @@ namespace InazumaTool.BasicTools
                 dGModifier.disconnect(plug_matColorOutput, plugArr_matColorOutDest[i]);
                 dGModifier.connect(plug_rsArchiOutColor, plugArr_matColorOutDest[i]);
             }
-            if (plug_matColorInput.source == null)
+
+            CopyShaderParam(plug_matColorInput, plug_rsArchiDiffuse);
+            //if (plug_matColorInput.source == null)
+            //{
+            //    plug_rsArchiDiffuse.child(0).setFloat(plug_matColorInput.child(0).asFloat());
+            //    plug_rsArchiDiffuse.child(1).setFloat(plug_matColorInput.child(1).asFloat());
+            //    plug_rsArchiDiffuse.child(2).setFloat(plug_matColorInput.child(2).asFloat());
+            //}
+            //else
+            //{
+            //    dGModifier.connect(plug_matColorInput.source, plug_rsArchiDiffuse);
+            //}
+
+            CopyShaderParam(plug_matTransparency, plug_rsArchiTransColor);
+            if (plug_matTransparency.child(0).asFloat() == 0 && plug_matTransparency.child(1).asFloat() == 0 && plug_matTransparency.child(2).asFloat() == 0)
             {
-
+                plug_rsArchiTransWeight.setFloat(1);
             }
-
-
+            else
+            {
+                plug_rsArchiTransWeight.setFloat(0);
+            }
+            //if (plug_matTransparency.source == null)
+            //{
+            //    //plug_rsArchiTransColor.setValue(plug_matColorInput.asMObject());
+            //    float matTransparency = plug_matTransparency.asFloat();
+            //    if (matTransparency == 0)
+            //    {
+            //        plug_rsArchiTransWeight.setFloat(0);
+            //        plug_rsArchiTransColor.child(0).setFloat(0);
+            //        plug_rsArchiTransColor.child(1).setFloat(0);
+            //        plug_rsArchiTransColor.child(2).setFloat(0);
+            //    }
+            //    else
+            //    {
+            //        plug_rsArchiTransWeight.setFloat(1);
+            //        plug_rsArchiTransColor.child(0).setFloat(plug_matTransparency.child(0).asFloat());
+            //        plug_rsArchiTransColor.child(1).setFloat(plug_matTransparency.child(1).asFloat());
+            //        plug_rsArchiTransColor.child(2).setFloat(plug_matTransparency.child(2).asFloat());
+            //    }
+            //}
+            //else
+            //{
+            //    dGModifier.connect(plug_matTransparency.source, plug_rsArchiTransColor);
+            //    plug_rsArchiTransWeight.setFloat(1);
+            //}
+            if (deleteOrigin)
+            {
+                dGModifier.deleteNode(matNode.objectProperty);
+            }
+            dGModifier.doIt();
         }
         #endregion
 
@@ -860,7 +966,7 @@ namespace InazumaTool.BasicTools
             {
                 DeleteUnusedMats(BasicFunc.GetSelectedList());
             }));
-            cmdList.Add(new CommandData("材质", cmdStr, "deleteUnusedMats", "删除无用着色组", () =>
+            cmdList.Add(new CommandData("材质", cmdStr, "deleteUnusedSGs", "删除无用着色组", () =>
             {
                 DeleteUnusedShadingNode(BasicFunc.GetSelectedList());
             }));
@@ -923,6 +1029,11 @@ namespace InazumaTool.BasicTools
             {
                 UI.MaterialManageWindow window = new UI.MaterialManageWindow();
                 window.Show();
+            }));
+            cmdList.Add(new CommandData("材质", "RS"));
+            cmdList.Add(new CommandData("材质", cmdStr, "convertMatToRS", "材质转为RS-Architecture", () =>
+            {
+                ConvertToRSMaterial(new MFnDependencyNode(BasicFunc.GetSelectedObject(0)),false);
             }));
             return cmdList;
         }
