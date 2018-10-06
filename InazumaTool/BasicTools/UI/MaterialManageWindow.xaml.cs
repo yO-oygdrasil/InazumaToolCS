@@ -75,5 +75,10 @@ namespace InazumaTool.BasicTools.UI
             e.Handled = false;
 
         }
+
+        private void ConvertToRSMats(object sender, RoutedEventArgs e)
+        {
+            MaterialManage.ConvertToRSMaterial(new MFnDependencyNode(BasicFunc.GetSelectedObject(0)), (bool)bto_deleteOriginMats.IsChecked);
+        }
     }
 }
