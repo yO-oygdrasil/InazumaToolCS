@@ -866,6 +866,14 @@ namespace InazumaTool.BasicTools
             MPlug plug_matTransparency = matNode.findPlug(ConstantValue.plugName_matTransparency);
 
             MFnDependencyNode rsArchiNode = CreateShadingNode(ShadingNodeType.Shader, ConstantValue.nodeName_RS_Architectural);
+            if (matNode.name.StartsWith("mat_"))
+            {
+                rsArchiNode.setName("rs" + matNode.name);
+            }
+            else
+            {
+                rsArchiNode.setName("rsmat_" + matNode.name);
+            }
             MPlug plug_rsArchiDiffuse = rsArchiNode.findPlug(ConstantValue.plugName_RS_diffuse);
             MPlug plug_rsArchiTransColor = rsArchiNode.findPlug(ConstantValue.plugName_RS_transColor);
             MPlug plug_rsArchiTransWeight = rsArchiNode.findPlug(ConstantValue.plugName_RS_transWeight);
