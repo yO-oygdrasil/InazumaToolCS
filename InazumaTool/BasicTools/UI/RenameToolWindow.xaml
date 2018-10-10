@@ -32,95 +32,9 @@
         </Style>
     </Window.Resources>
     <Grid Height="Auto" Width="Auto" Margin="0,0,0,10">
-        <TabControl Height="Auto" Name="tabControl1" Width="Auto" BorderBrush="#FF444444" SelectionChanged="tabControl1_SelectionChanged" Margin="10">
-            
-            <TabItem Header="Material" Name="tabItem_material" Background="#FF424242" Foreground="#FFC8C8C8">
-                <Grid Background="#FF444444">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition/>
-                    </Grid.RowDefinitions>
-                    <Grid Grid.Row="0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="120"/>
-                            <ColumnDefinition MinWidth="200" Width="Auto"/>
-                            <ColumnDefinition Width="120"/>
-                            <ColumnDefinition MinWidth="150" Width="Auto"/>
-                            <ColumnDefinition Width="120"/>
-                            <ColumnDefinition MinWidth="150" Width="Auto"/>
-                            <ColumnDefinition Width="120"/>
-                        </Grid.ColumnDefinitions>
-                        <Grid Grid.Column="0">
-                            <Label Content="New Folder Path" VerticalAlignment="Center" HorizontalAlignment="Right" Foreground="#FFC8C8C8"/>
-                        </Grid>
-                        <Grid Grid.Column="1">
-                            <TextBox Margin="0,5,5,0" Name="text_newFolder" AcceptsReturn="True" AcceptsTab="True" FontFamily="Courier New" FontSize="12" Cursor="IBeam" TabIndex="1" Background="#FF2A2A2A" BorderBrush="#FF9D9D9D" Foreground="#FFC8C8C8" Grid.RowSpan="1">DCIM</TextBox>
-                        </Grid>
-                        <Grid Grid.Column="2">
-                            <Label Content="Prefix" VerticalAlignment="Center" HorizontalAlignment="Right"  Foreground="#FFC8C8C8" />
-                        </Grid>
-                        <Grid Grid.Column="3">
-                            <TextBox Margin="0,5,5,0" Name="text_prename" AcceptsReturn="True" AcceptsTab="True" FontFamily="Courier New" FontSize="12" Cursor="IBeam" TabIndex="2" Background="#FF2A2A2A" BorderBrush="#FF9D9D9D" Foreground="#FFC8C8C8" Grid.RowSpan="1" >color</TextBox>
-                        </Grid>
-                        <Grid Grid.Column="4">
-                            <Label Content="U Count" VerticalAlignment="Center" HorizontalAlignment="Right"  Foreground="#FFC8C8C8" />
-                        </Grid>
-                        <Grid Grid.Column="5">
-                            <TextBox InputMethod.IsInputMethodEnabled="False" PreviewTextInput="text_uCount_preview" Margin="0,5,5,0" Name="text_uCount" AcceptsReturn="True" AcceptsTab="True" FontFamily="Courier New" FontSize="12" Cursor="IBeam" TabIndex="2" Background="#FF2A2A2A" BorderBrush="#FF9D9D9D" Foreground="#FFC8C8C8" Grid.RowSpan="1">5</TextBox>
-                            <!--<controls:NumbericTextBox x:Name="IPPart3" MaxValue="10" MinValue="1" Precision="0" />-->
-                        </Grid>
-                        <Grid Grid.Column="6">
-                            <Button Content="Convert To UDIM" Height="Auto" HorizontalAlignment="Center" Name="btn_combineUDIM" Background="#FFA2A2A2" Click="ConvertToUDIM" FontWeight="Bold" Grid.Row="1"/>
-
-                        </Grid>
+        <TabControl Height="Auto" Name="tabControl1" Width="Auto" BorderBrush="#FF444444" Margin="10">
                         
-                    </Grid>
-                    
-                    <Grid Grid.Row="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <!--<ColumnDefinition/>-->
-                    </Grid.ColumnDefinitions>
-                        <Grid Grid.Column="0">
-                            <Grid.RowDefinitions>
-                                <RowDefinition/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-                            <Grid Grid.Row="0">
-                                <Label Content="Textures" Height="28" HorizontalAlignment="Left" Margin="0,5,0,0" Name="label2" VerticalAlignment="Top" Foreground="#FFBABABA" />
-                                <TextBox Margin="1,30,10,0" Name="textBox1" AcceptsReturn="True" AcceptsTab="True" FontFamily="Courier New" FontSize="12" Cursor="IBeam" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" TabIndex="1" Background="#FF2A2A2A" BorderBrush="#FF9D9D9D" Foreground="#FFC8C8C8" Grid.RowSpan="2" />
-                            </Grid>
-                            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,10">
-                                <Button Content="SearchDAG(LogSth)" Height="28" HorizontalAlignment="Left" Name="SearchButton" Padding="5,0" Background="#FFA2A2A2" Click="ConvertToUDIM" FontWeight="Bold" Grid.Row="1" Margin="0,0,10,0" />
-                                <Label Content="Presets:" Height="28" HorizontalAlignment="Left" Name="label3" Foreground="#FFC8C8C8" Grid.Row="1" Margin="0,0,10,0" />
-                                <Button Content="All" Height="28" HorizontalAlignment="Left" x:Name="AllPreset" Padding="5,0" Background="#FFA2A2A2" Click="AllPreset_Click" Margin="0,0,10,0" />
-                            </StackPanel>
-                        </Grid>
-                    </Grid>
-                </Grid>
-            </TabItem>
-            
-            <TabItem Header="Redshift Convert" Name="tabItem3" Background="#FF444444" Foreground="#FFC8C8C8">
-                <Grid Background="#FF444444" Margin="0">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="50"/>
-                        <RowDefinition Height="50"/>
-                    </Grid.RowDefinitions>
-                    <Grid Grid.Row="0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="250"/>
-                            <ColumnDefinition Width="120"/>
-                            <ColumnDefinition Width="50"/>
-                            <ColumnDefinition Width="160"/>
-                        </Grid.ColumnDefinitions>
-                        <Label Grid.Column="0" Content="选中材质节点，转为RS-Architecture" VerticalAlignment="Center" HorizontalAlignment="Left" Foreground="#FFC8C8C8" FontWeight="Bold"/>
-                        <Label Grid.Column="1" Content="是否删除原材质节点" VerticalAlignment="Center" HorizontalAlignment="Left" Foreground="#FFC8C8C8"/>
-                        <CheckBox Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Center" Name="bto_deleteOriginMats"/>
-                        <Button Grid.Column="3" Content="Execute" Height="28" Width="120" VerticalAlignment="Center" Name="btn_matsConvertToRS"  HorizontalAlignment="Left" Background="#FFA2A2A2" Click="ConvertToRSMats" FontWeight="Bold"/>
-                    </Grid>
-                </Grid>
-            </TabItem>
-            <TabItem Header="Images" Name="tabItem4" Background="#FF424242" Foreground="#FFC8C8C8">
+            <TabItem Header="Replace" Name="tabItem4" Background="#FF424242" Foreground="#FFC8C8C8">
                 
                 <Grid Background="#FF444444">
                     <Grid.RowDefinitions>
@@ -185,7 +99,6 @@
                             <Button Grid.Row="0" Style="{StaticResource NormalButton}" Height="40" Width="130" Click="RenameSelected">选中的重命名</Button>
                         </Grid>
                     </Grid>
-                    <Image Grid.Row="1" Source="textures\mystery.jpg" Height="32" Width="32"></Image>
                 </Grid>
             </TabItem>
         </TabControl>

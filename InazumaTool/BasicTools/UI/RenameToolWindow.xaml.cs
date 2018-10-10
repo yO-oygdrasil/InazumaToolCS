@@ -33,55 +33,7 @@ namespace InazumaTool.BasicTools.UI
         {
 
         }
-
-        private void ConvertToUDIM(object sender, RoutedEventArgs e)
-        {
-            MaterialManage.CombineToUDIM(BasicFunc.GetSelectedObjectList(), text_prename.Text, text_newFolder.Text, int.Parse(text_uCount.Text));
-        }
-
-        private void AllPreset_Click(object sender, RoutedEventArgs e)
-        {
-            Debug.Log("yeah [all] button click!");
-        }
-
-        private void ResultGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-
-        }
-
-        private void tabControl1_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-
-        }
-
-        private void ResultGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-
-        }
-
-        private void text_uCount_preview(object sender, TextCompositionEventArgs e)
-        {
-            Regex re = new Regex("[^0-9.-]+");
-
-            if (re.IsMatch(e.Text))
-            {
-                int value = int.Parse(e.Text);
-                if (value > 0 && value < 10)
-                {
-                    e.Handled = true;
-                    return;
-                }
-            }
-            e.Handled = false;
-
-        }
-
-        private void ConvertToRSMats(object sender, RoutedEventArgs e)
-        {
-            MaterialManage.ConvertToRSMaterial(new MFnDependencyNode(BasicFunc.GetSelectedObject(0)), (bool)bto_deleteOriginMats.IsChecked);
-        }
-
-
+        
         private string GetNewName(string originName)
         {
             string prefix = text_prefix.Text;

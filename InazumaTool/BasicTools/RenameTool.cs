@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Autodesk.Maya.OpenMaya;
 using System.IO;
+using InazumaTool.BasicTools.UI;
+
 namespace InazumaTool.BasicTools
 {
     static class RenameTool
@@ -52,6 +54,21 @@ namespace InazumaTool.BasicTools
 
 
 
+        const string cmdStr = "RenameTool";
+        public static List<CommandData> GetCommandDatas()
+        {
+            List<CommandData> cmdList = new List<CommandData>();
+
+
+            cmdList.Add(new CommandData("重命名", "图片"));
+            cmdList.Add(new CommandData("重命名", cmdStr, "renameToolWindow", "重命名编辑器", () =>
+            {
+                RenameToolWindow rtw = new RenameToolWindow();
+                rtw.Show();
+            }));
+            
+            return cmdList;
+        }
 
     }
 }

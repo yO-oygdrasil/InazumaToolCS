@@ -1,7 +1,7 @@
 ﻿<Window x:Class="InazumaTool.BasicTools.UI.MaterialManageWindow"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             Title="Material Manager" Height="400" Width="1100" Loaded="Window_Loaded" Background="#FF444444" Margin="0,0,0,10">
+             Title="Material Manager" Height="400" Width="562.141" Loaded="Window_Loaded" Background="#FF444444" Margin="0,0,0,10">
 
     <Window.Resources>
         <Style x:Key="NormalTextBox" TargetType="TextBox">
@@ -30,164 +30,69 @@
             <Setter Property="Background" Value="#FFA2A2A2"/>
             <Setter Property="FontWeight" Value="Normal"/>
         </Style>
+        <Style x:Key="NormalBorder" TargetType="Border">
+            <Setter Property="BorderBrush" Value="Gray"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="BorderThickness" Value="2"/>
+        </Style>
     </Window.Resources>
     <Grid Height="Auto" Width="Auto" Margin="0,0,0,10">
-        <TabControl Height="Auto" Name="tabControl1" Width="Auto" BorderBrush="#FF444444" SelectionChanged="tabControl1_SelectionChanged" Margin="10">
+        <TabControl Height="Auto" Name="tabControl1" Width="Auto" BorderBrush="#FF444444" Margin="10">
             
             <TabItem Header="Material" Name="tabItem_material" Background="#FF424242" Foreground="#FFC8C8C8">
                 <Grid Background="#FF444444">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
-                        <RowDefinition/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    <Grid Grid.Row="0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="120"/>
-                            <ColumnDefinition MinWidth="200" Width="Auto"/>
-                            <ColumnDefinition Width="120"/>
-                            <ColumnDefinition MinWidth="150" Width="Auto"/>
-                            <ColumnDefinition Width="120"/>
-                            <ColumnDefinition MinWidth="150" Width="Auto"/>
-                            <ColumnDefinition Width="120"/>
-                        </Grid.ColumnDefinitions>
-                        <Grid Grid.Column="0">
-                            <Label Content="New Folder Path" VerticalAlignment="Center" HorizontalAlignment="Right" Foreground="#FFC8C8C8"/>
-                        </Grid>
-                        <Grid Grid.Column="1">
-                            <TextBox Margin="0,5,5,0" Name="text_newFolder" AcceptsReturn="True" AcceptsTab="True" FontFamily="Courier New" FontSize="12" Cursor="IBeam" TabIndex="1" Background="#FF2A2A2A" BorderBrush="#FF9D9D9D" Foreground="#FFC8C8C8" Grid.RowSpan="1">DCIM</TextBox>
-                        </Grid>
-                        <Grid Grid.Column="2">
-                            <Label Content="Prefix" VerticalAlignment="Center" HorizontalAlignment="Right"  Foreground="#FFC8C8C8" />
-                        </Grid>
-                        <Grid Grid.Column="3">
-                            <TextBox Margin="0,5,5,0" Name="text_prename" AcceptsReturn="True" AcceptsTab="True" FontFamily="Courier New" FontSize="12" Cursor="IBeam" TabIndex="2" Background="#FF2A2A2A" BorderBrush="#FF9D9D9D" Foreground="#FFC8C8C8" Grid.RowSpan="1" >color</TextBox>
-                        </Grid>
-                        <Grid Grid.Column="4">
-                            <Label Content="U Count" VerticalAlignment="Center" HorizontalAlignment="Right"  Foreground="#FFC8C8C8" />
-                        </Grid>
-                        <Grid Grid.Column="5">
-                            <TextBox InputMethod.IsInputMethodEnabled="False" PreviewTextInput="text_uCount_preview" Margin="0,5,5,0" Name="text_uCount" AcceptsReturn="True" AcceptsTab="True" FontFamily="Courier New" FontSize="12" Cursor="IBeam" TabIndex="2" Background="#FF2A2A2A" BorderBrush="#FF9D9D9D" Foreground="#FFC8C8C8" Grid.RowSpan="1">5</TextBox>
-                            <!--<controls:NumbericTextBox x:Name="IPPart3" MaxValue="10" MinValue="1" Precision="0" />-->
-                        </Grid>
-                        <Grid Grid.Column="6">
-                            <Button Content="Convert To UDIM" Height="Auto" HorizontalAlignment="Center" Name="btn_combineUDIM" Background="#FFA2A2A2" Click="ConvertToUDIM" FontWeight="Bold" Grid.Row="1"/>
+                    <StackPanel Orientation="Horizontal" Grid.Row="0">
+                        <Label Style="{StaticResource NormalLabel}">贴图转UDIM</Label>
+                        <Border Style="{StaticResource NormalBorder}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition MinWidth="150" Width="Auto"/>
+                                    <ColumnDefinition MinWidth="100" Width="Auto"/>
+                                    <ColumnDefinition Width="60"/>
+                                    <ColumnDefinition Width="120"/>
+                                </Grid.ColumnDefinitions>
 
-                        </Grid>
-                        
-                    </Grid>
-                    
-                    <Grid Grid.Row="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <!--<ColumnDefinition/>-->
-                    </Grid.ColumnDefinitions>
-                        <Grid Grid.Column="0">
-                            <Grid.RowDefinitions>
-                                <RowDefinition/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-                            <Grid Grid.Row="0">
-                                <Label Content="Textures" Height="28" HorizontalAlignment="Left" Margin="0,5,0,0" Name="label2" VerticalAlignment="Top" Foreground="#FFBABABA" />
-                                <TextBox Margin="1,30,10,0" Name="textBox1" AcceptsReturn="True" AcceptsTab="True" FontFamily="Courier New" FontSize="12" Cursor="IBeam" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" TabIndex="1" Background="#FF2A2A2A" BorderBrush="#FF9D9D9D" Foreground="#FFC8C8C8" Grid.RowSpan="2" />
+                                <StackPanel Orientation="Vertical" Grid.Column="0">
+                                    <Label Style="{StaticResource NormalLabel}">文件夹</Label>
+                                    <TextBox Name="text_newFolder" Style="{StaticResource NormalTextBox}">UDIM</TextBox>
+                                </StackPanel>
+                                <StackPanel Orientation="Vertical" Grid.Column="1">
+                                    <Label  Style="{StaticResource NormalLabel}">Prefix</Label>
+                                    <TextBox  Name="text_prename" Style="{StaticResource NormalTextBox}">color</TextBox>
+                                </StackPanel>
+                                <StackPanel Orientation="Vertical" Grid.Column="2">
+                                    <Label Style="{StaticResource NormalLabel}">U Count</Label>
+                                    <TextBox Name="text_uCount" Style="{StaticResource NormalTextBox}" InputMethod.IsInputMethodEnabled="False" PreviewTextInput="text_uCount_preview">5</TextBox>
+                                </StackPanel>
+                                <Button Grid.Column="3" Style="{StaticResource NormalButton}" Click="ConvertToUDIM" Height="30">Convert</Button>
+
                             </Grid>
-                            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,10">
-                                <Button Content="SearchDAG(LogSth)" Height="28" HorizontalAlignment="Left" Name="SearchButton" Padding="5,0" Background="#FFA2A2A2" Click="ConvertToUDIM" FontWeight="Bold" Grid.Row="1" Margin="0,0,10,0" />
-                                <Label Content="Presets:" Height="28" HorizontalAlignment="Left" Name="label3" Foreground="#FFC8C8C8" Grid.Row="1" Margin="0,0,10,0" />
-                                <Button Content="All" Height="28" HorizontalAlignment="Left" x:Name="AllPreset" Padding="5,0" Background="#FFA2A2A2" Click="AllPreset_Click" Margin="0,0,10,0" />
+                        </Border>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Grid.Row="1">
+                        <Label Style="{StaticResource NormalLabel}">贴图转UDIM</Label>
+                        <Border Style="{StaticResource NormalBorder}">
+                            <StackPanel Orientation="Horizontal">
+                                <StackPanel Orientation="Vertical">
+                                    <Label Style="{StaticResource NormalLabel}">选中材质节点，转为RS-Architecture</Label>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label Style="{StaticResource NormalLabel}">是否删除原材质节点</Label>
+                                        <CheckBox VerticalAlignment="Center" Name="bto_deleteOriginMats"/>
+                                    </StackPanel>
+                                </StackPanel>
+                                <Button Style="{StaticResource NormalButton}" Click="ConvertToRSMats">Execute</Button>
                             </StackPanel>
-                        </Grid>
-                    </Grid>
+                        </Border>
+                    </StackPanel>
+                    
                 </Grid>
             </TabItem>
             
-            <TabItem Header="Redshift Convert" Name="tabItem3" Background="#FF444444" Foreground="#FFC8C8C8">
-                <Grid Background="#FF444444" Margin="0">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="50"/>
-                        <RowDefinition Height="50"/>
-                    </Grid.RowDefinitions>
-                    <Grid Grid.Row="0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="250"/>
-                            <ColumnDefinition Width="120"/>
-                            <ColumnDefinition Width="50"/>
-                            <ColumnDefinition Width="160"/>
-                        </Grid.ColumnDefinitions>
-                        <Label Grid.Column="0" Content="选中材质节点，转为RS-Architecture" VerticalAlignment="Center" HorizontalAlignment="Left" Foreground="#FFC8C8C8" FontWeight="Bold"/>
-                        <Label Grid.Column="1" Content="是否删除原材质节点" VerticalAlignment="Center" HorizontalAlignment="Left" Foreground="#FFC8C8C8"/>
-                        <CheckBox Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Center" Name="bto_deleteOriginMats"/>
-                        <Button Grid.Column="3" Content="Execute" Height="28" Width="120" VerticalAlignment="Center" Name="btn_matsConvertToRS"  HorizontalAlignment="Left" Background="#FFA2A2A2" Click="ConvertToRSMats" FontWeight="Bold"/>
-                    </Grid>
-                </Grid>
-            </TabItem>
-            <TabItem Header="Images" Name="tabItem4" Background="#FF424242" Foreground="#FFC8C8C8">
-                
-                <Grid Background="#FF444444">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition/>
-                    </Grid.RowDefinitions>
-                    <Grid Grid.Row="0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="120"/>
-                            <ColumnDefinition MinWidth="200" Width="Auto"/>
-                            <ColumnDefinition Width="120"/>
-                            <ColumnDefinition MinWidth="150" Width="Auto"/>
-                            <ColumnDefinition Width="120"/>
-                        </Grid.ColumnDefinitions>
-                        <Grid Grid.Column="0">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="30"/>
-                                <RowDefinition Height="20"/>
-                                <RowDefinition Height="30"/>
-                                <RowDefinition Height="20"/>
-                            </Grid.RowDefinitions>
-                            <Label Grid.Row="2" Style="{StaticResource NormalLabel}">附加前缀</Label>
-                            <TextBox Grid.Row="3" Style="{StaticResource NormalTextBox}" Name="text_prefix"></TextBox>
-                        </Grid>
-                        <Grid Grid.Column="1">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="30"/>
-                                <RowDefinition Height="20"/>
-                                <RowDefinition Height="30"/>
-                                <RowDefinition Height="20"/>
-                            </Grid.RowDefinitions>
-                            <Label Grid.Row="0" Style="{StaticResource NormalLabel}">保留部分</Label>
-                            <TextBox Grid.Row="1" Style="{StaticResource NormalTextBox}"  Name="text_maintain">joint_</TextBox>
-                            <Label Grid.Row="2" Style="{StaticResource NormalLabel}">↓</Label>
-                            <TextBox Grid.Row="3" Style="{StaticResource NormalTextBox}"  Name="text_newMaintain">jt_</TextBox>
-                        </Grid>
-                        <Grid Grid.Column="2">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="30"/>
-                                <RowDefinition Height="20"/>
-                                <RowDefinition Height="30"/>
-                                <RowDefinition Height="20"/>
-                            </Grid.RowDefinitions>
-                            <Label Grid.Row="2" Style="{StaticResource NormalLabel}">附加后缀</Label>
-                            <TextBox Grid.Row="3" Style="{StaticResource NormalTextBox}" Name="text_suffix"></TextBox>
-                        </Grid>
-                        
-                        
-                        <Grid Grid.Column="3">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="50"/>
-                                <RowDefinition Height="50"/>
-                            </Grid.RowDefinitions>
-                            <Button Grid.Row="0" Style="{StaticResource NormalButton}" Height="40" Width="130" Click="RenameSingle">单个重命名</Button>
-                            <Button Grid.Row="1" Style="{StaticResource NormalButton}" Height="40" Width="130" Click="RenameHierachy">层级重命名</Button>
-                        </Grid>
-                        <Grid Grid.Column="4">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="50"/>
-                                <RowDefinition Height="50"/>
-                            </Grid.RowDefinitions>
-                            <Button Grid.Row="0" Style="{StaticResource NormalButton}" Height="40" Width="130" Click="RenameSelected">选中的重命名</Button>
-                        </Grid>
-                    </Grid>
-                    <Image Grid.Row="1" Source="textures\mystery.jpg" Height="32" Width="32"></Image>
-                </Grid>
-            </TabItem>
         </TabControl>
     </Grid>
 </Window>
