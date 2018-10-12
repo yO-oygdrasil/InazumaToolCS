@@ -68,6 +68,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AnimationTools\AnimationPass.cs" />
+    <Compile Include="AnimationTools\DeformWeightManage.cs" />
     <Compile Include="BasicTools\BasicWindow.cs" />
     <Compile Include="BasicTools\DependModules.cs" />
     <Compile Include="BasicTools\RenameTool.cs" />
