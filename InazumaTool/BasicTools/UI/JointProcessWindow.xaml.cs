@@ -51,8 +51,8 @@ namespace InazumaTool.BasicTools.UI
             e.Handled = false;
         }
 
-        List<MFnIkJoint> joints = new List<MFnIkJoint>(); 
-
+        List<MFnIkJoint> joints = new List<MFnIkJoint>();
+        List<Slider> sliders = new List<Slider>();
 
         private void AddJoints(object sender, RoutedEventArgs e)
         {
@@ -61,9 +61,13 @@ namespace InazumaTool.BasicTools.UI
                 joints.Add(new MFnIkJoint(dag));
             }, MFn.Type.kJoint);
 
+            for (int i = 0; i < joints.Count; i++)
+            {
+                Slider newSlider = new Slider { Style = this.FindResource("NormalSlider") as Style, Name = "joints" + i };
+                sliders.Add(newSlider);
 
+            }
 
-            Slider newSlider = new Slider { Style = this.FindResource("NormalSlider") as Style, Name= "joints};
             
             //newSlider.
 

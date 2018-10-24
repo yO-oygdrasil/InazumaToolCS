@@ -313,6 +313,38 @@ namespace InazumaTool.BasicTools
 
         }
 
+        private static List<MFnIkJoint> GetSelectedJoints(MSelectionList selectedList = null)
+        {
+            if (selectedList == null)
+            {
+                selectedList = BasicFunc.GetSelectedList();
+            }
+            List<MFnIkJoint> joints = new List<MFnIkJoint>();
+            BasicFunc.IterateSelectedDags((dag) =>
+            {
+                joints.Add(new MFnIkJoint(dag));
+            }, MFn.Type.kJoint, selectedList);
+            return joints;
+        }
+
+        /// <summary>
+        /// all joints point to last one
+        /// </summary>
+        /// <param name="joints"></param>
+        private static void LerpJointsOrient(List<MFnIkJoint> joints = null)
+        {
+            if (joints == null)
+            {
+                joints = GetSelectedJoints();
+            }
+            if (joints.Count < 2)
+            {
+                return;
+            }
+            for(int i =0;i<)
+
+        }
+
 
 
         const string cmdStr = "JointProcess";
@@ -356,6 +388,11 @@ namespace InazumaTool.BasicTools
                 BeautifulPole(null);
             }));
             cmdList.Add(new CommandData("骨骼", cmdStr, "manyBeautifulPole", "为很多漂亮的极向量铺路", () =>
+            {
+                BasicFunc.IterateSelectedDags((dag) => { BeautifulPole(dag, true); });
+            }));
+            cmdList.Add(new CommandData("骨骼", "过渡骨"));
+            cmdList.Add(new CommandData("骨骼", cmdStr, "lerpJoints", "过渡骨", () =>
             {
                 BasicFunc.IterateSelectedDags((dag) => { BeautifulPole(dag, true); });
             }));

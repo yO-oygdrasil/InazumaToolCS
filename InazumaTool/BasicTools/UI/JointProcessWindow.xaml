@@ -37,10 +37,12 @@
             <Setter Property="BorderThickness" Value="2"/>
         </Style>
         <Style x:Key="NormalSlider" TargetType="Slider">
-            <Setter Property="Width" Value="Auto"/>
+            <Setter Property="Width" Value="400"/>
             <Setter Property="Height" Value="30"/>
             <Setter Property="Minimum" Value="0"/>
             <Setter Property="Maximum" Value="1"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
         </Style>
     </Window.Resources>
     <Grid Height="Auto" Width="Auto" Margin="0,0,0,10">
@@ -57,11 +59,18 @@
                         <Label Style="{StaticResource NormalLabel}">Insert Joints</Label>
                         <Border Style="{StaticResource NormalBorder}">
                             <Grid Name="grid_jointSliders" MinHeight="30">
-                                <Slider Style="{StaticResource NormalSlider}" Name="test"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Style="{StaticResource NormalButton}" Width="80" Height="40" Click="LoadJoints">Joint 0</Button>
+                                    <Slider Style="{StaticResource NormalSlider}" Name="test"/>
 
+                                </StackPanel>
                             </Grid>
                         </Border>
-                        <Button Style="{StaticResource NormalButton}" Click="AddJoints">Add Joints</Button>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Button Style="{StaticResource NormalButton}" Width="80" Click="LoadJoints">Load</Button>
+                            <Button Style="{StaticResource NormalButton}" Width="80" Click="AddJoints">Add</Button>
+                            <Button Style="{StaticResource NormalButton}" Width="80" Click="ClearJoints">Clear</Button>
+                        </StackPanel>
                     </StackPanel>
 
 

@@ -182,7 +182,7 @@ namespace InazumaTool.AnimationTools
 
         }
 
-
+        ShapePoints sp;
 
 
 
@@ -223,7 +223,7 @@ namespace InazumaTool.AnimationTools
                         {
                             Debug.Log("shape:" + reader["shape"]);
                             XmlReader subReader = reader.ReadSubtree();
-
+                            List<MFloatVector> points = new List<MFloatVector>();
                             while (subReader.Read())
                             {
                                 if (subReader.Name == "point")
@@ -249,10 +249,7 @@ namespace InazumaTool.AnimationTools
 
                             while (subReader.Read())
                             {
-                                if (subReader.Name == "point")
-                                {
-                                    points.Add(StringToMFloatVector(subReader["value"], ' '));
-                                }
+                                
                                 //Debug.Log("name:" + subReader.Name + ",value:" + subReader["value"]);
                                 //points.Add(StringToMFloatVector(subReader["value"],' '));
                             }
