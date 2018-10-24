@@ -1,0 +1,73 @@
+﻿<Window x:Class="InazumaTool.BasicTools.UI.JointProcessWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Title="Material Manager" Height="400" Width="562.141" Loaded="Window_Loaded" Background="#FF444444" Margin="0,0,0,10">
+
+    <Window.Resources>
+        <Style x:Key="NormalTextBox" TargetType="TextBox">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="AcceptsReturn" Value="True"/>
+            <Setter Property="AcceptsTab" Value="True"/>
+            <Setter Property="FontFamily" Value="Courier New"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Cursor" Value="IBeam"/>
+            <Setter Property="Background" Value="#FF2A2A2A"/>
+            <Setter Property="BorderBrush" Value="#FF9D9D9D"/>
+            <Setter Property="Foreground" Value="#FFC8C8C8"/>
+            <Setter Property="Margin" Value="5,0,5,0"/>
+        </Style>
+        <Style x:Key="NormalLabel" TargetType="Label">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="Foreground" Value="#FFC8C8C8"/>
+        </Style>
+        <Style x:Key="NormalButton" TargetType="Button">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="5,0,5,0"/>
+            <Setter Property="Background" Value="#FFA2A2A2"/>
+            <Setter Property="FontWeight" Value="Normal"/>
+        </Style>
+        <Style x:Key="NormalBorder" TargetType="Border">
+            <Setter Property="BorderBrush" Value="Gray"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="BorderThickness" Value="2"/>
+        </Style>
+        <Style x:Key="NormalSlider" TargetType="Slider">
+            <Setter Property="Width" Value="Auto"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Minimum" Value="0"/>
+            <Setter Property="Maximum" Value="1"/>
+        </Style>
+    </Window.Resources>
+    <Grid Height="Auto" Width="Auto" Margin="0,0,0,10">
+        <TabControl Height="Auto" Name="tabControl1" Width="Auto" BorderBrush="#FF444444" Margin="10">
+            
+            <TabItem Header="Material" Name="tabItem_material" Background="#FF424242" Foreground="#FFC8C8C8">
+                <Grid Background="#FF444444">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    
+                    <StackPanel Orientation="Vertical" Grid.Row="0">
+                        <Label Style="{StaticResource NormalLabel}">Insert Joints</Label>
+                        <Border Style="{StaticResource NormalBorder}">
+                            <Grid Name="grid_jointSliders" MinHeight="30">
+                                <Slider Style="{StaticResource NormalSlider}" Name="test"/>
+
+                            </Grid>
+                        </Border>
+                        <Button Style="{StaticResource NormalButton}" Click="AddJoints">Add Joints</Button>
+                    </StackPanel>
+
+
+                </Grid>
+            </TabItem>
+            
+        </TabControl>
+    </Grid>
+</Window>

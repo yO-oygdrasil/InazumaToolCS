@@ -74,6 +74,9 @@
     <Compile Include="BasicTools\RenameTool.cs" />
     <Compile Include="BasicTools\Selector.cs" />
     <Compile Include="BasicTools\StringCompare.cs" />
+    <Compile Include="BasicTools\UI\JointProcessWindow.xaml.cs">
+      <DependentUpon>JointProcessWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="BasicTools\UI\RenameToolWindow.xaml.cs">
       <DependentUpon>RenameToolWindow.xaml</DependentUpon>
     </Compile>
@@ -96,6 +99,10 @@
     <Compile Include="TopoTools\MeshTool.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="BasicTools\UI\JointProcessWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="BasicTools\UI\RenameToolWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
