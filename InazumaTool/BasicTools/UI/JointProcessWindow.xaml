@@ -78,6 +78,11 @@
                             <Label Name="label4" Content="M" />
                         </ListBox>-->
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <TextBox Name="text_x" Style="{StaticResource NormalTextBox}" Height="25" PreviewTextInput="NumericPreview">0</TextBox>
+                            <TextBox Name="text_y" Style="{StaticResource NormalTextBox}" Height="25" PreviewTextInput="NumericPreview">0</TextBox>
+                            <TextBox Name="text_z" Style="{StaticResource NormalTextBox}" Height="25" PreviewTextInput="NumericPreview">0</TextBox>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                             <Button Style="{StaticResource NormalButton}" Width="80" Click="LoadJoints">Load</Button>
                             <Button Style="{StaticResource NormalButton}" Width="80" Click="AddJoints">Add</Button>
                             <Button Style="{StaticResource NormalButton}" Width="80" Click="ClearJoints">Clear</Button>

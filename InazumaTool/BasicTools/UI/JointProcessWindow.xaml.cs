@@ -35,7 +35,7 @@ namespace InazumaTool.BasicTools.UI
 
         }
                 
-        private void numericPreview(object sender, TextCompositionEventArgs e)
+        private void NumericPreview(object sender, TextCompositionEventArgs e)
         {
             Regex re = new Regex("[^0-9.-]+");
 
@@ -145,9 +145,15 @@ namespace InazumaTool.BasicTools.UI
             }
             MVector lastJointWorldPos = joints[joints.Count - 1].getTranslation(MSpace.Space.kWorld);
             MVector firstJointWorldPos = joints[0].getTranslation(MSpace.Space.kWorld);
+            string[] lines = System.IO.File.ReadAllLines("D:\temp\testValue.txt");
+            float valueX = float.Parse(lines[0]);
+            float valueY = float.Parse(lines[1]);
+            float valueZ = float.Parse(lines[2]);
+
             for (int i = 0; i < joints.Count - 1; i++)
             {
-                joints[i].setOrientation(new MEulerRotation(lastJointWorldPos - firstJointWorldPos));
+                //joints[i].setOrientation(new MEulerRotation(lastJointWorldPos - firstJointWorldPos));
+                joints[i].setOrientation(new MEulerRotation(valueX, valueY, valueZ));
             }
         }
 
@@ -157,12 +163,13 @@ namespace InazumaTool.BasicTools.UI
             {
                 return;
             }
-            MVector lastJointWorldPos = joints[joints.Count - 1].getTranslation(MSpace.Space.kWorld);
+            MFnIkJoint lastJoint = joints[joints.Count - 1];
+            MVector lastJointWorldPos = lastJoint.getTranslation(MSpace.Space.kWorld);
             MVector firstJointWorldPos = joints[0].getTranslation(MSpace.Space.kWorld);
             MVector direct = lastJointWorldPos - firstJointWorldPos;
             for (int i = 1; i < joints.Count - 1; i++)
             {
-                if (i>=sliders.Count|| sliders[i] == null)
+                if (i >= sliders.Count || sliders[i] == null)
                 {
                     
                     continue;
@@ -171,8 +178,8 @@ namespace InazumaTool.BasicTools.UI
                 JointProcess.MoveSkinJointsTool(joints[i].dagPath);
                 joints[i].setTranslation(direct * percent + firstJointWorldPos, MSpace.Space.kWorld);
             }
-
-
+            JointProcess.MoveSkinJointsTool(lastJoint.dagPath);
+            lastJoint.setTranslation(lastJointWorldPos, MSpace.Space.kWorld);
         }
 
         private void ClearJoints(object sender, RoutedEventArgs e)
