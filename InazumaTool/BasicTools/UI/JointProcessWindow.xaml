@@ -58,18 +58,31 @@
                     <StackPanel Orientation="Vertical" Grid.Row="0">
                         <Label Style="{StaticResource NormalLabel}">Insert Joints</Label>
                         <Border Style="{StaticResource NormalBorder}">
-                            <Grid Name="grid_jointSliders" MinHeight="30">
-                                <StackPanel Orientation="Horizontal">
+                            <StackPanel Orientation="Vertical" Name="grid_jointSliders" MinHeight="30">
+                                <!--<StackPanel Orientation="Horizontal">
                                     <Button Style="{StaticResource NormalButton}" Width="80" Height="40" Click="LoadJoints">Joint 0</Button>
-                                    <Slider Style="{StaticResource NormalSlider}" Name="test"/>
-
-                                </StackPanel>
-                            </Grid>
+                                    <Slider Style="{StaticResource NormalSlider}" Name="test" ValueChanged="TestChange"/>
+                                </StackPanel>-->
+                            </StackPanel>
                         </Border>
+
+                        <!--<ListBox AllowDrop="True">
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel/>
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+                            <Label Name="label1" Content="E" />
+                            <Label Name="label2" Content="A" />
+                            <Label Name="label3" Content="I" />
+                            <Label Name="label4" Content="M" />
+                        </ListBox>-->
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                             <Button Style="{StaticResource NormalButton}" Width="80" Click="LoadJoints">Load</Button>
                             <Button Style="{StaticResource NormalButton}" Width="80" Click="AddJoints">Add</Button>
                             <Button Style="{StaticResource NormalButton}" Width="80" Click="ClearJoints">Clear</Button>
+                            <Button Style="{StaticResource NormalButton}" Width="80" Click="UpdateJoints">Update</Button>
+                            <Button Style="{StaticResource NormalButton}" Width="80" Click="OrientFix">Orient Fix</Button>
                         </StackPanel>
                     </StackPanel>
 

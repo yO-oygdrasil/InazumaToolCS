@@ -47,7 +47,7 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     <StackPanel Orientation="Horizontal" Grid.Row="0">
-                        <Label Style="{StaticResource NormalLabel}">贴图转UDIM</Label>
+                        <Label Style="{StaticResource NormalLabel}" Width="70">贴图转UDIM</Label>
                         <Border Style="{StaticResource NormalBorder}">
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -58,7 +58,7 @@
                                 </Grid.ColumnDefinitions>
 
                                 <StackPanel Orientation="Vertical" Grid.Column="0">
-                                    <Label Style="{StaticResource NormalLabel}">文件夹</Label>
+                                    <Label Style="{StaticResource NormalLabel}">完整路径/附加文件夹</Label>
                                     <TextBox Name="text_newFolder" Style="{StaticResource NormalTextBox}">UDIM</TextBox>
                                 </StackPanel>
                                 <StackPanel Orientation="Vertical" Grid.Column="1">
@@ -75,7 +75,7 @@
                         </Border>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Grid.Row="1">
-                        <Label Style="{StaticResource NormalLabel}">贴图转UDIM</Label>
+                        <Label Style="{StaticResource NormalLabel}" Width="70">材质转为RS</Label>
                         <Border Style="{StaticResource NormalBorder}">
                             <StackPanel Orientation="Horizontal">
                                 <StackPanel Orientation="Vertical">

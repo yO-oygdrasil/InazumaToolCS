@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 using Autodesk.Maya.OpenMaya;
 using Autodesk.Maya.OpenMayaAnim;
+using InazumaTool.BasicTools.UI;
 
 namespace InazumaTool.BasicTools
 {
@@ -236,7 +237,7 @@ namespace InazumaTool.BasicTools
 
         }
 
-        private static void MoveSkinJointsTool(MDagPath dag = null)
+        public static void MoveSkinJointsTool(MDagPath dag = null)
         {
             if (dag != null)
             {
@@ -244,7 +245,7 @@ namespace InazumaTool.BasicTools
             }
             MGlobal.executeCommand("MoveSkinJointsTool");
         }
-
+        
         public static MVector GetLinearPosByWeight(MVector middleWorldPos, MVector parentWorldPos, MVector childWorldPos)
         {
             float length0 = (float)(middleWorldPos - parentWorldPos).length;
@@ -341,7 +342,6 @@ namespace InazumaTool.BasicTools
             {
                 return;
             }
-            for(int i =0;i<)
 
         }
 
@@ -392,9 +392,11 @@ namespace InazumaTool.BasicTools
                 BasicFunc.IterateSelectedDags((dag) => { BeautifulPole(dag, true); });
             }));
             cmdList.Add(new CommandData("骨骼", "过渡骨"));
-            cmdList.Add(new CommandData("骨骼", cmdStr, "lerpJoints", "过渡骨", () =>
+            cmdList.Add(new CommandData("骨骼", cmdStr, "lerpJoints", "过渡骨编辑器", () =>
             {
-                BasicFunc.IterateSelectedDags((dag) => { BeautifulPole(dag, true); });
+                JointProcessWindow jpw = new JointProcessWindow();
+                jpw.Topmost = true;
+                jpw.Show();
             }));
             return cmdList;
         }
