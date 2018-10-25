@@ -145,15 +145,27 @@ namespace InazumaTool.BasicTools.UI
             }
             MVector lastJointWorldPos = joints[joints.Count - 1].getTranslation(MSpace.Space.kWorld);
             MVector firstJointWorldPos = joints[0].getTranslation(MSpace.Space.kWorld);
-            string[] lines = System.IO.File.ReadAllLines("D:\temp\testValue.txt");
-            float valueX = float.Parse(lines[0]);
-            float valueY = float.Parse(lines[1]);
-            float valueZ = float.Parse(lines[2]);
+            //string[] lines = System.IO.File.ReadAllLines("D:\temp\testValue.txt");
+            //float valueX = float.Parse(text_x.Text);
+            //float valueY = float.Parse(text_y.Text);
+            //float valueZ = float.Parse(text_z.Text);
+            //MVector direction = (lastJointWorldPos - firstJointWorldPos).normal;
+            //MVector yzDirect = direction;
+            //yzDirect.x = 0;
+            //yzDirect.normalize();
+
 
             for (int i = 0; i < joints.Count - 1; i++)
             {
-                //joints[i].setOrientation(new MEulerRotation(lastJointWorldPos - firstJointWorldPos));
-                joints[i].setOrientation(new MEulerRotation(valueX, valueY, valueZ));
+                //MEulerRotation 
+                //MVector originOrient = joints[i].getOrientation()
+                MQuaternion mq = new MQuaternion(new MVector(1, 0, 0), lastJointWorldPos - firstJointWorldPos);
+                MEulerRotation euler = mq.asEulerRotation;
+                joints[i].setOrientation(mq);
+                text_x.Text = euler.x + "";
+                text_y.Text = euler.y + "";
+                text_z.Text = euler.z + "";
+                //joints[i].setOrientation(new MEulerRotation(valueX, valueY, valueZ));
             }
         }
 
