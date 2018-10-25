@@ -162,9 +162,9 @@ namespace InazumaTool.BasicTools.UI
                 MQuaternion mq = new MQuaternion(new MVector(1, 0, 0), lastJointWorldPos - firstJointWorldPos);
                 MEulerRotation euler = mq.asEulerRotation;
                 joints[i].setOrientation(mq);
-                text_x.Text = euler.x + "";
-                text_y.Text = euler.y + "";
-                text_z.Text = euler.z + "";
+                //text_x.Text = euler.x + "";
+                //text_y.Text = euler.y + "";
+                //text_z.Text = euler.z + "";
                 //joints[i].setOrientation(new MEulerRotation(valueX, valueY, valueZ));
             }
         }
