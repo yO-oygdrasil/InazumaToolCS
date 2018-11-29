@@ -271,7 +271,6 @@ namespace InazumaTool.BasicTools
             return GetMaterialsWithTex(imageNode);
 
         }
-
         public static MSelectionList GetMaterialsWithTex(MFnDependencyNode imageNode)
         {
             MPlug plug = imageNode.findPlug(ConstantValue.plugName_fileTexOutputColor);
@@ -852,6 +851,29 @@ namespace InazumaTool.BasicTools
             
         }
 
+        public static void ChangeTexturesPrefix(MSelectionList list,string newFolderPath)
+        {
+            if (list == null)
+            {
+                Debug.Log("list null");
+                return;
+            }
+            for (int i = 0; i < list.length; i++)
+            {
+                MObject mo = new MObject();
+                list.getDependNode((uint)i, mo);
+                MFnDependencyNode imageNode = new MFnDependencyNode(mo);
+                MPlug plug = imageNode.findPlug(ConstantValue.plugName_fileTexPath);
+                string filePath = plug.asString();
+                Debug.Log("filePath:" + filePath);
+                string fileName = Path.GetFileName(filePath);
+                plug.setString(Path.Combine(newFolderPath, fileName));
+                
+            }
+        }
+
+
+
         #region RedShift
 
 
@@ -1043,6 +1065,14 @@ namespace InazumaTool.BasicTools
             {
                 ConvertToRSMaterial(new MFnDependencyNode(BasicFunc.GetSelectedObject(0)),false);
             }));
+
+            cmdList.Add(new CommandData("材质", cmdStr, "tempConvert_delete", "临时-批量改贴图路径文件夹", () =>
+            {
+                Debug.Log("没做好编辑器所以就不调用了");
+                //ChangeTexturesPrefix(BasicFunc.GetSelectedList(), @"D:\testTextures");
+            }));
+
+
             return cmdList;
         }
 
