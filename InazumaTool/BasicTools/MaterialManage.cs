@@ -760,18 +760,26 @@ namespace InazumaTool.BasicTools
                 MPlug plug = matNode.findPlug(ConstantValue.plugName_matColorOutput);
                 MPlugArray plugArr = new MPlugArray();
                 plug.destinations(plugArr);
-                MFnDependencyNode sgNode = new MFnDependencyNode(plugArr[0].node);
-                Debug.Log(sgNode.name);
+                if (plugArr.Count > 0)
+                {
+                    MFnDependencyNode sgNode = new MFnDependencyNode(plugArr[0].node);
+                    Debug.Log(sgNode.name);
 
-                
 
-                MPlug plug_dagSetMemebers = sgNode.findPlug(ConstantValue.plugName_dagSetMembers);
-                Debug.Log("numelements:" + plug_dagSetMemebers.numElements);
-                if (plug_dagSetMemebers.numElements == 0)
+
+                    MPlug plug_dagSetMemebers = sgNode.findPlug(ConstantValue.plugName_dagSetMembers);
+                    Debug.Log("numelements:" + plug_dagSetMemebers.numElements);
+                    if (plug_dagSetMemebers.numElements == 0)
+                    {
+                        deleteList.Add(matNode);
+                        deleteList.Add(sgNode);
+                    }
+                }
+                else
                 {
                     deleteList.Add(matNode);
-                    deleteList.Add(sgNode);
                 }
+                
             }
             BasicFunc.DeleteObjects(deleteList);
         }
@@ -840,6 +848,9 @@ namespace InazumaTool.BasicTools
                 {
                     matStr += matClusterList[i][j] + "_";
                 }
+                Debug.Log(matStr);
+                matStr.Replace(':', '_');
+                Debug.Log("after deal:" + matStr);
                 MeshTool.CombineMeshesUsingMEL(dagClusterList[i], matStr);
 
                 //matStr += ":";
