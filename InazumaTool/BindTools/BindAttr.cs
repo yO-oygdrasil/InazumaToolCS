@@ -152,6 +152,39 @@ namespace InazumaTool.BindTools
 
         }
 
+        static void ExecuteSeqForBlendShape(MFnBlendShapeDeformer bs, Action<int,string> dealMethod, float selectWeight = 1, float restWeight = 0)
+        {
+            MPlug weightPlug = bs.findPlug(ConstantValue.plugName_blendShapeWeight);
+            int count = (int)weightPlug.numElements;
+
+            MDGModifier dGModifier = new MDGModifier();
+            for (int i = 0; i < count; i++)
+            {
+                //Debug.Log("process:" + i);
+                MPlug singleWeightPlug = weightPlug.elementByLogicalIndex((uint)i);
+                string weightName = singleWeightPlug.name.Split('.').Last();
+                singleWeightPlug.setFloat(selectWeight);
+                dealMethod?.Invoke(i,weightName);
+                singleWeightPlug.setFloat(restWeight);
+            }
+            dGModifier.doIt();
+        }
+
+
+        static void BlendShapeShout(MFnBlendShapeDeformer bs, MDagPath deformTarget, float xMove = 0.5f)
+        {
+            ExecuteSeqForBlendShape(bs,(morphIndex,weightName)=>
+            {
+                var newDag = BasicFunc.Duplicate(deformTarget, deformTarget.partialPathName + "_emo_" + weightName);
+                var newTrans = new MFnTransform(newDag);
+                if (xMove > 0)
+                {
+                    newTrans.setTranslation(newTrans.getTranslation(MSpace.Space.kWorld) + new MVector(xMove * (morphIndex + 1), 0, 0), MSpace.Space.kWorld);
+                }
+
+            });
+        }
+
         
         const string cmdStr = "BindAttr";
         public static List<CommandData> GetCommandDatas()
@@ -161,6 +194,12 @@ namespace InazumaTool.BindTools
             {
                 MFnBlendShapeDeformer bs = GetBlendShape();
                 BindBlendShapeCtl(bs);
+            }));
+            cmdList.Add(new CommandData("绑定属性", cmdStr, "blendShapeShout", "混合变形序列生成（混合变形 目标物体）", () =>
+            {
+                MFnBlendShapeDeformer bs = GetBlendShape();
+                BlendShapeShout(bs, BasicFunc.GetSelectedDagPath(1));
+
             }));
             return cmdList;
         }

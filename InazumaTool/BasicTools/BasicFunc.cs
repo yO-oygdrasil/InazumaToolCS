@@ -597,12 +597,18 @@ namespace InazumaTool.BasicTools
             return resultGrpDagPath;
         }
 
-        public static MDagPath Duplicate(MDagPath targetDag)
+        public static MDagPath Duplicate(MDagPath targetDag, string specificName = null)
         {
             string resultName = MGlobal.executePythonCommandStringResult(string.Format("cmds.duplicate(\"{0}\",rr = 1)", targetDag.fullPathName), true);
             Debug.Log("duplicate result:" + resultName);
             resultName = SubUShell(resultName);
-            return GetDagPathByName(resultName);
+            MDagPath result = GetDagPathByName(resultName);
+            if (specificName != null)
+            {
+                Rename(result, specificName);
+            }
+
+            return result;
         }
 
         public static MSelectionList DuplicateDags(MSelectionList list)

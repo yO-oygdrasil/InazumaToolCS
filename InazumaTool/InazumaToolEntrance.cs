@@ -242,7 +242,7 @@ namespace InazumaTool
         {
             string cmdStr = "menuItem -l \"" + label + "\" -p \"" + parentMenuName + "\" -c \"" + command + " " + paramStr + "\"";
             //Debug.Log(cmdStr);
-            MGlobal.executeCommand(cmdStr, true);
+            MGlobal.executeCommand(cmdStr);
             //MGlobal.executeCommand(cmdStr);
         }
 
