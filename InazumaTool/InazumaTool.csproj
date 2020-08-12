@@ -51,6 +51,7 @@
     <Reference Include="openmayacs, Version=18.0.0.5870, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\mayaDlls\openmayacs.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
