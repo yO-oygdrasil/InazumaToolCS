@@ -9,7 +9,7 @@ using Autodesk.Maya.OpenMaya;
 using InazumaTool.BasicTools;
 using InazumaTool.BindTools;
 using InazumaTool.TopoTools;
-
+using System.Windows.Media;
 
 [assembly: ExtensionPlugin(typeof(InazumaTool.InazumaToolEntrance), "Any")]
 [assembly: MPxCommandClass(typeof(InazumaTool.MPCMap), "InazumaCommand")]
@@ -127,6 +127,7 @@ namespace InazumaTool
         {
             totalMenuName = GetMayaWindowName();
             cds.AddRange(BasicFunc.GetCommandDatas());
+            cds.AddRange(TransformTool.GetCommandDatas());
             cds.AddRange(BindHumanBody.GetCommandDatas());
             cds.AddRange(DynamicConverter.GetCommandDatas());
             cds.AddRange(JointProcess.GetCommandDatas());

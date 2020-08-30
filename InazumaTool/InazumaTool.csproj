@@ -75,6 +75,7 @@
     <Compile Include="BasicTools\RenameTool.cs" />
     <Compile Include="BasicTools\Selector.cs" />
     <Compile Include="BasicTools\StringCompare.cs" />
+    <Compile Include="BasicTools\TransformTool.cs" />
     <Compile Include="BasicTools\UI\JointProcessWindow.xaml.cs">
       <DependentUpon>JointProcessWindow.xaml</DependentUpon>
     </Compile>

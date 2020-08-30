@@ -137,6 +137,12 @@ namespace InazumaTool.BasicTools
             MSelectionList selected = new MSelectionList();
             MGlobal.getActiveSelectionList(selected);
             MObject mObject = new MObject();
+
+            while (index < 0)
+            {
+                index = (int)(selected.length + index);
+            }
+
             if (index < selected.length)
             {
                 selected.getDependNode((uint)index, mObject);
@@ -180,6 +186,20 @@ namespace InazumaTool.BasicTools
                 selected.getDagPath((uint)index, dagPath);
             }
             return dagPath;
+        }
+
+        public static List<MFnTransform> GetSelectedTransforms()
+        {
+            MSelectionList selected = MGlobal.activeSelectionList;
+            
+            List<MFnTransform> result = new List<MFnTransform>();
+            for (uint i = 0; i < selected.length; i++)
+            {
+                MDagPath dag = new MDagPath();
+                selected.getDagPath(i, dag);
+                result.Add(new MFnTransform(dag));
+            }
+            return result;
         }
 
         public static MSelectionList GetSelectedList(MFn.Type type = MFn.Type.kInvalid)

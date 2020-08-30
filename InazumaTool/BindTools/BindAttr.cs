@@ -83,13 +83,26 @@ namespace InazumaTool.BindTools
             return true;
         }
 
-        public static MFnBlendShapeDeformer GetBlendShape(MObject targetObject = null)
+        public static MFnBlendShapeDeformer GetBlendShape(MObject targetObject = null, int selectIndex = 0)
         {
             if (targetObject == null)
             {
-                targetObject = BasicFunc.GetSelectedObject(0);
+                targetObject = BasicFunc.GetSelectedObject(selectIndex);
             }
-            MDagPath dag_target = MDagPath.getAPathTo(targetObject);
+            if (!targetObject.hasFn(MFn.Type.kTransform))
+            {
+                if (targetObject.hasFn(MFn.Type.kBlendShape))
+                {
+                    return new MFnBlendShapeDeformer(targetObject);
+                }
+            }
+            else
+            {
+                MDagPath dag_target = MDagPath.getAPathTo(targetObject);
+                dag_target.extendToShape();
+                targetObject = dag_target.node;
+            }
+
             MFnDependencyNode node_target = new MFnDependencyNode(targetObject);
             MPlug plug = node_target.findPlug("inMesh");
             Debug.Log("node_target:" + node_target.name+" plug:"+ plug.name);
@@ -152,7 +165,7 @@ namespace InazumaTool.BindTools
 
         }
 
-        static void ExecuteSeqForBlendShape(MFnBlendShapeDeformer bs, Action<int,string> dealMethod, float selectWeight = 1, float restWeight = 0)
+        static void ExecuteForBlendShapeWeights(MFnBlendShapeDeformer bs, Action<int,string> dealMethod, float selectWeight = 1, float restWeight = 0)
         {
             MPlug weightPlug = bs.findPlug(ConstantValue.plugName_blendShapeWeight);
             int count = (int)weightPlug.numElements;
@@ -170,10 +183,32 @@ namespace InazumaTool.BindTools
             dGModifier.doIt();
         }
 
+        //static void ExecuteForBlendShapeSourceDag(MFnBlendShapeDeformer bs, Action<int,string, MDagPath> dealMethod)
+        //{
+        //    MPlug weightPlug = bs.findPlug(ConstantValue.plugName_blendShapeWeight);
+        //    int count = (int)weightPlug.numElements;
 
-        static void BlendShapeShout(MFnBlendShapeDeformer bs, MDagPath deformTarget, float xMove = 0.5f)
+
+        //    for (int i = 0; i < count; i++)
+        //    {
+        //        //Debug.Log("process:" + i);
+        //        MPlug singleWeightPlug = weightPlug.elementByLogicalIndex((uint)i);
+        //        string weightName = singleWeightPlug.name.Split('.').Last();
+
+
+
+
+
+        //        dealMethod?.Invoke(i, weightName);
+
+
+        //    }
+        //}
+
+
+        static void BlendShapeShout(MFnBlendShapeDeformer bs, MDagPath deformTarget, float xMove = 0)
         {
-            ExecuteSeqForBlendShape(bs,(morphIndex,weightName)=>
+            ExecuteForBlendShapeWeights(bs,(morphIndex,weightName)=>
             {
                 var newDag = BasicFunc.Duplicate(deformTarget, deformTarget.partialPathName + "_emo_" + weightName);
                 var newTrans = new MFnTransform(newDag);
@@ -183,6 +218,12 @@ namespace InazumaTool.BindTools
                 }
 
             });
+        }
+
+        static void RenameSourceDagName(MFnBlendShapeDeformer bs)
+        {
+
+
         }
 
         
@@ -198,9 +239,22 @@ namespace InazumaTool.BindTools
             cmdList.Add(new CommandData("绑定属性", cmdStr, "blendShapeShout", "混合变形序列生成（混合变形 目标物体）", () =>
             {
                 MFnBlendShapeDeformer bs = GetBlendShape();
+                
+                //MDagPath distDag = BasicFunc.GetSelectedDagPath(2);
+
                 BlendShapeShout(bs, BasicFunc.GetSelectedDagPath(1));
 
             }));
+            cmdList.Add(new CommandData("绑定属性", cmdStr, "blendShapeRenameSource", "混合变形重命名（根据节点连接）", () =>
+            {
+                MFnBlendShapeDeformer bs = GetBlendShape();
+
+                //MDagPath distDag = BasicFunc.GetSelectedDagPath(2);
+
+                BlendShapeShout(bs, BasicFunc.GetSelectedDagPath(1));
+
+            }));
+
             return cmdList;
         }
 

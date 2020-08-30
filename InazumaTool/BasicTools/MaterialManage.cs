@@ -884,6 +884,29 @@ namespace InazumaTool.BasicTools
         }
 
 
+        static void IterateAndRenameTexturePath(MSelectionList list, RenameTool.StrModifyDelegate renameMethod)
+        {
+            if (list == null)
+            {
+                Debug.Log("list null");
+                return;
+            }
+            for (int i = 0; i < list.length; i++)
+            {
+                MObject mo = new MObject();
+                list.getDependNode((uint)i, mo);
+                MFnDependencyNode imageNode = new MFnDependencyNode(mo);
+                MPlug plug = imageNode.findPlug(ConstantValue.plugName_fileTexPath);
+                string originTexPath = plug.asString();
+                Debug.Log("filePath:" + originTexPath);
+                
+                plug.setString(renameMethod(originTexPath));
+
+            }
+        }
+
+
+
 
         #region RedShift
 
@@ -1012,7 +1035,7 @@ namespace InazumaTool.BasicTools
                 DeleteUnusedShadingNode(BasicFunc.GetSelectedList());
             }));
 
-            cmdList.Add(new CommandData("材质", "材质"));
+            cmdList.Add(new CommandData("材质", "图片"));
             cmdList.Add(new CommandData("材质", cmdStr, "combineTextures", "合并相同路径图片", () =>
             {
                 CombineSameTextures(BasicFunc.GetSelectedList());
@@ -1024,6 +1047,10 @@ namespace InazumaTool.BasicTools
             cmdList.Add(new CommandData("材质", cmdStr, "removeUnused", "删除无用图片", () =>
             {
                 RemoveUnusedTextures(BasicFunc.GetSelectedList());
+            }));
+            cmdList.Add(new CommandData("材质", cmdStr, "repairShiftJisPath", "修复Shift-jis路径", () =>
+            {
+                IterateAndRenameTexturePath(BasicFunc.GetSelectedList(), RenameTool.GBK_to_ShiftJis);
             }));
 
             cmdList.Add(new CommandData("材质", "物体"));
@@ -1082,7 +1109,6 @@ namespace InazumaTool.BasicTools
                 Debug.Log("没做好编辑器所以就不调用了");
                 //ChangeTexturesPrefix(BasicFunc.GetSelectedList(), @"D:\testTextures");
             }));
-
 
             return cmdList;
         }

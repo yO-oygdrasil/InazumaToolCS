@@ -52,7 +52,18 @@ namespace InazumaTool.BasicTools
 
         }
 
+        public delegate string StrModifyDelegate(string originStr);
 
+        public static string GBK_to_ShiftJis(string originStr)
+        {
+            var gbk = Encoding.GetEncoding("gbk");
+            byte[] bytes = gbk.GetBytes(originStr);
+
+            var sj = Encoding.GetEncoding("shift-jis");
+            string result = sj.GetString(bytes);
+
+            return result;
+        }
 
         const string cmdStr = "RenameTool";
         public static List<CommandData> GetCommandDatas()

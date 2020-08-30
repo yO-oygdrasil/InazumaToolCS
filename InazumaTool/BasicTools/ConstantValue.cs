@@ -48,6 +48,8 @@ namespace InazumaTool.BasicTools
 
 
         public const string plugName_blendShapeWeight = "weight";
+        public const string plugName_blendShapeInputTarget = "inputTarget";
+        public const string plugName_blendShapeInputTargetGroup = "inputTargetGroup";
 
         public const string
             plugName_tx = "translateX",
